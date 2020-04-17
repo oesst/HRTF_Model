@@ -86,7 +86,7 @@ def plot_localization_result(x_test, y_test, ax, sound_files, scale_values=False
     y_test = np.reshape(y_test, (y_test.shape[0] * y_test.shape[1]))
 
     ax.plot(np.arange(np.ceil(np.min(x_test)), np.ceil(np.max(x_test))), np.arange(
-        np.ceil(np.min(x_test)), np.ceil(np.max(x_test))), color='grey', linestyle='--', alpha=0.3)
+        np.ceil(np.min(x_test)), np.ceil(np.max(x_test))), color='grey', linestyle='--', alpha=0.3,label='_nolegend_')
 
     # error_mse = 0
     for i in range(0, n_sound_types):
@@ -137,7 +137,9 @@ def set_layout(drawing_size=25, regular_seaborn=False, box_frame=True):
 
         # plt.style.use('seaborn')
         # sns.set_style("ticks")
-
+    import seaborn as sns
+    # 21 defines the number of sound types
+    sns.set_palette(sns.color_palette("husl", 21))
     mpl.rcParams['grid.linestyle'] = ':'
 
     mpl.rcParams['font.size'] = drawing_size
@@ -277,12 +279,13 @@ def set_axis_all_elevations(ax, label=False):
     t[5] = -45 + 91 * 3
     ax.set_xticklabels(t[1:])
 
-    # t = np.zeros(6)
-    # t[0] = -55
-    # t[1] = -45
-    # t[2] = 0
-    # t[3] = 45
-    # t[4] = 90
-    # t[5] = 100
+    t = np.zeros(6)
+    t[0] = -55
+    t[1] = -45
+    t[2] = -45 + 91 * 0
+    t[3] = -45 + 91 * 1
+    t[4] = -45 + 91 * 2
+    t[5] = -45 + 91 * 3
+    ax.set_yticklabels(t[1:])
 
     return ax

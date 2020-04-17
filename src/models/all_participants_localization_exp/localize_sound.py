@@ -76,7 +76,7 @@ def main(model_name='all_participants', exp_name='localization_default'):
 
     ear = 'ipsi'
 
-    elevations = np.arange(0, 25, 1)
+    elevations = np.arange(0, 50, 1)
     ########################################################################
     ########################################################################
 
@@ -95,14 +95,14 @@ def main(model_name='all_participants', exp_name='localization_default'):
                 y_bin, x_bin_mean, y_bin_mean] = pickle.load(f)
     else:
 
-        x_mono = np.zeros((len(participant_numbers), len(SOUND_FILES) - 1, 25, 2))
-        y_mono = np.zeros((len(participant_numbers), len(SOUND_FILES) - 1, 25))
-        x_mono_mean = np.zeros((len(participant_numbers), len(SOUND_FILES) - 1, 25, 2))
-        y_mono_mean = np.zeros((len(participant_numbers), len(SOUND_FILES) - 1, 25))
-        x_bin = np.zeros((len(participant_numbers), len(SOUND_FILES) - 1, 25, 2))
-        y_bin = np.zeros((len(participant_numbers), len(SOUND_FILES) - 1, 25))
-        x_bin_mean = np.zeros((len(participant_numbers), len(SOUND_FILES) - 1, 25, 2))
-        y_bin_mean = np.zeros((len(participant_numbers), len(SOUND_FILES) - 1, 25))
+        x_mono = np.zeros((len(participant_numbers), len(SOUND_FILES), len(elevations), 2))
+        y_mono = np.zeros((len(participant_numbers), len(SOUND_FILES), len(elevations)))
+        x_mono_mean = np.zeros((len(participant_numbers), len(SOUND_FILES), len(elevations), 2))
+        y_mono_mean = np.zeros((len(participant_numbers), len(SOUND_FILES), len(elevations)))
+        x_bin = np.zeros((len(participant_numbers), len(SOUND_FILES), len(elevations), 2))
+        y_bin = np.zeros((len(participant_numbers), len(SOUND_FILES), len(elevations)))
+        x_bin_mean = np.zeros((len(participant_numbers), len(SOUND_FILES), len(elevations), 2))
+        y_bin_mean = np.zeros((len(participant_numbers), len(SOUND_FILES), len(elevations)))
         for i_par, par in enumerate(participant_numbers):
 
             # create or read the data

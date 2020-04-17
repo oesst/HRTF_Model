@@ -16,20 +16,18 @@ SOUND_FILES = ROOT / 'data/raw/sound_samples/'
 SOUND_FILES = list(SOUND_FILES.glob('**/*.wav'))
 
 
+def plot_corrcoeff(map, ax):
 
-def plot_corrcoeff(map,ax):
-
-    c = ax.pcolormesh(map,vmin=-1.0,vmax=1.0)
+    c = ax.pcolormesh(map, vmin=-1.0, vmax=1.0)
     cbar = plt.colorbar(c)
     cbar.ax.get_yaxis().labelpad = 15
     cbar.set_label('Correlation Coefficient',  labelpad=10, rotation=270)
     ax.xaxis.set_major_locator(ticker.MaxNLocator(4))
-    ax.set_xticklabels(['', 'HRTF_C','HRTF_I','Learned MAP',''])
+    ax.set_xticklabels(['', 'HRTF_C', 'HRTF_I', 'Learned MAP', ''])
     ax.yaxis.set_major_locator(ticker.MaxNLocator(4))
-    ax.set_yticklabels(['', 'HRTF_C','HRTF_I','Learned MAP',''])
+    ax.set_yticklabels(['', 'HRTF_C', 'HRTF_I', 'Learned MAP', ''])
 
     return ax
-
 
 
 # Define whether figures should be saved
@@ -74,41 +72,39 @@ def main(save_figs=False, save_type='svg', model_name='hrtf_comparison', exp_nam
         # try to load the model files
         with open(exp_file.as_posix(), 'rb') as f:
             logger.info('Reading model data from file')
-            [hrtfs_i,hrtfs_c,learned_map_mono,learned_map_mono_mean,learned_map_bin,learned_map_bin_mean] = pickle.load(f)
+            [hrtfs_i, hrtfs_c, learned_map_mono, learned_map_mono_mean, learned_map_bin, learned_map_bin_mean] = pickle.load(f)
 
-        fig = plt.figure(figsize=(20,10))
-        ax = fig.add_subplot(2,2,1)
+        fig = plt.figure(figsize=(20, 10))
+        ax = fig.add_subplot(2, 2, 1)
         ax.set_title('Mono Map')
         tmp = np.concatenate((hrtfs_c, hrtfs_i, learned_map_mono))
         tmp = np.corrcoef(tmp)
-        plot_corrcoeff(tmp,ax)
+        plot_corrcoeff(tmp, ax)
 
-        ax = fig.add_subplot(2,2,2)
+        ax = fig.add_subplot(2, 2, 2)
         ax.set_title('Mono-Mean Map')
         tmp = np.concatenate((hrtfs_c, hrtfs_i, learned_map_mono_mean))
         tmp = np.corrcoef(tmp)
-        plot_corrcoeff(tmp,ax)
+        plot_corrcoeff(tmp, ax)
 
-
-        ax = fig.add_subplot(2,2,3)
+        ax = fig.add_subplot(2, 2, 3)
         ax.set_title('Bin Map')
         tmp = np.concatenate((hrtfs_c, hrtfs_i, learned_map_bin))
         tmp = np.corrcoef(tmp)
-        plot_corrcoeff(tmp,ax)
+        plot_corrcoeff(tmp, ax)
 
-
-        ax = fig.add_subplot(2,2,4)
+        ax = fig.add_subplot(2, 2, 4)
         ax.set_title('Bin-Mean Map')
         tmp = np.concatenate((hrtfs_c, hrtfs_i, learned_map_bin_mean))
         tmp = np.corrcoef(tmp)
-        plot_corrcoeff(tmp,ax)
+        plot_corrcoeff(tmp, ax)
 
         if save_figs:
             fig_save_path = ROOT / 'reports' / 'figures' / model_name
-            logger.info('Saving Figures to : '+fig_save_path.as_posix())
+            logger.info('Saving Figures to : ' + fig_save_path.as_posix())
             if not fig_save_path.exists():
                 fig_save_path.mkdir(parents=True, exist_ok=True)
-            plt.savefig((fig_save_path / (exp_name+'_localization.' + save_type)).as_posix(), dpi=300)
+            plt.savefig((fig_save_path / (exp_name + '_localization.' + save_type)).as_posix(), dpi=300)
 
         plt.show()
     else:
