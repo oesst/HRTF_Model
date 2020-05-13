@@ -41,7 +41,7 @@ def main(save_figs=False, save_type='svg', model_name='hrtf_comparison', exp_nam
 
     ### Set Parameters of Input Files ###
     azimuth = 12
-    snr = 0.0
+    snr = 0
     freq_bands = 128
     participant_number = 9
 

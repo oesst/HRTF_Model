@@ -18,7 +18,7 @@ SOUND_FILES = ROOT / 'data/raw/sound_samples/'
 # create a list of the sound files
 SOUND_FILES = list(SOUND_FILES.glob('**/*.wav'))
 
-def create_data(freq_bands=24, participant_number=19, snr=0.2, normalize=False, azimuth=13, time_window=0.1):
+def create_data(freq_bands=24, participant_number=19, snr=0.2, normalize=False, azimuth=12, time_window=0.1):
 
     str_r = 'data/processed/binaural_right_0_gammatone_' + str(time_window) + '_window_{0:03d}'.format(participant_number) + '_cipic_' + str(
         int(snr * 100)) + '_srn_' + str(freq_bands) + '_channels_' + str((azimuth - 12) * 10) + '_azi_' + str(normalize) + '_norm.npy'

@@ -91,7 +91,7 @@ def centre_freqs(fs, num_freqs, cutoff):
        return np.array([50, 150, 250, 350, 455, 570, 700, 845, 1000, 1175, 1375, 1600, 1860, 2160, 2525, 2925, 3425, 4050, 4850, 5850, 7050, 8600, 10750, 13750])
     else:
        # default cfs
-       return erb_space(cutoff, fs / 2, num_freqs)
+       return erb_space(num=num_freqs)
 
 
 def make_erb_filters(fs, centre_freqs, width=1.0):

@@ -88,7 +88,7 @@ def main(model_name='hrtf_comparison', exp_name='single_participant'):
     elevations = np.arange(0,25,1)
     ########################################################################
     ########################################################################
-    
+
 
     # create unique experiment name
     exp_name_str = exp_name + '_' + normalization_type + str(sigma_smoothing) + str(sigma_gauss_norm) + str(mean_subtracted_map) + '_' + str(time_window) + '_window_{0:03d}'.format(participant_number) + '_cipic_' + str(
@@ -167,16 +167,16 @@ def main(model_name='hrtf_comparison', exp_name='single_participant'):
             logger.info('Creating model file')
             pickle.dump([hrtfs_i,hrtfs_c,learned_map_mono,learned_map_mono_mean,learned_map_bin,learned_map_bin_mean], f)
 
-    # fig = plt.figure(figsize=(20, 5))
-    # # plt.suptitle('Single Participant')
-    # # Monoaural Data (Ipsilateral), No Mean Subtracted
-    # ax = fig.add_subplot(1, 2, 1)
-    # a = ax.pcolormesh(np.squeeze(correlations[:, :, 0]))
-    # plt.colorbar(a)
-    # ax = fig.add_subplot(1, 2, 2)
-    # a = ax.pcolormesh(np.squeeze(correlations[:, :, 1]))
-    # plt.colorbar(a)
-    # plt.show()
+    fig = plt.figure(figsize=(20, 5))
+    # plt.suptitle('Single Participant')
+    # Monoaural Data (Ipsilateral), No Mean Subtracted
+    ax = fig.add_subplot(1, 2, 1)
+    a = ax.pcolormesh(np.squeeze(learned_map_bin))
+    plt.colorbar(a)
+    ax = fig.add_subplot(1, 2, 2)
+    a = ax.pcolormesh(np.squeeze(learned_map_bin_mean))
+    plt.colorbar(a)
+    plt.show()
 
 
 if __name__ == '__main__':
