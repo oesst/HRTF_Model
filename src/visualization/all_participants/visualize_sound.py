@@ -19,7 +19,7 @@ SOUND_FILES = list(SOUND_FILES.glob('**/*.wav'))
 @click.command()
 @click.option('--save_figs', default=False, help='Save the figures.')
 @click.option('--save_type', default='svg', help='Define the format figures are saved.')
-def main(save_figs=False, save_type='svg', model_name='all_participants', exp_name='localization_sounds'):
+def main(save_figs=False, save_type='svg', model_name='all_participants', exp_name='localization_default'):
     """ This script plots the localization quality for all participants over sounds
     """
     logger = logging.getLogger(__name__)
@@ -147,7 +147,7 @@ def main(save_figs=False, save_type='svg', model_name='all_participants', exp_na
             fig_save_path = ROOT / 'reports' / 'figures' / model_name
             if not fig_save_path.exists():
                 fig_save_path.mkdir(parents=True, exist_ok=True)
-            plt.savefig((fig_save_path / (exp_name + '_localization.' + save_type)).as_posix(),
+            plt.savefig((fig_save_path / (exp_name + '_localization_sounds.' + save_type)).as_posix(),
                         dpi=300, bbox_extra_artists=(lgd,), bbox_inches='tight')
 
         plt.show()

@@ -125,7 +125,7 @@ def main(save_figs=False, save_type='svg', model_name='all_participants', exp_na
             fig_save_path = ROOT / 'reports' / 'figures' / model_name
             if not fig_save_path.exists():
                 fig_save_path.mkdir(parents=True, exist_ok=True)
-            plt.savefig((fig_save_path / (exp_name + '_localization.' + save_type)).as_posix(), dpi=300)
+            plt.savefig((fig_save_path / (exp_name + '_regression_values.' + save_type)).as_posix(), dpi=300)
 
         plt.show()
     else:

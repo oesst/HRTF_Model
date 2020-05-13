@@ -104,7 +104,7 @@ def main(save_figs=False, save_type='svg', model_name='hrtf_comparison', exp_nam
             logger.info('Saving Figures to : ' + fig_save_path.as_posix())
             if not fig_save_path.exists():
                 fig_save_path.mkdir(parents=True, exist_ok=True)
-            plt.savefig((fig_save_path / (exp_name + '_localization.' + save_type)).as_posix(), dpi=300)
+            plt.savefig((fig_save_path / (exp_name + '_hrtfs_xcorr.' + save_type)).as_posix(), dpi=300)
 
         plt.show()
     else:

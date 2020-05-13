@@ -46,12 +46,11 @@ def process_inputs(psd_all_i, psd_all_c, ear='ipsi', normalization_type='sum_1',
     return psd_mono, psd_mono_mean, psd_binaural, psd_binaural_mean
 
 
-def main(model_name='all_participants', exp_name='localization_default'):
-    """ This script takes the filtered data and tries to localize sounds with a learned map
-        for all participants.
+def main(model_name='elevation_spectra_maps', exp_name='unfiltered'):
+    """ TODO
     """
     logger = logging.getLogger(__name__)
-    logger.info('Localizing sounds for all participants')
+    logger.info('Creating maps for all participants and sounds')
 
     ########################################################################
     ######################## Set parameters ################################
@@ -66,22 +65,12 @@ def main(model_name='all_participants', exp_name='localization_default'):
     normalize = False
     time_window = 0.1  # time window in sec
 
-    # filtering parameters
-    normalization_type = 'sum_1'
-    sigma_smoothing = 0
-    sigma_gauss_norm = 1
-
-    # use the mean subtracted map as the learned map
-    mean_subtracted_map = True
-
-    ear = 'ipsi'
-
-    elevations = np.arange(0, 25, 1)
+    elevations = np.arange(0, 50, 1)
     ########################################################################
     ########################################################################
 
     # create unique experiment name
-    exp_name_str = exp_name + '_' + normalization_type + str(sigma_smoothing) + str(sigma_gauss_norm) + str(mean_subtracted_map) + '_' + str(time_window) + '_window_' + str(
+    exp_name_str = exp_name + '_' + str(time_window) + '_window_' + str(
         int(snr * 100)) + '_srn_' + str(freq_bands) + '_channels_' + str((azimuth - 12) * 10) + '_azi_' + str(normalize) + '_norm' + str(len(elevations)) + '_elevs.npy'
 
     exp_path = ROOT / 'models' / model_name
@@ -91,18 +80,12 @@ def main(model_name='all_participants', exp_name='localization_default'):
         # try to load the model files
         with exp_file.open('rb') as f:
             logger.info('Reading model data from file')
-            [x_mono, y_mono, x_mono_mean, y_mono_mean, x_bin,
-                y_bin, x_bin_mean, y_bin_mean] = pickle.load(f)
+            [ipsi_maps,contra_maps] = pickle.load(f)
     else:
 
-        x_mono = np.zeros((len(participant_numbers), len(SOUND_FILES), len(elevations), 2))
-        y_mono = np.zeros((len(participant_numbers), len(SOUND_FILES), len(elevations)))
-        x_mono_mean = np.zeros((len(participant_numbers), len(SOUND_FILES), len(elevations), 2))
-        y_mono_mean = np.zeros((len(participant_numbers), len(SOUND_FILES), len(elevations)))
-        x_bin = np.zeros((len(participant_numbers), len(SOUND_FILES), len(elevations), 2))
-        y_bin = np.zeros((len(participant_numbers), len(SOUND_FILES), len(elevations)))
-        x_bin_mean = np.zeros((len(participant_numbers), len(SOUND_FILES), len(elevations), 2))
-        y_bin_mean = np.zeros((len(participant_numbers), len(SOUND_FILES), len(elevations)))
+        ipsi_maps = np.zeros((len(participant_numbers), len(SOUND_FILES), len(elevations), freq_bands))
+        contra_maps = np.zeros((len(participant_numbers), len(SOUND_FILES), len(elevations), freq_bands))
+
         for i_par, par in enumerate(participant_numbers):
 
             # create or read the data
@@ -113,31 +96,14 @@ def main(model_name='all_participants', exp_name='localization_default'):
             psd_all_c = psd_all_c[:, elevations, :]
             psd_all_i = psd_all_i[:, elevations, :]
 
-            # filter data and integrate it
-            psd_mono, psd_mono_mean, psd_binaural, psd_binaural_mean = process_inputs(
-                psd_all_i, psd_all_c, ear, normalization_type, sigma_smoothing, sigma_gauss_norm)
-
-            # create map from defined processed data
-            learned_map = hp.create_map(psd_binaural, mean_subtracted_map)
-
-            # localize the sounds and save the results
-            x_mono[i_par, :, :, :], y_mono[i_par, :] = hp.localize_sound(psd_mono, learned_map)
-
-            # localize the sounds and save the results
-            x_mono_mean[i_par, :, :, :], y_mono_mean[i_par, :, :] = hp.localize_sound(psd_mono_mean, learned_map)
-
-            # localize the sounds and save the results
-            x_bin[i_par, :, :, :], y_bin[i_par, :, :] = hp.localize_sound(psd_binaural, learned_map)
-
-            # localize the sounds and save the results
-            x_bin_mean[i_par, :, :, :], y_bin_mean[i_par, :, :] = hp.localize_sound(psd_binaural_mean, learned_map)
+            ipsi_maps[i_par, :, :, :] = psd_all_i
+            contra_maps[i_par, :, :, :] = psd_all_c
 
         # create Path
         exp_path.mkdir(parents=True, exist_ok=True)
         with exp_file.open('wb') as f:
             logger.info('Creating model file')
-            pickle.dump([x_mono, y_mono, x_mono_mean, y_mono_mean,
-                         x_bin, y_bin, x_bin_mean, y_bin_mean], f)
+            pickle.dump([ipsi_maps,contra_maps], f)
 
 
 if __name__ == '__main__':
