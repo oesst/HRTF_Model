@@ -55,14 +55,12 @@ def main(model_name='elevation_spectra_maps', exp_name='unfiltered'):
     ########################################################################
     ######################## Set parameters ################################
     ########################################################################
-    azimuth = 13
+    azimuth = 12
     snr = 0.2
     freq_bands = 128
 
     participant_numbers = np.array([1, 2, 3, 8, 9, 10, 11,
                                     12, 15, 17, 18, 19, 20, 21, 27, 28, 33, 40])
-
-    participant_numbers = np.array([9])
 
     normalize = False
     time_window = 0.1  # time window in sec

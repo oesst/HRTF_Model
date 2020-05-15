@@ -15,7 +15,7 @@ from scipy import signal as sgn
 
 DEFAULT_FILTER_NUM = 100
 DEFAULT_LOW_FREQ = 100
-DEFAULT_HIGH_FREQ = 18000
+DEFAULT_HIGH_FREQ = 20000
 
 
 def erb_point(low_freq, high_freq, fraction):

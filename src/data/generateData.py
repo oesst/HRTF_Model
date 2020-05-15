@@ -112,13 +112,16 @@ def main():
     time_window = 0.1  # time window for spectrogram in sec
 
     # Parameter to test
-    #snrs = np.arange(0, 1.1, 0.1)  # Signal to noise ratio
+    snrs = np.arange(0, 1.1, 0.1)  # Signal to noise ratio
     snrs = np.array([0.2])  # Signal to noise ratio
+    #snrs = np.array([0.2])  # Signal to noise ratio
     # freq_bandss = np.array([32, 64, 128]) # Frequency bands in resulting data
     freq_bandss = np.array([128]) # Frequency bands in resulting data
-    azimuths = np.arange(0, 25, 1)  # which azimuths to create
+    #azimuths = np.arange(0, 25, 1)  # which azimuths to create
+    azimuths = np.array([12])   # which azimuths to create
     participant_numbers = np.array([1, 2, 3, 8, 9, 10, 11,
                            12, 15, 17, 18, 19, 20, 21, 27, 28, 33, 40])
+    #participant_numbers = participant_numbers[::-1]
     ########################################################################
     ########################################################################
 

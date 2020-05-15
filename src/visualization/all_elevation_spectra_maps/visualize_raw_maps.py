@@ -9,36 +9,7 @@ import numpy as np
 import click
 
 
-class ERBFormatter(mpl.ticker.EngFormatter):
-    """
-    Axis formatter for gammatone filterbank analysis. This formatter calculates
-    the ERB spaced frequencies used for analysis, and renders them similarly to
-    the engineering axis formatter.
-    The scale is changed so that `[0, 1]` corresponds to ERB spaced frequencies
-    from ``high_freq`` to ``low_freq`` (note the reversal). It should be used
-    with ``imshow`` where the ``extent`` argument is ``[a, b, 1, 0]`` (again,
-    note the inversion).
-    """
 
-    def __init__(self, low_freq, high_freq, *args, **kwargs):
-        """
-        Creates a new :class ERBFormatter: for use with ``matplotlib`` plots.
-        Note that this class does not supply the ``units`` or ``places``
-        arguments; typically these would be ``'Hz'`` and ``0``.
-        :param low_freq: the low end of the gammatone filterbank frequency range
-        :param high_freq: the high end of the gammatone filterbank frequency
-          range
-        """
-        self.low_freq = high_freq
-        self.high_freq = low_freq
-        super().__init__(*args, **kwargs)
-
-    def _erb_axis_scale(self, fraction):
-        return filters.erb_point(self.low_freq, self.high_freq, fraction)
-
-    def __call__(self, val, pos=None):
-        newval = self._erb_axis_scale(val)
-        return super().__call__(newval, pos)
 
 
 hp.set_layout(15)
@@ -63,14 +34,13 @@ def main(save_figs=False, save_type='svg', model_name='elevation_spectra_maps', 
     ########################################################################
     ######################## Set parameters ################################
     ########################################################################
-    azimuth = 13
+    azimuth = 12
     snr = 0.2
     freq_bands = 128
 
     participant_numbers = np.array([1, 2, 3, 8, 9, 10, 11,
                                     12, 15, 17, 18, 19, 20, 21, 27, 28, 33, 40])
 
-    participant_numbers = np.array([9])
     normalize = False
     time_window = 0.1  # time window in sec
 
@@ -111,6 +81,9 @@ def main(save_figs=False, save_type='svg', model_name='elevation_spectra_maps', 
     fig_size = (7, 5)
     # fig_size = (20, 14)
 
+    formatter = hp.ERBFormatter(100, 18000, unit='', places=0)
+
+
     # check if model results exist already and load
     if exp_path.exists() and exp_file.is_file():
         # try to load the model files
@@ -133,15 +106,11 @@ def main(save_figs=False, save_type='svg', model_name='elevation_spectra_maps', 
                 # ax.imshow(np.squeeze(ipsi_maps[i_par, i_sound]),interpolation = 'bilinear')
                 data = np.squeeze(ipsi_maps[i_par, i_sound])
                 # ax.pcolormesh(np.squeeze(ipsi_maps[i_par, i_sound]),shading='gouraud',linewidth=0,rasterized=True)
-                ax.pcolormesh(np.linspace(0, 1, data.shape[1]), np.linspace(-45, 90, data.shape[0]),
+                c = ax.pcolormesh(np.linspace(0, 1, data.shape[1]), np.linspace(-45, 90, data.shape[0]),
                               data, shading='gouraud', linewidth=0, rasterized=True)
-
-                formatter = ERBFormatter(100, 18000, unit='', places=0)
+                plt.colorbar(c)
                 ax.xaxis.set_major_formatter(formatter)
                 ax.set_xlabel('Frequency [Hz]')
-                ax.set_ylabel('Elevation')
-
-                ax.set_xlabel('Frequency Bands')
                 ax.set_ylabel('Elevations [deg]')
                 # ax.set_yticklabels(t[1:-1])
 
@@ -162,9 +131,11 @@ def main(save_figs=False, save_type='svg', model_name='elevation_spectra_maps', 
                 # ax.pcolormesh(np.squeeze(contra_maps[i_par, i_sound]), shading='gouraud', linewidth=0, rasterized=True)
                 data = np.squeeze(contra_maps[i_par, i_sound])
                 # ax.pcolormesh(np.squeeze(ipsi_maps[i_par, i_sound]),shading='gouraud',linewidth=0,rasterized=True)
-                ax.pcolormesh(np.linspace(0, 1, data.shape[1]), np.linspace(-45, 90, data.shape[0]),
+                c = ax.pcolormesh(np.linspace(0, 1, data.shape[1]), np.linspace(-45, 90, data.shape[0]),
                               data, shading='gouraud', linewidth=0, rasterized=True)
-                ax.set_xlabel('Frequency Bands')
+                plt.colorbar(c)
+                ax.xaxis.set_major_formatter(formatter)
+                ax.set_xlabel('Frequency [Hz]')
                 ax.set_ylabel('Elevations [deg]')
                 # ax.set_yticklabels(t[1:-1])
 

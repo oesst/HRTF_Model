@@ -5,7 +5,7 @@ from pathlib import Path
 from src.data import generateHRTFs
 from src.data import generateData
 from src.features import helpers as hp
-# from src.visualization import helpers as hpVis
+from src.visualization import helpers as hpVis
 import numpy as np
 import pickle
 import matplotlib.pyplot as plt
@@ -85,10 +85,9 @@ def main(model_name='hrtf_comparison', exp_name='single_participant'):
 
     ear = 'ipsi'
 
-    elevations = np.arange(0,25,1)
+    elevations = np.arange(0, 25, 1)
     ########################################################################
     ########################################################################
-
 
     # create unique experiment name
     exp_name_str = exp_name + '_' + normalization_type + str(sigma_smoothing) + str(sigma_gauss_norm) + str(mean_subtracted_map) + '_' + str(time_window) + '_window_{0:03d}'.format(participant_number) + '_cipic_' + str(
@@ -101,13 +100,12 @@ def main(model_name='hrtf_comparison', exp_name='single_participant'):
         # try to load the model files
         with exp_file.open('rb') as f:
             logger.info('Reading model data from file')
-            [hrtfs_i,hrtfs_c,learned_map_mono,learned_map_mono_mean,learned_map_bin,learned_map_bin_mean] = pickle.load(f)
+            [hrtfs_i, hrtfs_c, learned_map_mono, learned_map_mono_mean, learned_map_bin, learned_map_bin_mean] = pickle.load(f)
     else:
 
         # create or read the data
         psd_all_c, psd_all_i = generateData.create_data(
             freq_bands, participant_number, snr, normalize, azimuth, time_window)
-
 
         # filter data and integrate it
         psd_mono, psd_mono_mean, psd_binaural, psd_binaural_mean = process_inputs(
@@ -143,7 +141,6 @@ def main(model_name='hrtf_comparison', exp_name='single_participant'):
         learned_map_bin -= learned_map_bin.mean()
         learned_map_bin_mean -= learned_map_bin_mean.mean()
 
-
         # ## calculate pearson index
         # correlations[i_par, 0, 0] = pearson2d(learned_map_mono, hrtfs_i)
         # correlations[i_par, 0, 1] = pearson2d(learned_map_mono, hrtfs_c)
@@ -161,22 +158,32 @@ def main(model_name='hrtf_comparison', exp_name='single_participant'):
         # correlations[i_par, 3, 1] = pearson2d(
         #     learned_map_bin_mean, hrtfs_c)
 
-        ## create Path
+        # create Path
         exp_path.mkdir(parents=True, exist_ok=True)
         with exp_file.open('wb') as f:
             logger.info('Creating model file')
-            pickle.dump([hrtfs_i,hrtfs_c,learned_map_mono,learned_map_mono_mean,learned_map_bin,learned_map_bin_mean], f)
+            pickle.dump([hrtfs_i, hrtfs_c, learned_map_mono, learned_map_mono_mean, learned_map_bin, learned_map_bin_mean], f)
 
-    fig = plt.figure(figsize=(20, 5))
-    # plt.suptitle('Single Participant')
-    # Monoaural Data (Ipsilateral), No Mean Subtracted
-    ax = fig.add_subplot(1, 2, 1)
-    a = ax.pcolormesh(np.squeeze(learned_map_bin))
-    plt.colorbar(a)
-    ax = fig.add_subplot(1, 2, 2)
-    a = ax.pcolormesh(np.squeeze(learned_map_bin_mean))
-    plt.colorbar(a)
-    plt.show()
+    # fig = plt.figure(figsize=(20, 5))
+    # # plt.suptitle('Single Participant')
+    # # Monoaural Data (Ipsilateral), No Mean Subtracted
+    # ax = fig.add_subplot(1, 2, 1)
+    # # a = ax.pcolormesh(np.squeeze(hrtfs_i[:,:-5]))
+    # data = hrtfs_i[:, :-5]
+    # a = ax.pcolormesh(np.linspace(0, 1, data.shape[1]), np.linspace(-45, 90, data.shape[0]),
+    #                   data, shading='gouraud', linewidth=0, rasterized=True)
+    # formatter = hpVis.ERBFormatter(100, 18000, unit='', places=0)
+    #
+    # ax.xaxis.set_major_formatter(formatter)
+    # plt.colorbar(a)
+    # ax = fig.add_subplot(1, 2, 2)
+    # data = 20*np.log10(hrtfs_c[:, :-5]+1)
+    # a = ax.pcolormesh(np.linspace(0, 1, data.shape[1]), np.linspace(-45, 90, data.shape[0]),
+    #                   data, shading='gouraud', linewidth=0, rasterized=True)
+    # formatter = hpVis.ERBFormatter(100, 18000, unit='', places=0)
+    # ax.xaxis.set_major_formatter(formatter)
+    # plt.colorbar(a)
+    # plt.show()
 
 
 if __name__ == '__main__':
