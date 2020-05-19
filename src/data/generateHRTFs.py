@@ -16,12 +16,14 @@ ROOT = Path(__file__).resolve().parents[2]
 # set the path to the sound files
 # create a list of the sound files
 
+# Define up to which frequency the data should be generated
+FREQ = 22
 
 def create_data(freq_bands=24, participant_number=19, snr=0.2, normalize=False, azimuth=13, time_window=0.1):
 
-    str_r = 'data/processed/binaural_right_0_gammatone_' + str(time_window) + '_window_{0:03d}'.format(participant_number) + '_cipic_' + str(
+    str_r = 'data/processed_'+str(FREQ)+'kHz/binaural_right_0_gammatone_' + str(time_window) + '_window_{0:03d}'.format(participant_number) + '_cipic_' + str(
         int(snr * 100)) + '_srn_' + str(freq_bands) + '_channels_' + str((azimuth - 12) * 10) + '_azi_' + str(normalize) + '_norm_flat_spectrum.npy'
-    str_l = 'data/processed/binaural_left_0_gammatone_' + str(time_window) + '_window_{0:03d}'.format(participant_number) + '_cipic_' + str(
+    str_l = 'data/processed_'+str(FREQ)+'kHz/binaural_left_0_gammatone_' + str(time_window) + '_window_{0:03d}'.format(participant_number) + '_cipic_' + str(
         int(snr * 100)) + '_srn_' + str(freq_bands) + '_channels_' + str((azimuth - 12) * 10) + '_azi_' + str(normalize) + '_norm_flat_spectrum.npy'
 
     path_data_r = ROOT / str_r

@@ -35,7 +35,7 @@ def main(save_figs=False, save_type='svg', model_name='different_learned_maps', 
     normalize = False
     time_window = 0.1  # time window in sec
 
-    elevations = np.arange(0, 25, 1)
+    elevations = np.arange(0, 50, 1)
 
     # filtering parameters
     normalization_type = 'sum_1'
@@ -46,7 +46,6 @@ def main(save_figs=False, save_type='svg', model_name='different_learned_maps', 
     mean_subtracted_map = True
 
     ear = 'ipsi'
-    elevations = np.arange(0, 25, 1)
     ########################################################################
     ########################################################################
 

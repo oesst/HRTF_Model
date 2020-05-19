@@ -47,7 +47,6 @@ def main(save_figs=False, save_type='svg', model_name='all_participants', exp_na
     mean_subtracted_map = True
 
     ear = 'ipsi'
-    elevations = np.arange(0, 25, 1)
     ########################################################################
     ########################################################################
 

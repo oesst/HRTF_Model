@@ -67,6 +67,8 @@ def main(model_name='single_participant', exp_name='single_participant_default')
     normalize = False
     time_window = 0.1  # time window in sec
 
+    elevations = np.arange(0, 25, 1)
+
     # filtering parameters
     normalization_type = 'sum_1'
     sigma_smoothing = 0
@@ -76,8 +78,6 @@ def main(model_name='single_participant', exp_name='single_participant_default')
     mean_subtracted_map = True
 
     ear = 'ipsi'
-
-    elevations = np.arange(0, 25, 1)
     ########################################################################
     ########################################################################
 

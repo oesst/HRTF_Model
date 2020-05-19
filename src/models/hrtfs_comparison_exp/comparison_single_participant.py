@@ -68,17 +68,17 @@ def main(model_name='hrtf_comparison', exp_name='single_participant'):
     ######################## Set parameters ################################
     ########################################################################
     azimuth = 12
-    snr = 0.0
+    snr = 0.2
     freq_bands = 128
 
-    participant_number = 9
+    participant_number = 2
     normalize = False
     time_window = 0.1  # time window in sec
 
     # filtering parameters
     normalization_type = 'sum_1'
-    sigma_smoothing = 0
-    sigma_gauss_norm = 1
+    sigma_smoothing = 1
+    sigma_gauss_norm = 0
 
     # use the mean subtracted map as the learned map
     mean_subtracted_map = True
@@ -164,26 +164,28 @@ def main(model_name='hrtf_comparison', exp_name='single_participant'):
             logger.info('Creating model file')
             pickle.dump([hrtfs_i, hrtfs_c, learned_map_mono, learned_map_mono_mean, learned_map_bin, learned_map_bin_mean], f)
 
-    # fig = plt.figure(figsize=(20, 5))
-    # # plt.suptitle('Single Participant')
-    # # Monoaural Data (Ipsilateral), No Mean Subtracted
-    # ax = fig.add_subplot(1, 2, 1)
-    # # a = ax.pcolormesh(np.squeeze(hrtfs_i[:,:-5]))
-    # data = hrtfs_i[:, :-5]
-    # a = ax.pcolormesh(np.linspace(0, 1, data.shape[1]), np.linspace(-45, 90, data.shape[0]),
-    #                   data, shading='gouraud', linewidth=0, rasterized=True)
-    # formatter = hpVis.ERBFormatter(100, 18000, unit='', places=0)
-    #
-    # ax.xaxis.set_major_formatter(formatter)
-    # plt.colorbar(a)
-    # ax = fig.add_subplot(1, 2, 2)
-    # data = 20*np.log10(hrtfs_c[:, :-5]+1)
-    # a = ax.pcolormesh(np.linspace(0, 1, data.shape[1]), np.linspace(-45, 90, data.shape[0]),
-    #                   data, shading='gouraud', linewidth=0, rasterized=True)
-    # formatter = hpVis.ERBFormatter(100, 18000, unit='', places=0)
-    # ax.xaxis.set_major_formatter(formatter)
-    # plt.colorbar(a)
-    # plt.show()
+    fig = plt.figure(figsize=(20, 5))
+    # plt.suptitle('Single Participant')
+    # Monoaural Data (Ipsilateral), No Mean Subtracted
+    ax = fig.add_subplot(1, 2, 1)
+    # a = ax.pcolormesh(np.squeeze(hrtfs_i[:,:-5]))
+    data = learned_map_bin[:, :]
+    data = np.squeeze(hrtfs_i[:,:])
+    a = ax.pcolormesh(np.linspace(0, 1, data.shape[1]), np.linspace(-45, 90, data.shape[0]),
+                      data, shading='gouraud', linewidth=0, rasterized=True)
+    formatter = hpVis.ERBFormatter(100, 20000, unit='', places=0)
+
+    ax.xaxis.set_major_formatter(formatter)
+    plt.colorbar(a)
+    ax = fig.add_subplot(1, 2, 2)
+    data = learned_map_bin_mean[:, :]
+    data = np.squeeze(hrtfs_c[:,:])
+    a = ax.pcolormesh(np.linspace(0, 1, data.shape[1]), np.linspace(-45, 90, data.shape[0]),
+                      data, shading='gouraud', linewidth=0, rasterized=True)
+    formatter = hpVis.ERBFormatter(100, 20000, unit='', places=0)
+    ax.xaxis.set_major_formatter(formatter)
+    plt.colorbar(a)
+    plt.show()
 
 
 if __name__ == '__main__':

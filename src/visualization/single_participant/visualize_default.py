@@ -45,9 +45,6 @@ def main(save_figs=False, save_type='svg',model_name='single_participant', exp_n
 
     # use the mean subtracted map as the learned map
     mean_subtracted_map = True
-
-    ear = 'ipsi'
-    elevations = np.arange(0, 25, 1)
     ########################################################################
     ########################################################################
 
@@ -81,7 +78,7 @@ def main(save_figs=False, save_type='svg',model_name='single_participant', exp_n
         # Monoaural Data (Ipsilateral), No Mean Subtracted
         ax = fig.add_subplot(1, 4, 1)
         hp.plot_localization_result(
-            x_mono, y_mono, ax, SOUND_FILES, scale_values=True, linear_reg=True)
+            x_mono, y_mono, ax, SOUND_FILES, scale_values=True, linear_reg=True,disp_values=True)
         ax.set_title('Monoaural')
         hp.set_axis(ax)
         ax.set_ylabel('Estimated Elevation [deg]')
@@ -90,7 +87,7 @@ def main(save_figs=False, save_type='svg',model_name='single_participant', exp_n
         # Monoaural Data (Ipsilateral), Mean Subtracted
         ax = fig.add_subplot(1, 4, 2)
         hp.plot_localization_result(
-            x_mono_mean, y_mono_mean, ax, SOUND_FILES, scale_values=True, linear_reg=True)
+            x_mono_mean, y_mono_mean, ax, SOUND_FILES, scale_values=True, linear_reg=True,disp_values=True)
         ax.set_title('Mono - Mean')
         hp.set_axis(ax)
         ax.set_xlabel('True Elevation [deg]')
@@ -98,7 +95,7 @@ def main(save_figs=False, save_type='svg',model_name='single_participant', exp_n
         # Binaural Data (Ipsilateral), No Mean Subtracted
         ax = fig.add_subplot(1, 4, 3)
         hp.plot_localization_result(
-            x_bin, y_bin, ax, SOUND_FILES, scale_values=True, linear_reg=True)
+            x_bin, y_bin, ax, SOUND_FILES, scale_values=True, linear_reg=True,disp_values=True)
         ax.set_title('Binaural')
         hp.set_axis(ax)
         ax.set_xlabel('True Elevation [deg]')
@@ -106,7 +103,7 @@ def main(save_figs=False, save_type='svg',model_name='single_participant', exp_n
         # Binaural Data (Ipsilateral), Mean Subtracted
         ax = fig.add_subplot(1, 4, 4)
         hp.plot_localization_result(
-            x_bin_mean, y_bin_mean, ax, SOUND_FILES, scale_values=True, linear_reg=True)
+            x_bin_mean, y_bin_mean, ax, SOUND_FILES, scale_values=True, linear_reg=True,disp_values=True)
         ax.set_title('Bin - Mean')
         hp.set_axis(ax)
         ax.set_xlabel('True Elevation [deg]')

@@ -76,7 +76,7 @@ def main(model_name='different_learned_maps', exp_name='localization_default'):
 
     ear = 'ipsi'
 
-    elevations = np.arange(0, 25, 1)
+    elevations = np.arange(0, 50, 1)
     ########################################################################
     ########################################################################
 

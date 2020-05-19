@@ -76,7 +76,7 @@ def main(model_name='all_participants', exp_name='localization_default'):
 
     ear = 'ipsi'
 
-    elevations = np.arange(0, 50, 1)
+    elevations = np.arange(0, 25, 1)
     ########################################################################
     ########################################################################
 
