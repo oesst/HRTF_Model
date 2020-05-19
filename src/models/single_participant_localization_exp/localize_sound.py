@@ -26,10 +26,10 @@ def process_inputs(psd_all_i, psd_all_c, ear='ipsi', normalization_type='sum_1',
     # integrate the signals and filter
     if ear.find('contra') >= 0:
         psd_binaural = hp.filter_dataset(
-            psd_mono_c / psd_mono_i, normalization_type=normalization_type, sigma_smoothing=0, sigma_gauss_norm=0)
+            psd_mono_c / (psd_mono_i + psd_mono_c), normalization_type=normalization_type, sigma_smoothing=0, sigma_gauss_norm=0)
     else:
         psd_binaural = hp.filter_dataset(
-            psd_mono_i / psd_mono_c, normalization_type=normalization_type, sigma_smoothing=0, sigma_gauss_norm=0)
+            psd_mono_i / (psd_mono_i + psd_mono_c), normalization_type=normalization_type, sigma_smoothing=0, sigma_gauss_norm=0)
 
     # calculate different input sounds. should be 4 of them (mono,mono-mean,bin, bin-mean)
     if ear.find('contra') >= 0:
@@ -59,10 +59,10 @@ def main(model_name='single_participant', exp_name='single_participant_default')
     ########################################################################
     ######################## Set parameters ################################
     ########################################################################
-    azimuth = 13
+    azimuth = 12
     snr = 0.2
     freq_bands = 128
-    participant_number = 9
+    participant_number = 3
 
     normalize = False
     time_window = 0.1  # time window in sec

@@ -28,10 +28,10 @@ def main(save_figs=False, save_type='svg',model_name='single_participant', exp_n
     ########################################################################
     ######################## Set parameters ################################
     ########################################################################
-    azimuth = 13
+    azimuth = 12
     snr = 0.2
     freq_bands = 128
-    participant_number = 9
+    participant_number = 3
 
     normalize = False
     time_window = 0.1  # time window in sec

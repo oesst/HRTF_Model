@@ -29,23 +29,22 @@ def main(save_figs=False, save_type='svg', model_name='different_learned_maps', 
     azimuth = 12
     snr = 0.2
     freq_bands = 128
-    participant_numbers = np.array([1, 2, 3, 8, 9, 10, 11,
+    participant_numbers = np.array([1,2, 3, 8, 9, 10, 11,
                                     12, 15, 17, 18, 19, 20, 21, 27, 28, 33, 40])
 
     normalize = False
     time_window = 0.1  # time window in sec
 
-    elevations = np.arange(0, 50, 1)
+    elevations = np.arange(0, 25, 1)
 
     # filtering parameters
     normalization_type = 'sum_1'
-    sigma_smoothing = 1
+    sigma_smoothing = 0
     sigma_gauss_norm = 1
 
     # use the mean subtracted map as the learned map
     mean_subtracted_map = True
 
-    ear = 'ipsi'
     ########################################################################
     ########################################################################
 

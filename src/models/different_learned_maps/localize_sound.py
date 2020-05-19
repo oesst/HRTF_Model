@@ -14,38 +14,6 @@ SOUND_FILES = ROOT / 'data/raw/sound_samples/'
 SOUND_FILES = list(SOUND_FILES.glob('**/*.wav'))
 
 
-def process_inputs(psd_all_i, psd_all_c, ear='ipsi', normalization_type='sum_1', sigma_smoothing=0, sigma_gauss_norm=1):
-    # filter the data
-    psd_mono_c = hp.filter_dataset(psd_all_c, normalization_type=normalization_type,
-                                   sigma_smoothing=sigma_smoothing, sigma_gauss_norm=sigma_gauss_norm)
-    psd_mono_i = hp.filter_dataset(psd_all_i, normalization_type=normalization_type,
-                                   sigma_smoothing=sigma_smoothing, sigma_gauss_norm=sigma_gauss_norm)
-
-    # integrate the signals and filter
-    if ear.find('contra') >= 0:
-        psd_binaural = hp.filter_dataset(
-            psd_mono_c / psd_mono_i, normalization_type=normalization_type, sigma_smoothing=0, sigma_gauss_norm=0)
-    else:
-        psd_binaural = hp.filter_dataset(
-            psd_mono_i / psd_mono_c, normalization_type=normalization_type, sigma_smoothing=0, sigma_gauss_norm=0)
-
-    # calculate different input sounds. should be 4 of them (mono,mono-mean,bin, bin-mean)
-    if ear.find('contra') >= 0:
-        psd_mono = psd_mono_c
-    else:
-        psd_mono = psd_mono_i
-
-    psd_mono_mean = psd_mono - \
-        np.transpose(np.tile(np.mean(psd_mono, axis=1), [
-                     psd_mono.shape[1], 1, 1]), [1, 0, 2])
-    psd_binaural = psd_binaural
-    psd_binaural_mean = psd_binaural - \
-        np.transpose(np.tile(np.mean(psd_binaural, axis=1), [
-                     psd_binaural.shape[1], 1, 1]), [1, 0, 2])
-
-    return psd_mono, psd_mono_mean, psd_binaural, psd_binaural_mean
-
-
 def main(model_name='different_learned_maps', exp_name='localization_default'):
     """ This script takes the filtered data and tries to localize sounds with different, learned map
         for all participants.
@@ -68,15 +36,15 @@ def main(model_name='different_learned_maps', exp_name='localization_default'):
 
     # filtering parameters
     normalization_type = 'sum_1'
-    sigma_smoothing = 1
+    sigma_smoothing = 0
     sigma_gauss_norm = 1
 
     # use the mean subtracted map as the learned map
     mean_subtracted_map = True
 
-    ear = 'ipsi'
+    ear = 'contra'
 
-    elevations = np.arange(0, 50, 1)
+    elevations = np.arange(0, 25, 1)
     ########################################################################
     ########################################################################
 
@@ -114,7 +82,7 @@ def main(model_name='different_learned_maps', exp_name='localization_default'):
             psd_all_i = psd_all_i[:, elevations, :]
 
             # filter data and integrate it
-            psd_mono, psd_mono_mean, psd_binaural, psd_binaural_mean = process_inputs(
+            psd_mono, psd_mono_mean, psd_binaural, psd_binaural_mean = hp.process_inputs(
                 psd_all_i, psd_all_c, ear, normalization_type, sigma_smoothing, sigma_gauss_norm)
 
             # walk over the 4 different maps: mono, mono_mean, bina, bina_mean
@@ -132,7 +100,6 @@ def main(model_name='different_learned_maps', exp_name='localization_default'):
                     learned_map = hp.create_map(psd_binaural, True)
                 else:
                     logger.error('Something went wrong in if i_map statement')
-
 
                 # localize the sounds and save the results
                 x_mono[i_map, i_par, :, :, :], y_mono[i_map, i_par, :] = hp.localize_sound(psd_mono, learned_map)

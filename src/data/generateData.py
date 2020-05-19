@@ -19,13 +19,13 @@ SOUND_FILES = ROOT / 'data/raw/sound_samples/'
 SOUND_FILES = list(SOUND_FILES.glob('**/*.wav'))
 
 # Define up to which frequency the data should be generated
-FREQ = 22
 
-def create_data(freq_bands=24, participant_number=19, snr=0.2, normalize=False, azimuth=12, time_window=0.1):
 
-    str_r = 'data/processed_'+str(FREQ)+'kHz/binaural_right_0_gammatone_' + str(time_window) + '_window_{0:03d}'.format(participant_number) + '_cipic_' + str(
+def create_data(freq_bands=24, participant_number=19, snr=0.2, normalize=False, azimuth=12, time_window=0.1, max_freq=20000):
+
+    str_r = 'data/processed_' + str(max_freq) + 'Hz/binaural_right_0_gammatone_' + str(time_window) + '_window_{0:03d}'.format(participant_number) + '_cipic_' + str(
         int(snr * 100)) + '_srn_' + str(freq_bands) + '_channels_' + str((azimuth - 12) * 10) + '_azi_' + str(normalize) + '_norm.npy'
-    str_l = 'data/processed_'+str(FREQ)+'kHz/binaural_left_0_gammatone_' + str(time_window) + '_window_{0:03d}'.format(participant_number) + '_cipic_' + str(
+    str_l = 'data/processed_' + str(max_freq) + 'Hz/binaural_left_0_gammatone_' + str(time_window) + '_window_{0:03d}'.format(participant_number) + '_cipic_' + str(
         int(snr * 100)) + '_srn_' + str(freq_bands) + '_channels_' + str((azimuth - 12) * 10) + '_azi_' + str(normalize) + '_norm.npy'
 
     path_data_r = ROOT / str_r
@@ -79,13 +79,13 @@ def create_data(freq_bands=24, participant_number=19, snr=0.2, normalize=False, 
 
                 ###### Apply Gammatone Filter Bank ##############
                 y = gtgram.gtgram(signal_elevs, fs, twin,
-                           thop, freq_bands, fmin)
+                                  thop, freq_bands, fmin, max_freq)
                 y = (20 * np.log10(y + 1))
                 window_means = np.mean(y, axis=1)
                 psd_all_i[i, i_elevs, :] = window_means
 
                 y = gtgram.gtgram(signal_elevs_c, fs,
-                           twin, thop, freq_bands, fmin)
+                                  twin, thop, freq_bands, fmin, max_freq)
                 y = (20 * np.log10(y + 1))
                 window_means = np.mean(y, axis=1)
                 psd_all_c[i, i_elevs, :] = window_means
@@ -95,7 +95,6 @@ def create_data(freq_bands=24, participant_number=19, snr=0.2, normalize=False, 
         np.save(path_data_l.absolute(), psd_all_i)
 
         return psd_all_c, psd_all_i
-
 
 
 def main():
@@ -115,16 +114,26 @@ def main():
     time_window = 0.1  # time window for spectrogram in sec
 
     # Parameter to test
-    snrs = np.arange(0, 1.1, 0.1)  # Signal to noise ratio
+    # snrs = np.arange(0, 1.1, 0.1)  # Signal to noise ratio
     snrs = np.array([0.2])  # Signal to noise ratio
-    #snrs = np.array([0.2])  # Signal to noise ratio
+    # snrs = np.array([0.2])  # Signal to noise ratio
     # freq_bandss = np.array([32, 64, 128]) # Frequency bands in resulting data
-    freq_bandss = np.array([128]) # Frequency bands in resulting data
-    #azimuths = np.arange(0, 25, 1)  # which azimuths to create
+    freq_bandss = np.array([128])  # Frequency bands in resulting data
+    # azimuths = np.arange(0, 25, 1)  # which azimuths to create
     azimuths = np.array([12])   # which azimuths to create
     participant_numbers = np.array([1, 2, 3, 8, 9, 10, 11,
-                           12, 15, 17, 18, 19, 20, 21, 27, 28, 33, 40])
-    #participant_numbers = participant_numbers[::-1]
+                                    12, 15, 17, 18, 19, 20,
+                                    21, 27, 28, 33, 40, 44,
+                                    48, 50, 51, 58, 59, 60,
+                                    61, 65, 119, 124, 126,
+                                    127, 131, 133, 134, 135,
+                                    137, 147, 148, 152, 153,
+                                    154, 155, 156, 158, 162,
+                                    163, 165])
+    participant_numbers = participant_numbers[::-1]
+    # define max frequency for gammatone filter bank
+    max_freq=20000
+    
     ########################################################################
     ########################################################################
 
@@ -133,7 +142,7 @@ def main():
         for _, snr in enumerate(snrs):
             for _, freq_bands in enumerate(freq_bandss):
                 for _, azimuth in enumerate(azimuths):
-                    psd_all_c, psd_all_i = create_data(freq_bands, participant_number, snr, normalize, azimuth, time_window)
+                    psd_all_c, psd_all_i = create_data(freq_bands, participant_number, snr, normalize, azimuth, time_window,max_freq=max_freq)
 
 
 if __name__ == '__main__':

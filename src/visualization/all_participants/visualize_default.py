@@ -30,7 +30,8 @@ def main(save_figs=False, save_type='svg', model_name='all_participants', exp_na
     azimuth = 12
     snr = 0.2
     freq_bands = 128
-    participant_numbers = np.array([1, 2, 3, 8, 9, 10, 11,
+    # can't be changed for now
+    participant_numbers = np.array([1,2,3, 8, 9, 10, 11,
                                     12, 15, 17, 18, 19, 20, 21, 27, 28, 33, 40])
 
     normalize = False
@@ -45,8 +46,6 @@ def main(save_figs=False, save_type='svg', model_name='all_participants', exp_na
 
     # use the mean subtracted map as the learned map
     mean_subtracted_map = True
-
-    ear = 'ipsi'
     ########################################################################
     ########################################################################
 
@@ -84,6 +83,7 @@ def main(save_figs=False, save_type='svg', model_name='all_participants', exp_na
 
         # plot regression line for each participant
         for i_par, par in enumerate(participant_numbers):
+
             hp.plot_localization_result(x_mono[i_par], y_mono[i_par], ax1, SOUND_FILES, scale_values=True, linear_reg=True, scatter_data=False)
             ax1.set_title('Monoaural')
             hp.set_axis(ax1)

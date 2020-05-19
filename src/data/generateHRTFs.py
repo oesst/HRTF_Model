@@ -17,13 +17,13 @@ ROOT = Path(__file__).resolve().parents[2]
 # create a list of the sound files
 
 # Define up to which frequency the data should be generated
-FREQ = 22
 
-def create_data(freq_bands=24, participant_number=19, snr=0.2, normalize=False, azimuth=13, time_window=0.1):
 
-    str_r = 'data/processed_'+str(FREQ)+'kHz/binaural_right_0_gammatone_' + str(time_window) + '_window_{0:03d}'.format(participant_number) + '_cipic_' + str(
+def create_data(freq_bands=24, participant_number=19, snr=0.2, normalize=False, azimuth=13, time_window=0.1, max_freq=18000):
+
+    str_r = 'data/processed_' + str(max_freq) + 'kHz/binaural_right_0_gammatone_' + str(time_window) + '_window_{0:03d}'.format(participant_number) + '_cipic_' + str(
         int(snr * 100)) + '_srn_' + str(freq_bands) + '_channels_' + str((azimuth - 12) * 10) + '_azi_' + str(normalize) + '_norm_flat_spectrum.npy'
-    str_l = 'data/processed_'+str(FREQ)+'kHz/binaural_left_0_gammatone_' + str(time_window) + '_window_{0:03d}'.format(participant_number) + '_cipic_' + str(
+    str_l = 'data/processed_' + str(max_freq) + 'kHz/binaural_left_0_gammatone_' + str(time_window) + '_window_{0:03d}'.format(participant_number) + '_cipic_' + str(
         int(snr * 100)) + '_srn_' + str(freq_bands) + '_channels_' + str((azimuth - 12) * 10) + '_azi_' + str(normalize) + '_norm_flat_spectrum.npy'
 
     path_data_r = ROOT / str_r
@@ -33,6 +33,7 @@ def create_data(freq_bands=24, participant_number=19, snr=0.2, normalize=False, 
     twin = time_window
     thop = twin / 2
     fmin = 100
+    fmax = max_freq
     fs = 44100
 
     # check if we can load the data from a file
@@ -51,8 +52,8 @@ def create_data(freq_bands=24, participant_number=19, snr=0.2, normalize=False, 
         # get the data for the right ear
         hrir_r = hrir_mat['hrir_r']
         # use always all elevations -> 50
-        psd_all_i = np.zeros((1,50, freq_bands))
-        psd_all_c = np.zeros((1,50, freq_bands))
+        psd_all_i = np.zeros((1, 50, freq_bands))
+        psd_all_c = np.zeros((1, 50, freq_bands))
         # temporal_means = np.zeros((hrir_elevs.shape[0],87))
         for i_elevs in range(psd_all_i.shape[1]):
             # read the hrir for a specific location
@@ -76,16 +77,16 @@ def create_data(freq_bands=24, participant_number=19, snr=0.2, normalize=False, 
 
             ###### Apply Gammatone Filter Bank ##############
             y = gtgram.gtgram(signal_elevs, fs, twin,
-                              thop, freq_bands, fmin)
+                              thop, freq_bands, fmin, fmax)
             y = (20 * np.log10(y + 1))
             window_means = np.mean(y, axis=1)
-            psd_all_i[0,i_elevs, :] = window_means
+            psd_all_i[0, i_elevs, :] = window_means
 
             y = gtgram.gtgram(signal_elevs_c, fs,
-                              twin, thop, freq_bands, fmin)
+                              twin, thop, freq_bands, fmin, fmax)
             y = (20 * np.log10(y + 1))
             window_means = np.mean(y, axis=1)
-            psd_all_c[0,i_elevs, :] = window_means
+            psd_all_c[0, i_elevs, :] = window_means
             #################################################
 
         np.save(path_data_r.absolute(), psd_all_c)
