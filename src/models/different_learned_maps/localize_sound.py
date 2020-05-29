@@ -27,9 +27,20 @@ def main(model_name='different_learned_maps', exp_name='localization_default'):
     azimuth = 12
     snr = 0.2
     freq_bands = 128
+    max_freq = 22000
+    # participant_numbers = np.array([1, 2, 3, 8, 9, 10, 11,
+    #                                 12, 15, 17, 18, 19, 20, 21, 27, 28, 33, 40])
+
 
     participant_numbers = np.array([1, 2, 3, 8, 9, 10, 11,
-                                    12, 15, 17, 18, 19, 20, 21, 27, 28, 33, 40])
+                                    12, 15, 17, 18, 19, 20,
+                                    21, 27, 28, 33, 40, 44,
+                                    48, 50, 51, 58, 59, 60,
+                                    61, 65, 119, 124, 126,
+                                    127, 131, 133, 134, 135,
+                                    137, 147, 148, 152, 153,
+                                    154, 155, 156, 158, 162,
+                                    163, 165])
 
     normalize = False
     time_window = 0.1  # time window in sec
@@ -50,7 +61,7 @@ def main(model_name='different_learned_maps', exp_name='localization_default'):
 
     # create unique experiment name
     exp_name_str = exp_name + '_' + normalization_type + str(sigma_smoothing) + str(sigma_gauss_norm) + str(mean_subtracted_map) + '_' + str(time_window) + '_window_' + str(
-        int(snr * 100)) + '_srn_' + str(freq_bands) + '_channels_' + str((azimuth - 12) * 10) + '_azi_' + str(normalize) + '_norm' + str(len(elevations)) + '_elevs.npy'
+        int(snr * 100)) + '_srn_' + str(freq_bands) + '_channels_'+str(max_freq)+'_max_freq_' + str((azimuth - 12) * 10) + '_azi_' + str(normalize) + '_norm' + str(len(elevations)) + '_elevs.npy'
 
     exp_path = ROOT / 'models' / model_name
     exp_file = exp_path / exp_name_str
@@ -75,7 +86,7 @@ def main(model_name='different_learned_maps', exp_name='localization_default'):
 
             # create or read the data
             psd_all_c, psd_all_i = generateData.create_data(
-                freq_bands, par, snr, normalize, azimuth, time_window)
+                freq_bands, par, snr, normalize, azimuth, time_window,max_freq=max_freq)
 
             # Take only given elevations
             psd_all_c = psd_all_c[:, elevations, :]

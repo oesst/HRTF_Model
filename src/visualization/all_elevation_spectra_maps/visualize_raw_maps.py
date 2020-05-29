@@ -37,7 +37,7 @@ def main(save_figs=False, save_type='svg', model_name='elevation_spectra_maps', 
     azimuth = 12
     snr = 0.2
     freq_bands = 128
-
+    max_freq = 20000
     participant_numbers = np.array([1, 2, 3, 8, 9, 10, 11,
                                     12, 15, 17, 18, 19, 20, 21, 27, 28, 33, 40])
 
@@ -50,7 +50,7 @@ def main(save_figs=False, save_type='svg', model_name='elevation_spectra_maps', 
 
     # create unique experiment name
     exp_name_str = exp_name + '_' + str(time_window) + '_window_' + str(
-        int(snr * 100)) + '_srn_' + str(freq_bands) + '_channels_' + str((azimuth - 12) * 10) + '_azi_' + str(normalize) + '_norm50_elevs.npy'
+        int(snr * 100)) + '_srn_' + str(freq_bands) + '_channels_'+str(max_freq)+'_max_freq_' + str((azimuth - 12) * 10) + '_azi_' + str(normalize) + '_norm' + str(len(elevations)) + '_elevs.npy'
     exp_path = ROOT / 'models' / model_name
     exp_file = exp_path / exp_name_str
 
@@ -140,7 +140,7 @@ def main(save_figs=False, save_type='svg', model_name='elevation_spectra_maps', 
                 # ax.set_yticklabels(t[1:-1])
 
                 if save_figs:
-                    fig_save_path = ROOT / 'reports' / 'figures' / model_name / ('participant_' + str(par))
+                    fig_save_path = ROOT / 'reports' / 'figures' / model_name / exp_name_str / ('participant_' + str(par))
                     if not fig_save_path.exists():
                         fig_save_path.mkdir(parents=True, exist_ok=True)
                     plt.savefig((fig_save_path / (exp_name + '_raw_maps_contra_' + str(sound) +

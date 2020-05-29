@@ -44,7 +44,7 @@ def main(save_figs=False, save_type='svg', model_name='hrtf_comparison', exp_nam
     snr = 0
     freq_bands = 128
     participant_number = 9
-
+    max_freq = 20000
     normalize = False
     time_window = 0.1  # time window in sec
 
@@ -62,8 +62,8 @@ def main(save_figs=False, save_type='svg', model_name='hrtf_comparison', exp_nam
     ######################################
 
     # create unique experiment name
-    exp_name_str = exp_name + '_' + normalization_type + str(sigma_smoothing) + str(sigma_gauss_norm) + str(mean_subtracted_map) + '_' + str(time_window) + '_window_{0:03d}'.format(participant_number) + '_cipic_' + str(
-        int(snr * 100)) + '_srn_' + str(freq_bands) + '_channels_' + str((azimuth - 12) * 10) + '_azi_' + str(normalize) + '_norm.npy'
+    exp_name_str = exp_name + '_' + normalization_type + str(sigma_smoothing) + str(sigma_gauss_norm) + str(mean_subtracted_map) + '_' + str(time_window) + '_window_' + str(
+        int(snr * 100)) + '_srn_' + str(freq_bands) + '_channels_'+str(max_freq)+'_max_freq_' + str((azimuth - 12) * 10) + '_azi_' + str(normalize) + '_norm' + str(len(elevations)) + '_elevs.npy'
 
     exp_path = ROOT / 'models' / model_name
     exp_file = exp_path / exp_name_str
@@ -100,10 +100,10 @@ def main(save_figs=False, save_type='svg', model_name='hrtf_comparison', exp_nam
         plot_corrcoeff(tmp, ax)
 
         if save_figs:
-            fig_save_path = ROOT / 'reports' / 'figures' / model_name
-            logger.info('Saving Figures to : ' + fig_save_path.as_posix())
+            fig_save_path = ROOT / 'reports' / 'figures' / model_name / exp_name_str
             if not fig_save_path.exists():
                 fig_save_path.mkdir(parents=True, exist_ok=True)
+            logger.info('Saving figures to ' + fig_save_path.as_posix())
             plt.savefig((fig_save_path / (exp_name + '_hrtfs_xcorr.' + save_type)).as_posix(), dpi=300)
 
         plt.show()

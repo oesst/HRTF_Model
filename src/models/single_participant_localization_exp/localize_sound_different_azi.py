@@ -57,13 +57,17 @@ def main(model_name='single_participant', exp_name='single_participant_different
     ########################################################################
     ######################## Set parameters ################################
     ########################################################################
-    azimuth = 13
+    azimuth = 12
     snr = 0.2
     freq_bands = 128
+    max_freq = 20000
     participant_number = 9
 
     normalize = False
     time_window = 0.1  # time window in sec
+
+    elevations = np.arange(0, 25, 1)
+
 
     # filtering parameters
     normalization_type = 'sum_1'
@@ -79,8 +83,9 @@ def main(model_name='single_participant', exp_name='single_participant_different
     ########################################################################
     ########################################################################
 
-    exp_name_str = exp_name + '_' + normalization_type + str(sigma_smoothing) + str(sigma_gauss_norm) + str(mean_subtracted_map) + '_' + str(time_window) + '_window_{0:03d}'.format(participant_number) + '_cipic_' + str(
-        int(snr * 100)) + '_srn_' + str(freq_bands) + '_channels_' + str((azimuth - 12) * 10) + '_azi_' + str(normalize) + '_norm.npy'
+    # create unique experiment name
+    exp_name_str = exp_name + '_' + normalization_type + str(sigma_smoothing) + str(sigma_gauss_norm) + str(mean_subtracted_map) + '_' + str(time_window) + '_window_' + str(
+        int(snr * 100)) + '_srn_' + str(freq_bands) + '_channels_'+str(max_freq)+'_max_freq_' + str((azimuth - 12) * 10) + '_azi_' + str(normalize) + '_norm' + str(len(elevations)) + '_elevs.npy'
 
     exp_path = ROOT / 'models' / model_name
     exp_file = exp_path / exp_name_str
@@ -97,6 +102,10 @@ def main(model_name='single_participant', exp_name='single_participant_different
         # create or read the data
         psd_all_c, psd_all_i = generateData.create_data(
             freq_bands, participant_number, snr, normalize, 12, time_window)
+
+        # Take only given elevations
+        psd_all_c = psd_all_c[:, elevations, :]
+        psd_all_i = psd_all_i[:, elevations, :]
 
         ####### Map Learning #######
         # filter data and integrate it for map learning

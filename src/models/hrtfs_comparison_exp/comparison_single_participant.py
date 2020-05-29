@@ -70,7 +70,7 @@ def main(model_name='hrtf_comparison', exp_name='single_participant'):
     azimuth = 12
     snr = 0.2
     freq_bands = 128
-
+    max_freq = 20000
     participant_number = 2
     normalize = False
     time_window = 0.1  # time window in sec
@@ -90,8 +90,8 @@ def main(model_name='hrtf_comparison', exp_name='single_participant'):
     ########################################################################
 
     # create unique experiment name
-    exp_name_str = exp_name + '_' + normalization_type + str(sigma_smoothing) + str(sigma_gauss_norm) + str(mean_subtracted_map) + '_' + str(time_window) + '_window_{0:03d}'.format(participant_number) + '_cipic_' + str(
-        int(snr * 100)) + '_srn_' + str(freq_bands) + '_channels_' + str((azimuth - 12) * 10) + '_azi_' + str(normalize) + '_norm.npy'
+    exp_name_str = exp_name + '_' + normalization_type + str(sigma_smoothing) + str(sigma_gauss_norm) + str(mean_subtracted_map) + '_' + str(time_window) + '_window_' + str(
+        int(snr * 100)) + '_srn_' + str(freq_bands) + '_channels_'+str(max_freq)+'_max_freq_' + str((azimuth - 12) * 10) + '_azi_' + str(normalize) + '_norm' + str(len(elevations)) + '_elevs.npy'
 
     exp_path = ROOT / 'models' / model_name
     exp_file = exp_path / exp_name_str

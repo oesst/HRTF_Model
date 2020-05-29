@@ -29,8 +29,8 @@ def main(save_figs=False, save_type='svg', model_name='different_learned_maps', 
     azimuth = 12
     snr = 0.2
     freq_bands = 128
-    participant_numbers = np.array([1,2, 3, 8, 9, 10, 11,
-                                    12, 15, 17, 18, 19, 20, 21, 27, 28, 33, 40])
+    max_freq = 22000
+    # participant_numbers = np.array([1,2, 3])
 
     normalize = False
     time_window = 0.1  # time window in sec
@@ -49,8 +49,9 @@ def main(save_figs=False, save_type='svg', model_name='different_learned_maps', 
     ########################################################################
 
     # create unique experiment name
+    # create unique experiment name
     exp_name_str = exp_name + '_' + normalization_type + str(sigma_smoothing) + str(sigma_gauss_norm) + str(mean_subtracted_map) + '_' + str(time_window) + '_window_' + str(
-        int(snr * 100)) + '_srn_' + str(freq_bands) + '_channels_' + str((azimuth - 12) * 10) + '_azi_' + str(normalize) + '_norm' + str(len(elevations)) + '_elevs.npy'
+        int(snr * 100)) + '_srn_' + str(freq_bands) + '_channels_'+str(max_freq)+'_max_freq_' + str((azimuth - 12) * 10) + '_azi_' + str(normalize) + '_norm' + str(len(elevations)) + '_elevs.npy'
 
     exp_path = ROOT / 'models' / model_name
     exp_file = exp_path / exp_name_str
@@ -93,7 +94,7 @@ def main(save_figs=False, save_type='svg', model_name='different_learned_maps', 
             x_bin_mean = x_bin_mean_all[i_map]
             y_bin_mean = y_bin_mean_all[i_map]
 
-            for i_par, par in enumerate(participant_numbers):
+            for i_par in range(x_mono_all.shape[1]):
 
                 hp.plot_localization_result(x_mono[i_par], y_mono[i_par], ax1, SOUND_FILES, scale_values=True, linear_reg=True, scatter_data=False)
                 if i_map == 0:
@@ -155,9 +156,10 @@ def main(save_figs=False, save_type='svg', model_name='different_learned_maps', 
                                         linear_reg=True, disp_values=True, scatter_data=False, reg_color="black")
 
         if save_figs:
-            fig_save_path = ROOT / 'reports' / 'figures' / model_name
+            fig_save_path = ROOT / 'reports' / 'figures' / model_name / exp_name_str
             if not fig_save_path.exists():
                 fig_save_path.mkdir(parents=True, exist_ok=True)
+            logger.info('Saving figures to ' + fig_save_path.as_posix())
             plt.savefig((fig_save_path / (exp_name + '_localization.' + save_type)).as_posix(), dpi=300)
 
         plt.show()

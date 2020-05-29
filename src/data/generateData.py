@@ -114,8 +114,8 @@ def main():
     time_window = 0.1  # time window for spectrogram in sec
 
     # Parameter to test
-    # snrs = np.arange(0, 1.1, 0.1)  # Signal to noise ratio
-    snrs = np.array([0.2])  # Signal to noise ratio
+    snrs = np.arange(0, 1.1, 0.1)  # Signal to noise ratio
+    # snrs = np.array([0.2])  # Signal to noise ratio
     # snrs = np.array([0.2])  # Signal to noise ratio
     # freq_bandss = np.array([32, 64, 128]) # Frequency bands in resulting data
     freq_bandss = np.array([128])  # Frequency bands in resulting data
@@ -130,10 +130,13 @@ def main():
                                     137, 147, 148, 152, 153,
                                     154, 155, 156, 158, 162,
                                     163, 165])
-    participant_numbers = participant_numbers[::-1]
     # define max frequency for gammatone filter bank
-    max_freq=20000
-    
+    max_freqs = np.array([16000, 20000])
+
+    participant_numbers = participant_numbers[::-1]
+    # snrs = snrs[::-1]
+    # freq_bandss = freq_bandss[::-1]
+
     ########################################################################
     ########################################################################
 
@@ -142,7 +145,8 @@ def main():
         for _, snr in enumerate(snrs):
             for _, freq_bands in enumerate(freq_bandss):
                 for _, azimuth in enumerate(azimuths):
-                    psd_all_c, psd_all_i = create_data(freq_bands, participant_number, snr, normalize, azimuth, time_window,max_freq=max_freq)
+                    for _, max_freq in enumerate(max_freqs):
+                        psd_all_c, psd_all_i = create_data(freq_bands, participant_number, snr, normalize, azimuth, time_window, max_freq=max_freq)
 
 
 if __name__ == '__main__':

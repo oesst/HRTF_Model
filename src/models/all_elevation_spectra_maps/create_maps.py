@@ -58,9 +58,16 @@ def main(model_name='elevation_spectra_maps', exp_name='unfiltered'):
     azimuth = 12
     snr = 0.2
     freq_bands = 128
-
+    max_freq = 20000
     participant_numbers = np.array([1, 2, 3, 8, 9, 10, 11,
-                                    12, 15, 17, 18, 19, 20, 21, 27, 28, 33, 40])
+                                    12, 15, 17, 18, 19, 20,
+                                    21, 27, 28, 33, 40, 44,
+                                    48, 50, 51, 58, 59, 60,
+                                    61, 65, 119, 124, 126,
+                                    127, 131, 133, 134, 135,
+                                    137, 147, 148, 152, 153,
+                                    154, 155, 156, 158, 162,
+                                    163, 165])
 
     normalize = False
     time_window = 0.1  # time window in sec
@@ -71,7 +78,7 @@ def main(model_name='elevation_spectra_maps', exp_name='unfiltered'):
 
     # create unique experiment name
     exp_name_str = exp_name + '_' + str(time_window) + '_window_' + str(
-        int(snr * 100)) + '_srn_' + str(freq_bands) + '_channels_' + str((azimuth - 12) * 10) + '_azi_' + str(normalize) + '_norm' + str(len(elevations)) + '_elevs.npy'
+        int(snr * 100)) + '_srn_' + str(freq_bands) + '_channels_'+str(max_freq)+'_max_freq_' + str((azimuth - 12) * 10) + '_azi_' + str(normalize) + '_norm' + str(len(elevations)) + '_elevs.npy'
 
     exp_path = ROOT / 'models' / model_name
     exp_file = exp_path / exp_name_str
