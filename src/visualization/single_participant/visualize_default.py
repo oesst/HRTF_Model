@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
-import src.visualization.helpers as hp
+import src.features.helpers_vis as hp_vis
+import src.features.helpers as hp
 import logging
 import pickle
 from pathlib import Path
@@ -7,7 +8,7 @@ import numpy as np
 import click
 
 
-hp.set_layout(15)
+hp_vis.set_layout(15)
 
 
 ROOT = Path(__file__).resolve().parents[3]
@@ -18,7 +19,7 @@ SOUND_FILES = list(SOUND_FILES.glob('**/*.wav'))
 
 # Define whether figures should be saved
 @click.command()
-@click.option('--save_figs', default=False, help='Save the figures.')
+@click.option('--save_figs', type=click.BOOL, default=False, help='Save figures')
 @click.option('--save_type', default='svg', help='Define the format figures are saved.')
 @click.option('--model_name', default='single_participant', help='Defines the model name.')
 @click.option('--exp_name', default='single_participant_default', help='Defines the experiment name')
@@ -38,6 +39,10 @@ def main(save_figs=False, save_type='svg', model_name='single_participant', exp_
     logger = logging.getLogger(__name__)
     logger.info('Showing localization results for a single participant')
 
+    # make sure save type is given
+    if not save_type or len(save_type) == 0:
+        save_type = 'svg'
+
     ########################################################################
     ######################## Set parameters ################################
     ########################################################################
@@ -49,9 +54,8 @@ def main(save_figs=False, save_type='svg', model_name='single_participant', exp_
     ########################################################################
     ########################################################################
 
-    # create unique experiment name
-    exp_name_str = exp_name + '_' + normalization_type + str(sigma_smoothing) + str(sigma_gauss_norm) + str(mean_subtracted_map) + '_' + str(time_window) + '_window_{0:03d}'.format(participant_number) + '_cipic_' + str(
-        int(snr * 100)) + '_srn_' + str(freq_bands) + '_channels_' + str(max_freq) + '_max_freq_' + str((azimuth - 12) * 10) + str((azimuth - 12) * 10) + '_azi_' + str(normalize) + '_norm' + str(len(elevations)) + '_elevs.npy'
+    exp_name_str = hp.create_exp_name([exp_name, normalization_type, sigma_smoothing, sigma_gauss_norm, mean_subtracted_map, time_window, int(
+        snr * 100), freq_bands, max_freq, participant_number, (azimuth - 12) * 10, normalize, len(elevations)])
 
     exp_path = ROOT / 'models' / model_name
     exp_file = exp_path / exp_name_str
@@ -78,35 +82,35 @@ def main(save_figs=False, save_type='svg', model_name='single_participant', exp_
         # plt.suptitle('Single Participant')
         # Monoaural Data (Ipsilateral), No Mean Subtracted
         ax = fig.add_subplot(1, 4, 1)
-        hp.plot_localization_result(
+        hp_vis.plot_localization_result(
             x_mono, y_mono, ax, SOUND_FILES, scale_values=True, linear_reg=True, disp_values=True)
         ax.set_title('Monoaural')
-        hp.set_axis(ax)
+        hp_vis.set_axis(ax)
         ax.set_ylabel('Estimated Elevation [deg]')
         ax.set_xlabel('True Elevation [deg]')
 
         # Monoaural Data (Ipsilateral), Mean Subtracted
         ax = fig.add_subplot(1, 4, 2)
-        hp.plot_localization_result(
+        hp_vis.plot_localization_result(
             x_mono_mean, y_mono_mean, ax, SOUND_FILES, scale_values=True, linear_reg=True, disp_values=True)
         ax.set_title('Mono - Mean')
-        hp.set_axis(ax)
+        hp_vis.set_axis(ax)
         ax.set_xlabel('True Elevation [deg]')
 
         # Binaural Data (Ipsilateral), No Mean Subtracted
         ax = fig.add_subplot(1, 4, 3)
-        hp.plot_localization_result(
+        hp_vis.plot_localization_result(
             x_bin, y_bin, ax, SOUND_FILES, scale_values=True, linear_reg=True, disp_values=True)
         ax.set_title('Binaural')
-        hp.set_axis(ax)
+        hp_vis.set_axis(ax)
         ax.set_xlabel('True Elevation [deg]')
 
         # Binaural Data (Ipsilateral), Mean Subtracted
         ax = fig.add_subplot(1, 4, 4)
-        hp.plot_localization_result(
+        hp_vis.plot_localization_result(
             x_bin_mean, y_bin_mean, ax, SOUND_FILES, scale_values=True, linear_reg=True, disp_values=True)
         ax.set_title('Bin - Mean')
-        hp.set_axis(ax)
+        hp_vis.set_axis(ax)
         ax.set_xlabel('True Elevation [deg]')
 
         if save_figs:

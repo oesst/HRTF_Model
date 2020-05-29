@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import logging
+import click
 from pathlib import Path
 from src.data import generateData
 from src.features import helpers as hp
@@ -46,7 +47,18 @@ def process_inputs(psd_all_i, psd_all_c, ear='ipsi', normalization_type='sum_1',
     return psd_mono, psd_mono_mean, psd_binaural, psd_binaural_mean
 
 
-def main(model_name='elevation_spectra_maps', exp_name='unfiltered'):
+
+@click.command()
+@click.option('--model_name', default='single_participant', help='Defines the model name.')
+@click.option('--exp_name', default='single_participant_default', help='Defines the experiment name')
+@click.option('--azimuth', default=12, help='Azimuth for which localization is done. Default is 12')
+@click.option('--participant_numbers', help='CIPIC participant number. Default is None')
+@click.option('--snr', default=0.2, help='Signal to noise ration to use. Default is 0.2')
+@click.option('--freq_bands', default=128, help='Amount of frequency bands to use. Default is 128')
+@click.option('--max_freq', default=20000, help='Max frequency to use. Default is 20000')
+@click.option('--elevations', default=25, help='Number of elevations to use 0-n. Default is 25 which equals 0-90 deg')
+@click.option('--clean', is_flag=True)
+def main(model_name='elevation_spectra_maps', exp_name='unfiltered', azimuth=12, participant_numbers=None, snr=0.2, freq_bands=24, max_freq=20000, elevations=25, clean=False):
     """ TODO
     """
     logger = logging.getLogger(__name__)
@@ -55,35 +67,37 @@ def main(model_name='elevation_spectra_maps', exp_name='unfiltered'):
     ########################################################################
     ######################## Set parameters ################################
     ########################################################################
-    azimuth = 12
-    snr = 0.2
-    freq_bands = 128
-    max_freq = 20000
-    participant_numbers = np.array([1, 2, 3, 8, 9, 10, 11,
-                                    12, 15, 17, 18, 19, 20,
-                                    21, 27, 28, 33, 40, 44,
-                                    48, 50, 51, 58, 59, 60,
-                                    61, 65, 119, 124, 126,
-                                    127, 131, 133, 134, 135,
-                                    137, 147, 148, 152, 153,
-                                    154, 155, 156, 158, 162,
-                                    163, 165])
+
+    # if participant_numbers is not given we use all of them
+    if not participant_numbers:
+        participant_numbers = np.array([1, 2, 3, 8, 9, 10, 11,
+                                        12, 15, 17, 18, 19, 20,
+                                        21, 27, 28, 33, 40, 44,
+                                        48, 50, 51, 58, 59, 60,
+                                        61, 65, 119, 124, 126,
+                                        127, 131, 133, 134, 135,
+                                        137, 147, 148, 152, 153,
+                                        154, 155, 156, 158, 162,
+                                        163, 165])
+    else:
+        # participant_numbers are given. need to be cast to int array
+        participant_numbers = np.array([int(i) for i in participant_numbers.split(',')])
+        print(participant_numbers)
 
     normalize = False
     time_window = 0.1  # time window in sec
 
-    elevations = np.arange(0, 50, 1)
+    elevations = np.arange(0, elevations, 1)
     ########################################################################
     ########################################################################
 
     # create unique experiment name
-    exp_name_str = exp_name + '_' + str(time_window) + '_window_' + str(
-        int(snr * 100)) + '_srn_' + str(freq_bands) + '_channels_'+str(max_freq)+'_max_freq_' + str((azimuth - 12) * 10) + '_azi_' + str(normalize) + '_norm' + str(len(elevations)) + '_elevs.npy'
+    exp_name_str = hp.create_exp_name([exp_name, time_window, int(snr * 100), freq_bands, max_freq, participant_numbers, (azimuth - 12) * 10, normalize, len(elevations)])
 
     exp_path = ROOT / 'models' / model_name
     exp_file = exp_path / exp_name_str
     # check if model results exist already and load
-    if exp_path.exists() and exp_file.is_file():
+    if not clean and exp_path.exists() and exp_file.is_file():
         # try to load the model files
         with exp_file.open('rb') as f:
             logger.info('Reading model data from file')
@@ -97,7 +111,7 @@ def main(model_name='elevation_spectra_maps', exp_name='unfiltered'):
 
             # create or read the data
             psd_all_c, psd_all_i = generateData.create_data(
-                freq_bands, par, snr, normalize, azimuth, time_window)
+                freq_bands, par, snr, normalize, azimuth, time_window,max_freq=max_freq)
 
             # Take only given elevations
             psd_all_c = psd_all_c[:, elevations, :]

@@ -1,12 +1,13 @@
 import matplotlib.pyplot as plt
-import src.visualization.helpers as hp
+import src.features.helpers_vis as hp_vis
+import src.features.helpers as hp
 import logging
 import pickle
 from pathlib import Path
 import numpy as np
 import click
 
-hp.set_layout(15)
+hp_vis.set_layout(15)
 
 
 ROOT = Path(__file__).resolve().parents[3]
@@ -15,9 +16,9 @@ SOUND_FILES = ROOT / 'data/raw/sound_samples/'
 # create a list of the sound files
 SOUND_FILES = list(SOUND_FILES.glob('**/*.wav'))
 
-# Define whether figures should be saved
+# Parameters
 @click.command()
-@click.option('--save_figs', default=False, help='Save the figures.')
+@click.option('--save_figs', type=click.BOOL, default=False, help='Save figures')
 @click.option('--save_type', default='svg', help='Define the format figures are saved.')
 @click.option('--model_name', default='single_participant', help='Defines the model name.')
 @click.option('--exp_name', default='single_participant_default', help='Defines the experiment name')
@@ -41,6 +42,10 @@ def main(save_figs=False, save_type='svg', model_name='all_participants', exp_na
     ######################## Set parameters ################################
     ########################################################################
 
+    # make sure save type is given
+    if not save_type or len(save_type) == 0:
+        save_type = 'svg'
+
     normalize = False
     time_window = 0.1  # time window in sec
 
@@ -50,9 +55,7 @@ def main(save_figs=False, save_type='svg', model_name='all_participants', exp_na
     ########################################################################
 
     # create unique experiment name
-    # create unique experiment name
-    exp_name_str = exp_name + '_' + normalization_type + str(sigma_smoothing) + str(sigma_gauss_norm) + str(mean_subtracted_map) + '_' + str(time_window) + '_window_' + str(
-        int(snr * 100)) + '_srn_' + str(freq_bands) + '_channels_'+str(max_freq)+'_max_freq_' + str((azimuth - 12) * 10) + '_azi_' + str(normalize) + '_norm' + str(len(elevations)) + '_elevs.npy'
+    exp_name_str = hp.create_exp_name([exp_name,normalization_type, sigma_smoothing, sigma_gauss_norm,mean_subtracted_map, time_window, int(snr * 100), freq_bands ,max_freq, (azimuth - 12) * 10, normalize, len(elevations)])
 
     exp_path = ROOT / 'models' / model_name
     exp_file = exp_path / exp_name_str
@@ -85,32 +88,32 @@ def main(save_figs=False, save_type='svg', model_name='all_participants', exp_na
         # plot regression line for each participant
         for i_par in range(x_mono.shape[0]):
 
-            hp.plot_localization_result(x_mono[i_par], y_mono[i_par], ax1, SOUND_FILES, scale_values=True, linear_reg=True, scatter_data=False)
+            hp_vis.plot_localization_result(x_mono[i_par], y_mono[i_par], ax1, SOUND_FILES, scale_values=True, linear_reg=True, scatter_data=False)
             ax1.set_title('Monoaural')
-            hp.set_axis(ax1)
+            hp_vis.set_axis(ax1)
             ax1.set_ylabel('Estimated Elevation [deg]')
             ax1.set_xlabel('True Elevation [deg]')
 
             # Monoaural Data (Ipsilateral), Mean Subtracted
-            hp.plot_localization_result(x_mono_mean[i_par], y_mono_mean[i_par], ax2, SOUND_FILES,
+            hp_vis.plot_localization_result(x_mono_mean[i_par], y_mono_mean[i_par], ax2, SOUND_FILES,
                                         scale_values=True, linear_reg=True, scatter_data=False)
             ax2.set_title('Mono - Mean')
-            hp.set_axis(ax2)
+            hp_vis.set_axis(ax2)
             ax2.set_xlabel('True Elevation [deg]')
 
             # Binaural Data (Ipsilateral), No Mean Subtracted
 
-            hp.plot_localization_result(x_bin[i_par], y_bin[i_par], ax3, SOUND_FILES, scale_values=True, linear_reg=True, scatter_data=False)
+            hp_vis.plot_localization_result(x_bin[i_par], y_bin[i_par], ax3, SOUND_FILES, scale_values=True, linear_reg=True, scatter_data=False)
             ax3.set_title('Binaural')
-            hp.set_axis(ax3)
+            hp_vis.set_axis(ax3)
             ax3.set_xlabel('True Elevation [deg]')
 
             # Binaural Data (Ipsilateral), Mean Subtracted
 
-            hp.plot_localization_result(x_bin_mean[i_par], y_bin_mean[i_par], ax4, SOUND_FILES,
+            hp_vis.plot_localization_result(x_bin_mean[i_par], y_bin_mean[i_par], ax4, SOUND_FILES,
                                         scale_values=True, linear_reg=True, scatter_data=False)
             ax4.set_title('Bin - Mean')
-            hp.set_axis(ax4)
+            hp_vis.set_axis(ax4)
             ax4.set_xlabel('True Elevation [deg]')
 
         # plot a common regression line
@@ -126,13 +129,13 @@ def main(save_figs=False, save_type='svg', model_name='all_participants', exp_na
         x_bin_mean_ = np.reshape(x_bin_mean, (x_bin_mean.shape[0] * x_bin_mean.shape[1], x_bin_mean.shape[2], x_bin_mean.shape[3]))
         y_bin_mean_ = np.reshape(y_bin_mean, (y_bin_mean.shape[0] * y_bin_mean.shape[1], y_bin_mean.shape[2]))
 
-        hp.plot_localization_result(x_mono_, y_mono_, ax1, SOUND_FILES, scale_values=False, linear_reg=True,
+        hp_vis.plot_localization_result(x_mono_, y_mono_, ax1, SOUND_FILES, scale_values=False, linear_reg=True,
                                     disp_values=True, scatter_data=False, reg_color="black")
-        hp.plot_localization_result(x_mono_mean_, y_mono_mean_, ax2, SOUND_FILES, scale_values=False,
+        hp_vis.plot_localization_result(x_mono_mean_, y_mono_mean_, ax2, SOUND_FILES, scale_values=False,
                                     linear_reg=True, disp_values=True, scatter_data=False, reg_color="black")
-        hp.plot_localization_result(x_bin_, y_bin_, ax3, SOUND_FILES, scale_values=False, linear_reg=True,
+        hp_vis.plot_localization_result(x_bin_, y_bin_, ax3, SOUND_FILES, scale_values=False, linear_reg=True,
                                     disp_values=True, scatter_data=False, reg_color="black")
-        hp.plot_localization_result(x_bin_mean_, y_bin_mean_, ax4, SOUND_FILES, scale_values=False,
+        hp_vis.plot_localization_result(x_bin_mean_, y_bin_mean_, ax4, SOUND_FILES, scale_values=False,
                                     linear_reg=True, disp_values=True, scatter_data=False, reg_color="black")
 
         if save_figs:

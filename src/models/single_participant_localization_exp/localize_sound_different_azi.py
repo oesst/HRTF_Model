@@ -84,8 +84,8 @@ def main(model_name='single_participant', exp_name='single_participant_different
     ########################################################################
 
     # create unique experiment name
-    exp_name_str = exp_name + '_' + normalization_type + str(sigma_smoothing) + str(sigma_gauss_norm) + str(mean_subtracted_map) + '_' + str(time_window) + '_window_' + str(
-        int(snr * 100)) + '_srn_' + str(freq_bands) + '_channels_'+str(max_freq)+'_max_freq_' + str((azimuth - 12) * 10) + '_azi_' + str(normalize) + '_norm' + str(len(elevations)) + '_elevs.npy'
+    exp_name_str = hp.create_exp_name([exp_name, normalization_type, sigma_smoothing, sigma_gauss_norm, mean_subtracted_map, time_window, int(
+        snr * 100), freq_bands, max_freq, participant_number, (azimuth - 12) * 10, normalize, len(elevations)])
 
     exp_path = ROOT / 'models' / model_name
     exp_file = exp_path / exp_name_str
@@ -101,7 +101,7 @@ def main(model_name='single_participant', exp_name='single_participant_different
         exp_path.mkdir(parents=True, exist_ok=True)
         # create or read the data
         psd_all_c, psd_all_i = generateData.create_data(
-            freq_bands, participant_number, snr, normalize, 12, time_window)
+            freq_bands, participant_number, snr, normalize, 12, time_window,max_freq=max_freq)
 
         # Take only given elevations
         psd_all_c = psd_all_c[:, elevations, :]

@@ -16,8 +16,8 @@ SOUND_FILES = list(SOUND_FILES.glob('**/*.wav'))
 
 # Define whether figures should be saved
 @click.command()
-@click.option('--model_name', default='single_participant', help='Defines the model name.')
-@click.option('--exp_name', default='single_participant_default', help='Defines the experiment name')
+@click.option('--model_name', default='all_participants', help='Defines the model name.')
+@click.option('--exp_name', default='localization_default', help='Defines the experiment name')
 @click.option('--azimuth', default=12, help='Azimuth for which localization is done. Default is 12')
 @click.option('--snr', default=0.2, help='Signal to noise ration to use. Default is 0.2')
 @click.option('--freq_bands', default=128, help='Amount of frequency bands to use. Default is 128')
@@ -59,8 +59,7 @@ def main(model_name='all_participants', exp_name='localization_default', azimuth
     ########################################################################
 
     # create unique experiment name
-    exp_name_str = exp_name + '_' + normalization_type + str(sigma_smoothing) + str(sigma_gauss_norm) + str(mean_subtracted_map) + '_' + str(time_window) + '_window_' + str(
-        int(snr * 100)) + '_srn_' + str(freq_bands) + '_channels_'+str(max_freq)+'_max_freq_' + str((azimuth - 12) * 10) + '_azi_' + str(normalize) + '_norm' + str(len(elevations)) + '_elevs.npy'
+    exp_name_str = hp.create_exp_name([exp_name,normalization_type, sigma_smoothing, sigma_gauss_norm,mean_subtracted_map, time_window, int(snr * 100), freq_bands ,max_freq, (azimuth - 12) * 10, normalize, len(elevations)])
 
     exp_path = ROOT / 'models' / model_name
     exp_file = exp_path / exp_name_str
@@ -85,7 +84,7 @@ def main(model_name='all_participants', exp_name='localization_default', azimuth
 
             # create or read the data
             psd_all_c, psd_all_i = generateData.create_data(
-                freq_bands, par, snr, normalize, azimuth, time_window)
+                freq_bands, par, snr, normalize, azimuth, time_window,max_freq=max_freq)
 
             # Take only given elevations
             psd_all_c = psd_all_c[:, elevations, :]

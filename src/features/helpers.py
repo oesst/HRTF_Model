@@ -108,3 +108,8 @@ def filter_dataset(dataset, normalization_type='sum_1', sigma_smoothing=0, sigma
         ds = ds / (gaussian_filter1d(ds, sigma=sigma_gauss_norm, mode='nearest', axis=2))
 
     return ds
+
+
+def create_exp_name(values):
+    # receives an array of values and returns a unique experiment name from these values
+    return '_'.join([ str(i) for i in values]) + '.npy'
