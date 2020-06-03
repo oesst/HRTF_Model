@@ -74,11 +74,11 @@ def main(save_figs=False, save_type='svg', model_name='all_participants', exp_na
 
     elevations = np.arange(0, elevations, 1)
 
-
     ########################################################################
     ########################################################################
 
-    exp_name_str = hp.create_exp_name([exp_name,normalization_type, sigma_smoothing, sigma_gauss_norm,mean_subtracted_map, time_window, int(snr * 100), freq_bands ,max_freq, (azimuth - 12) * 10, normalize, len(elevations)])
+    exp_name_str = hp.create_exp_name([exp_name, normalization_type, sigma_smoothing, sigma_gauss_norm, mean_subtracted_map, time_window, int(
+        snr * 100), freq_bands, max_freq, (azimuth - 12) * 10, normalize, len(elevations), ear])
 
     exp_path = ROOT / 'models' / model_name
     exp_file = exp_path / exp_name_str
@@ -107,10 +107,10 @@ def main(save_figs=False, save_type='svg', model_name='all_participants', exp_na
 
         # plot regression line for each participant
         for i_par, par in enumerate(participant_numbers):
-            coeff_ms[0,i_par],coeff_bs[0,i_par],scores[0,i_par] =get_regression_values(x_mono[i_par],y_mono[i_par])
-            coeff_ms[1,i_par],coeff_bs[1,i_par],scores[1,i_par] =get_regression_values(x_mono_mean[i_par],y_mono_mean[i_par])
-            coeff_ms[2,i_par],coeff_bs[2,i_par],scores[2,i_par] =get_regression_values(x_bin[i_par],y_bin[i_par])
-            coeff_ms[3,i_par],coeff_bs[3,i_par],scores[3,i_par] =get_regression_values(x_bin_mean[i_par],y_bin_mean[i_par])
+            coeff_ms[0, i_par], coeff_bs[0, i_par], scores[0, i_par] = get_regression_values(x_mono[i_par], y_mono[i_par])
+            coeff_ms[1, i_par], coeff_bs[1, i_par], scores[1, i_par] = get_regression_values(x_mono_mean[i_par], y_mono_mean[i_par])
+            coeff_ms[2, i_par], coeff_bs[2, i_par], scores[2, i_par] = get_regression_values(x_bin[i_par], y_bin[i_par])
+            coeff_ms[3, i_par], coeff_bs[3, i_par], scores[3, i_par] = get_regression_values(x_bin_mean[i_par], y_bin_mean[i_par])
 
             # sns.set_palette('muted')
             # my_pal = sns.color_palette("hls", 8)

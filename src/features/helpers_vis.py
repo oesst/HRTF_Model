@@ -32,6 +32,7 @@ class LinearReg():
         return [self.x, self.lr_model.predict(self.x)]
 
     def get_coefficients(self):
+        # gain, bias
         return self.lr_model.coef_[0, 0], self.lr_model.intercept_[0]
 
     def get_score(self, x=0, y=0):
@@ -142,7 +143,7 @@ def set_layout(drawing_size=25, regular_seaborn=False, box_frame=True):
         # sns.set_style("ticks")
     import seaborn as sns
     # 21 defines the number of sound types
-    sns.set_palette(sns.color_palette("husl", 21))
+    # sns.set_palette(sns.color_palette("husl", 21))
     mpl.rcParams['grid.linestyle'] = ':'
 
     mpl.rcParams['font.size'] = drawing_size

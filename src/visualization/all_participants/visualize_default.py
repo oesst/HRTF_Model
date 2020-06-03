@@ -55,7 +55,8 @@ def main(save_figs=False, save_type='svg', model_name='all_participants', exp_na
     ########################################################################
 
     # create unique experiment name
-    exp_name_str = hp.create_exp_name([exp_name,normalization_type, sigma_smoothing, sigma_gauss_norm,mean_subtracted_map, time_window, int(snr * 100), freq_bands ,max_freq, (azimuth - 12) * 10, normalize, len(elevations)])
+    exp_name_str = hp.create_exp_name([exp_name, normalization_type, sigma_smoothing, sigma_gauss_norm, mean_subtracted_map, time_window, int(
+        snr * 100), freq_bands, max_freq, (azimuth - 12) * 10, normalize, len(elevations), ear])
 
     exp_path = ROOT / 'models' / model_name
     exp_file = exp_path / exp_name_str
@@ -96,7 +97,7 @@ def main(save_figs=False, save_type='svg', model_name='all_participants', exp_na
 
             # Monoaural Data (Ipsilateral), Mean Subtracted
             hp_vis.plot_localization_result(x_mono_mean[i_par], y_mono_mean[i_par], ax2, SOUND_FILES,
-                                        scale_values=True, linear_reg=True, scatter_data=False)
+                                            scale_values=True, linear_reg=True, scatter_data=False)
             ax2.set_title('Mono - Mean')
             hp_vis.set_axis(ax2)
             ax2.set_xlabel('True Elevation [deg]')
@@ -111,7 +112,7 @@ def main(save_figs=False, save_type='svg', model_name='all_participants', exp_na
             # Binaural Data (Ipsilateral), Mean Subtracted
 
             hp_vis.plot_localization_result(x_bin_mean[i_par], y_bin_mean[i_par], ax4, SOUND_FILES,
-                                        scale_values=True, linear_reg=True, scatter_data=False)
+                                            scale_values=True, linear_reg=True, scatter_data=False)
             ax4.set_title('Bin - Mean')
             hp_vis.set_axis(ax4)
             ax4.set_xlabel('True Elevation [deg]')
@@ -130,13 +131,13 @@ def main(save_figs=False, save_type='svg', model_name='all_participants', exp_na
         y_bin_mean_ = np.reshape(y_bin_mean, (y_bin_mean.shape[0] * y_bin_mean.shape[1], y_bin_mean.shape[2]))
 
         hp_vis.plot_localization_result(x_mono_, y_mono_, ax1, SOUND_FILES, scale_values=False, linear_reg=True,
-                                    disp_values=True, scatter_data=False, reg_color="black")
+                                        disp_values=True, scatter_data=False, reg_color="black")
         hp_vis.plot_localization_result(x_mono_mean_, y_mono_mean_, ax2, SOUND_FILES, scale_values=False,
-                                    linear_reg=True, disp_values=True, scatter_data=False, reg_color="black")
+                                        linear_reg=True, disp_values=True, scatter_data=False, reg_color="black")
         hp_vis.plot_localization_result(x_bin_, y_bin_, ax3, SOUND_FILES, scale_values=False, linear_reg=True,
-                                    disp_values=True, scatter_data=False, reg_color="black")
+                                        disp_values=True, scatter_data=False, reg_color="black")
         hp_vis.plot_localization_result(x_bin_mean_, y_bin_mean_, ax4, SOUND_FILES, scale_values=False,
-                                    linear_reg=True, disp_values=True, scatter_data=False, reg_color="black")
+                                        linear_reg=True, disp_values=True, scatter_data=False, reg_color="black")
 
         if save_figs:
             fig_save_path = ROOT / 'reports' / 'figures' / model_name / exp_name_str

@@ -39,7 +39,6 @@ def main(save_figs=False, save_type='svg', model_name='all_participants', exp_na
     logger = logging.getLogger(__name__)
     logger.info('Showing localization results for all sounds')
 
-
     # make sure save type is given
     if not save_type or len(save_type) == 0:
         save_type = 'svg'
@@ -67,7 +66,8 @@ def main(save_figs=False, save_type='svg', model_name='all_participants', exp_na
     ########################################################################
 
     # create unique experiment name
-    exp_name_str = hp.create_exp_name([exp_name,normalization_type, sigma_smoothing, sigma_gauss_norm,mean_subtracted_map, time_window, int(snr * 100), freq_bands ,max_freq, (azimuth - 12) * 10, normalize, len(elevations)])
+    exp_name_str = hp.create_exp_name([exp_name, normalization_type, sigma_smoothing, sigma_gauss_norm, mean_subtracted_map, time_window, int(
+        snr * 100), freq_bands, max_freq, (azimuth - 12) * 10, normalize, len(elevations), ear])
 
     exp_path = ROOT / 'models' / model_name
     exp_file = exp_path / exp_name_str
@@ -100,7 +100,7 @@ def main(save_figs=False, save_type='svg', model_name='all_participants', exp_na
         # plot regression line for each sound
         for i_sound, sound in enumerate(sounds):
             hp_vis.plot_localization_result(x_mono[:, i_sound], y_mono[:, i_sound], ax1, SOUND_FILES,
-                                        scale_values=True, linear_reg=True, scatter_data=False)
+                                            scale_values=True, linear_reg=True, scatter_data=False)
             ax1.set_title('Monoaural')
             hp_vis.set_axis(ax1)
             ax1.set_ylabel('Estimated Elevation [deg]')
@@ -108,7 +108,7 @@ def main(save_figs=False, save_type='svg', model_name='all_participants', exp_na
 
             # Monoaural Data (Ipsilateral), Mean Subtracted
             hp_vis.plot_localization_result(x_mono_mean[:, i_sound], y_mono_mean[:, i_sound], ax2, SOUND_FILES,
-                                        scale_values=True, linear_reg=True, scatter_data=False)
+                                            scale_values=True, linear_reg=True, scatter_data=False)
             ax2.set_title('Mono - Mean')
             hp_vis.set_axis(ax2)
             ax2.set_xlabel('True Elevation [deg]')
@@ -116,7 +116,7 @@ def main(save_figs=False, save_type='svg', model_name='all_participants', exp_na
             # Binaural Data (Ipsilateral), No Mean Subtracted
 
             hp_vis.plot_localization_result(x_bin[:, i_sound], y_bin[:, i_sound], ax3, SOUND_FILES,
-                                        scale_values=True, linear_reg=True, scatter_data=False)
+                                            scale_values=True, linear_reg=True, scatter_data=False)
             ax3.set_title('Binaural')
             hp_vis.set_axis(ax3)
             ax3.set_xlabel('True Elevation [deg]')
@@ -124,7 +124,7 @@ def main(save_figs=False, save_type='svg', model_name='all_participants', exp_na
             # Binaural Data (Ipsilateral), Mean Subtracted
 
             hp_vis.plot_localization_result(x_bin_mean[:, i_sound], y_bin_mean[:, i_sound], ax4, SOUND_FILES,
-                                        scale_values=True, linear_reg=True, scatter_data=False)
+                                            scale_values=True, linear_reg=True, scatter_data=False)
             ax4.set_title('Bin - Mean')
             hp_vis.set_axis(ax4)
             ax4.set_xlabel('True Elevation [deg]')
@@ -143,13 +143,13 @@ def main(save_figs=False, save_type='svg', model_name='all_participants', exp_na
         y_bin_mean_ = np.reshape(y_bin_mean, (y_bin_mean.shape[0] * y_bin_mean.shape[1], y_bin_mean.shape[2]))
 
         hp_vis.plot_localization_result(x_mono_, y_mono_, ax1, SOUND_FILES, scale_values=False, linear_reg=True,
-                                    disp_values=True, scatter_data=False, reg_color="black")
+                                        disp_values=True, scatter_data=False, reg_color="black")
         hp_vis.plot_localization_result(x_mono_mean_, y_mono_mean_, ax2, SOUND_FILES, scale_values=False,
-                                    linear_reg=True, disp_values=True, scatter_data=False, reg_color="black")
+                                        linear_reg=True, disp_values=True, scatter_data=False, reg_color="black")
         hp_vis.plot_localization_result(x_bin_, y_bin_, ax3, SOUND_FILES, scale_values=False, linear_reg=True,
-                                    disp_values=True, scatter_data=False, reg_color="black")
+                                        disp_values=True, scatter_data=False, reg_color="black")
         hp_vis.plot_localization_result(x_bin_mean_, y_bin_mean_, ax4, SOUND_FILES, scale_values=False,
-                                    linear_reg=True, disp_values=True, scatter_data=False, reg_color="black")
+                                        linear_reg=True, disp_values=True, scatter_data=False, reg_color="black")
 
         # get the name of the sounds
         sound_names = np.array([i.name.split('.')[0] for i in SOUND_FILES])

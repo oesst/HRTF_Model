@@ -117,6 +117,15 @@ create_elevation_spectra_maps:
 		$(PYTHON_INTERPRETER) src/visualization/all_elevation_spectra_maps/visualize_raw_maps.py --save_figs=$(save_figs) --save_type=$(save_type) --model_name='elevation_spectra_maps' --exp_name=$(exp_name) --azimuth=$(azimuth)  --snr=$(snr) --freq_bands=$(freq_bands) --max_freq=$(max_freq) --elevations=$(elevations) --participant_numbers=$(participant_numbers)
 
 
+map_learning:
+	test $(exp_name)
+	test $(n_trials)
+
+	# create model file
+	$(PYTHON_INTERPRETER) src/models/map_learning_exp/map_learning.py --model_name='map_learning' --exp_name=$(exp_name) --azimuth=$(azimuth) --n_trials=$(n_trials) --snr=$(snr) --freq_bands=$(freq_bands) --max_freq=$(max_freq) --elevations=$(elevations) --mean_subtracted_map=$(mean_subtracted_map) --ear=$(ear) --normalization_type=$(normalization_type) --sigma_smoothing=$(sigma_smoothing) --sigma_gauss_norm=$(sigma_gauss_norm) $(clean)
+	$(PYTHON_INTERPRETER) src/visualization/map_learning/visualize_default.py --save_figs=$(save_figs) --save_type=$(save_type) --model_name='map_learning' --exp_name=$(exp_name) --azimuth=$(azimuth) --n_trials=$(n_trials) --snr=$(snr) --freq_bands=$(freq_bands) --max_freq=$(max_freq) --elevations=$(elevations) --mean_subtracted_map=$(mean_subtracted_map) --ear=$(ear) --normalization_type=$(normalization_type) --sigma_smoothing=$(sigma_smoothing) --sigma_gauss_norm=$(sigma_gauss_norm)
+
+
 
 
 #################################################################################

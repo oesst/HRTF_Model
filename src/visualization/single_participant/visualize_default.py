@@ -55,7 +55,7 @@ def main(save_figs=False, save_type='svg', model_name='single_participant', exp_
     ########################################################################
 
     exp_name_str = hp.create_exp_name([exp_name, normalization_type, sigma_smoothing, sigma_gauss_norm, mean_subtracted_map, time_window, int(
-        snr * 100), freq_bands, max_freq, participant_number, (azimuth - 12) * 10, normalize, len(elevations)])
+        snr * 100), freq_bands, max_freq, participant_number, (azimuth - 12) * 10, normalize, len(elevations), ear])
 
     exp_path = ROOT / 'models' / model_name
     exp_file = exp_path / exp_name_str

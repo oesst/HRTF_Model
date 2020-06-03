@@ -9,7 +9,7 @@ from scipy.spatial import distance
 from sklearn.linear_model import LinearRegression
 from scipy.ndimage import gaussian_filter1d
 import seaborn as sns
-
+from src.features.helpers_vis import LinearReg
 
 def process_inputs(psd_all_i, psd_all_c, ear='ipsi', normalization_type='sum_1', sigma_smoothing=0, sigma_gauss_norm=1):
     # filter the data
@@ -108,6 +108,14 @@ def filter_dataset(dataset, normalization_type='sum_1', sigma_smoothing=0, sigma
         ds = ds / (gaussian_filter1d(ds, sigma=sigma_gauss_norm, mode='nearest', axis=2))
 
     return ds
+
+def get_localization_coefficients_score(x_test, y_test):
+    x_test = np.reshape(x_test, (x_test.shape[0] * x_test.shape[1], 2))
+    y_test = np.reshape(y_test, (y_test.shape[0] * y_test.shape[1]))
+
+    lr_model = LinearReg(x_test, y_test)
+    gain, bias = lr_model.get_coefficients()
+    return gain, bias, lr_model.get_score()
 
 
 def create_exp_name(values):
