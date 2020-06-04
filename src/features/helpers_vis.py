@@ -68,7 +68,7 @@ def removeOutliers(x, outlierConstant=1.5):
     return np.array(resultList)
 
 
-def scale_v(x_test, y_test,n_elevations):
+def scale_v(x_test, y_test, n_elevations):
     a = x_test[:, :, 1] / n_elevations
     a = a * (n_elevations-1)*5.625 - 45
     x_test[:, :, 1] = a

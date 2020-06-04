@@ -155,7 +155,7 @@ def main(save_figs=False, save_type='svg', model_name='all_participants', exp_na
         sound_names = np.array([i.name.split('.')[0] for i in SOUND_FILES])
 
         lgd = ax4.legend(sound_names, loc=(1.04, 0))
-
+        # plt.tight_layout()
         if save_figs:
             fig_save_path = ROOT / 'reports' / 'figures' / model_name / exp_name_str
             if not fig_save_path.exists():
@@ -164,7 +164,8 @@ def main(save_figs=False, save_type='svg', model_name='all_participants', exp_na
             plt.savefig((fig_save_path / (exp_name + '_localization_sounds.' + save_type)).as_posix(),
                         dpi=300, bbox_extra_artists=(lgd,), bbox_inches='tight')
 
-        plt.show()
+        else:
+            plt.show()
     else:
         logger.error('No data set found. Run model first!')
         logger.error(exp_file)

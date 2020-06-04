@@ -125,7 +125,8 @@ def main(save_figs=False, save_type='svg', model_name='all_participants', exp_na
             logger.info('Saving figures to ' + fig_save_path.as_posix())
             plt.savefig((fig_save_path / (exp_name + '_map_learning.' + save_type)).as_posix(), dpi=300)
 
-        plt.show()
+        else:
+            plt.show()
     else:
         logger.error('No data set found. Run model first!')
         logger.error(exp_file)

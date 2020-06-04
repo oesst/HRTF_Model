@@ -18,7 +18,7 @@ SOUND_FILES = list(SOUND_FILES.glob('**/*.wav'))
 
 
 def get_regression_values(x, y):
-    x, y = hp_vis.scale_v(x, y)
+    x, y = hp_vis.scale_v(x, y, x.shape[1])
     x = np.reshape(x, (x.shape[0] * x.shape[1], 2))
     y = np.reshape(y, (y.shape[0] * y.shape[1]))
 
@@ -173,7 +173,9 @@ def main(save_figs=False, save_type='svg', model_name='different_learned_maps', 
             logger.info('Saving figures to ' + fig_save_path.as_posix())
             plt.savefig((fig_save_path / (exp_name + '_regression_values.' + save_type)).as_posix(), dpi=300)
 
-        plt.show()
+        else:
+            plt.show()
+            
     else:
         logger.error('No data set found. Run model first!')
         logger.error(exp_file)

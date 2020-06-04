@@ -19,7 +19,8 @@ SOUND_FILES = list(SOUND_FILES.glob('**/*.wav'))
 
 def plot_corrcoeff(map, ax):
 
-    c = ax.pcolormesh(map, vmin=-1.0, vmax=1.0)
+    # c = ax.pcolormesh(map, vmin=-1.0, vmax=1.0)
+    c = ax.pcolormesh(map)
     cbar = plt.colorbar(c)
     cbar.ax.get_yaxis().labelpad = 15
     cbar.set_label('Correlation Coefficient',  labelpad=10, rotation=270)
@@ -108,7 +109,9 @@ def main(save_figs=False, save_type='svg', model_name='hrtf_comparison', exp_nam
             logger.info('Saving figures to ' + fig_save_path.as_posix())
             plt.savefig((fig_save_path / (exp_name + '_hrtfs_xcorr.' + save_type)).as_posix(), dpi=300)
 
-        plt.show()
+        else:
+            plt.show()
+            
     else:
         logger.error('No data set found. Run model first!')
         logger.error(exp_file)

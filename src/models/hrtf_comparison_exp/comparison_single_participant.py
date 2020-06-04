@@ -106,7 +106,7 @@ def main(model_name='hrtf_comparison', exp_name='single_participant', azimuth=12
 
         # create or read the data
         psd_all_c, psd_all_i = generateData.create_data(
-            freq_bands, participant_number, snr, normalize, azimuth, time_window,max_freq=max_freq)
+            freq_bands, participant_number, snr, normalize, azimuth, time_window, max_freq=max_freq)
 
         # filter data and integrate it
         psd_mono, psd_mono_mean, psd_binaural, psd_binaural_mean = process_inputs(
@@ -120,7 +120,7 @@ def main(model_name='hrtf_comparison', exp_name='single_participant', azimuth=12
         # learned_map = hp.create_map(psd_mono, False)
         # Get the actual HRTF
         hrtfs_c, hrtfs_i = generateHRTFs.create_data(
-            freq_bands, participant_number, snr, normalize, azimuth, time_window,max_freq=max_freq)
+            freq_bands, participant_number, snr, normalize, azimuth, time_window, max_freq=max_freq)
 
         # filter data and integrate it
         # hrtfs_c = hp.filter_dataset(hrtfs_c, normalization_type=normalization_type,
@@ -132,10 +132,17 @@ def main(model_name='hrtf_comparison', exp_name='single_participant', azimuth=12
             hrtfs_i, hrtfs_c, 'contra', normalization_type, sigma_smoothing, sigma_gauss_norm)
 
         # remove mean for later comparison
-        hrtfs_c = np.squeeze(hrtfs_c[0, 0:len(elevations), :])
+        hrtfs_c = np.squeeze(hrtfs_c[0, elevations, :])
         hrtfs_c -= hrtfs_c.mean()
-        hrtfs_i = np.squeeze(hrtfs_i[0, 0:len(elevations), :])
+        hrtfs_i = np.squeeze(hrtfs_i[0, elevations, :])
         hrtfs_i -= hrtfs_i.mean()
+
+        # remove unwanted elevations
+        learned_map_mono = learned_map_mono[elevations, :]
+        learned_map_mono_mean = learned_map_mono_mean[elevations, :]
+        learned_map_bin = learned_map_bin[elevations, :]
+        learned_map_bin_mean = learned_map_bin_mean[elevations, :]
+
         learned_map_mono -= learned_map_mono.mean()
         learned_map_mono_mean -= learned_map_mono_mean.mean()
         learned_map_bin -= learned_map_bin.mean()

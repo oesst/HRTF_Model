@@ -105,7 +105,8 @@ def main(save_figs=False, save_type='svg', model_name='hrtf_comparison', exp_nam
             plt.savefig((fig_save_path / (exp_name +'_'+str(participant_number)+ '_raw_hrtfs.' + save_type)).as_posix(), dpi=300, transparent=True)
             plt.close()
 
-        plt.show()
+        else:
+            plt.show()
 
     else:
         logger.error('No data set found. Run model first!')

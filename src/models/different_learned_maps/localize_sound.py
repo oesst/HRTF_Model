@@ -67,7 +67,7 @@ def main(model_name='different_learned_maps', exp_name='localization_default', a
     if not clean and exp_path.exists() and exp_file.is_file():
         # try to load the model files
         with exp_file.open('rb') as f:
-            logger.info('Reading model data from file')
+            logger.info('Reading model data from file'+exp_file.as_posix())
             [x_mono, y_mono, x_mono_mean, y_mono_mean, x_bin,
                 y_bin, x_bin_mean, y_bin_mean] = pickle.load(f)
     else:

@@ -139,14 +139,16 @@ def main(save_figs=False, save_type='svg', model_name='all_participants', exp_na
         hp_vis.plot_localization_result(x_bin_mean_, y_bin_mean_, ax4, SOUND_FILES, scale_values=False,
                                         linear_reg=True, disp_values=True, scatter_data=False, reg_color="black")
 
+        plt.tight_layout()
+
         if save_figs:
             fig_save_path = ROOT / 'reports' / 'figures' / model_name / exp_name_str
             if not fig_save_path.exists():
                 fig_save_path.mkdir(parents=True, exist_ok=True)
             logger.info('Saving figures to ' + fig_save_path.as_posix())
             plt.savefig((fig_save_path / (exp_name + '_localization.' + save_type)).as_posix(), dpi=300)
-
-        plt.show()
+        else:
+            plt.show()
     else:
         logger.error('No data set found. Run model first!')
         logger.error(exp_file)

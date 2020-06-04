@@ -46,7 +46,7 @@ requirements: test_environment
 	$(PYTHON_INTERPRETER) -m pip install -r requirements.txt
 
 ## Make Dataset
-data: requirements
+data:
 	$(PYTHON_INTERPRETER) src/data/generateData.py
 
 ## Delete all compiled Python files
@@ -75,6 +75,10 @@ ifeq ($(visualization_type),regression)
 	$(PYTHON_INTERPRETER) src/visualization/all_participants/visualize_regression_values.py --save_figs=$(save_figs) --save_type=$(save_type) --model_name='all_participants' --exp_name=$(exp_name) --azimuth=$(azimuth)  --snr=$(snr) --freq_bands=$(freq_bands) --max_freq=$(max_freq) --elevations=$(elevations) --mean_subtracted_map=$(mean_subtracted_map) --ear=$(ear) --normalization_type=$(normalization_type) --sigma_smoothing=$(sigma_smoothing) --sigma_gauss_norm=$(sigma_gauss_norm)
 else ifeq ($(visualization_type),sounds)
 	$(PYTHON_INTERPRETER) src/visualization/all_participants/visualize_sound.py --save_figs=$(save_figs) --save_type=$(save_type) --model_name='all_participants' --exp_name=$(exp_name) --azimuth=$(azimuth)  --snr=$(snr) --freq_bands=$(freq_bands) --max_freq=$(max_freq) --elevations=$(elevations) --mean_subtracted_map=$(mean_subtracted_map) --ear=$(ear) --normalization_type=$(normalization_type) --sigma_smoothing=$(sigma_smoothing) --sigma_gauss_norm=$(sigma_gauss_norm)
+else ifeq ($(visualization_type),all)
+	$(PYTHON_INTERPRETER) src/visualization/all_participants/visualize_default.py --save_figs=$(save_figs) --save_type=$(save_type) --model_name='all_participants' --exp_name=$(exp_name) --azimuth=$(azimuth)  --snr=$(snr) --freq_bands=$(freq_bands) --max_freq=$(max_freq) --elevations=$(elevations) --mean_subtracted_map=$(mean_subtracted_map) --ear=$(ear) --normalization_type=$(normalization_type) --sigma_smoothing=$(sigma_smoothing) --sigma_gauss_norm=$(sigma_gauss_norm)
+	$(PYTHON_INTERPRETER) src/visualization/all_participants/visualize_regression_values.py --save_figs=$(save_figs) --save_type=$(save_type) --model_name='all_participants' --exp_name=$(exp_name) --azimuth=$(azimuth)  --snr=$(snr) --freq_bands=$(freq_bands) --max_freq=$(max_freq) --elevations=$(elevations) --mean_subtracted_map=$(mean_subtracted_map) --ear=$(ear) --normalization_type=$(normalization_type) --sigma_smoothing=$(sigma_smoothing) --sigma_gauss_norm=$(sigma_gauss_norm)
+	$(PYTHON_INTERPRETER) src/visualization/all_participants/visualize_sound.py --save_figs=$(save_figs) --save_type=$(save_type) --model_name='all_participants' --exp_name=$(exp_name) --azimuth=$(azimuth)  --snr=$(snr) --freq_bands=$(freq_bands) --max_freq=$(max_freq) --elevations=$(elevations) --mean_subtracted_map=$(mean_subtracted_map) --ear=$(ear) --normalization_type=$(normalization_type) --sigma_smoothing=$(sigma_smoothing) --sigma_gauss_norm=$(sigma_gauss_norm)
 else
 	$(PYTHON_INTERPRETER) src/visualization/all_participants/visualize_default.py --save_figs=$(save_figs) --save_type=$(save_type) --model_name='all_participants' --exp_name=$(exp_name) --azimuth=$(azimuth)  --snr=$(snr) --freq_bands=$(freq_bands) --max_freq=$(max_freq) --elevations=$(elevations) --mean_subtracted_map=$(mean_subtracted_map) --ear=$(ear) --normalization_type=$(normalization_type) --sigma_smoothing=$(sigma_smoothing) --sigma_gauss_norm=$(sigma_gauss_norm)
 endif
@@ -85,14 +89,16 @@ different_learned_maps:
 		test $(visualization_type)
 
 		# create model file
-		$(PYTHON_INTERPRETER) src/models/different_learned_maps/localize_sound.py --model_name='all_participants' --exp_name=$(exp_name) --azimuth=$(azimuth) --snr=$(snr) --freq_bands=$(freq_bands) --max_freq=$(max_freq) --elevations=$(elevations) --mean_subtracted_map=$(mean_subtracted_map) --ear=$(ear) --normalization_type=$(normalization_type) --sigma_smoothing=$(sigma_smoothing) --sigma_gauss_norm=$(sigma_gauss_norm) $(clean)
+		$(PYTHON_INTERPRETER) src/models/different_learned_maps/localize_sound.py --model_name='different_learned_maps' --exp_name=$(exp_name) --azimuth=$(azimuth) --snr=$(snr) --freq_bands=$(freq_bands) --max_freq=$(max_freq) --elevations=$(elevations) --mean_subtracted_map=$(mean_subtracted_map) --ear=$(ear) --normalization_type=$(normalization_type) --sigma_smoothing=$(sigma_smoothing) --sigma_gauss_norm=$(sigma_gauss_norm) $(clean)
 		# visualization
 ifeq ($(visualization_type),regression)
-	$(PYTHON_INTERPRETER) src/visualization/different_learned_maps/visualize_regression_values.py --save_figs=$(save_figs) --save_type=$(save_type) --model_name='all_participants' --exp_name=$(exp_name) --azimuth=$(azimuth)  --snr=$(snr) --freq_bands=$(freq_bands) --max_freq=$(max_freq) --elevations=$(elevations) --mean_subtracted_map=$(mean_subtracted_map) --ear=$(ear) --normalization_type=$(normalization_type) --sigma_smoothing=$(sigma_smoothing) --sigma_gauss_norm=$(sigma_gauss_norm)
+	$(PYTHON_INTERPRETER) src/visualization/different_learned_maps/visualize_regression_values.py --save_figs=$(save_figs) --save_type=$(save_type) --model_name='different_learned_maps' --exp_name=$(exp_name) --azimuth=$(azimuth)  --snr=$(snr) --freq_bands=$(freq_bands) --max_freq=$(max_freq) --elevations=$(elevations) --mean_subtracted_map=$(mean_subtracted_map) --ear=$(ear) --normalization_type=$(normalization_type) --sigma_smoothing=$(sigma_smoothing) --sigma_gauss_norm=$(sigma_gauss_norm)
+else ifeq ($(visualization_type),all)
+	$(PYTHON_INTERPRETER) src/visualization/different_learned_maps/visualize_regression_values.py --save_figs=$(save_figs) --save_type=$(save_type) --model_name='different_learned_maps' --exp_name=$(exp_name) --azimuth=$(azimuth)  --snr=$(snr) --freq_bands=$(freq_bands) --max_freq=$(max_freq) --elevations=$(elevations) --mean_subtracted_map=$(mean_subtracted_map) --ear=$(ear) --normalization_type=$(normalization_type) --sigma_smoothing=$(sigma_smoothing) --sigma_gauss_norm=$(sigma_gauss_norm)
+	$(PYTHON_INTERPRETER) src/visualization/different_learned_maps/visualize_default.py --save_figs=$(save_figs) --save_type=$(save_type) --model_name='different_learned_maps' --exp_name=$(exp_name) --azimuth=$(azimuth)  --snr=$(snr) --freq_bands=$(freq_bands) --max_freq=$(max_freq) --elevations=$(elevations) --mean_subtracted_map=$(mean_subtracted_map) --ear=$(ear) --normalization_type=$(normalization_type) --sigma_smoothing=$(sigma_smoothing) --sigma_gauss_norm=$(sigma_gauss_norm)
 else
-	$(PYTHON_INTERPRETER) src/visualization/different_learned_maps/visualize_default.py --save_figs=$(save_figs) --save_type=$(save_type) --model_name='all_participants' --exp_name=$(exp_name) --azimuth=$(azimuth)  --snr=$(snr) --freq_bands=$(freq_bands) --max_freq=$(max_freq) --elevations=$(elevations) --mean_subtracted_map=$(mean_subtracted_map) --ear=$(ear) --normalization_type=$(normalization_type) --sigma_smoothing=$(sigma_smoothing) --sigma_gauss_norm=$(sigma_gauss_norm)
+	$(PYTHON_INTERPRETER) src/visualization/different_learned_maps/visualize_default.py --save_figs=$(save_figs) --save_type=$(save_type) --model_name='different_learned_maps' --exp_name=$(exp_name) --azimuth=$(azimuth)  --snr=$(snr) --freq_bands=$(freq_bands) --max_freq=$(max_freq) --elevations=$(elevations) --mean_subtracted_map=$(mean_subtracted_map) --ear=$(ear) --normalization_type=$(normalization_type) --sigma_smoothing=$(sigma_smoothing) --sigma_gauss_norm=$(sigma_gauss_norm)
 endif
-
 
 
 hrtf_comparison:
@@ -101,9 +107,12 @@ hrtf_comparison:
 	test $(visualization_type)
 
 	# create model file
-	$(PYTHON_INTERPRETER) src/models/hrtf_comparison_exp/comparison_single_participant.py --model_name='hrtf_comparison' --exp_name=$(exp_name) --azimuth=$(azimuth) --participant_number=$(participant_number) --snr=$(snr) --freq_bands=$(freq_bands) --max_freq=$(max_freq) --elevations=$(elevations) --mean_subtracted_map=$(mean_subtracted_map) --ear=$(ear) --normalization_type=$(normalization_type) --sigma_smoothing=$(sigma_smoothing) --sigma_gauss_norm=$(sigma_gauss_norm) $(clean)
+	$(PYTHON_INTERPRETER) src/models/hrtf_comparison_exp/comparison_single_participant.py --model_name='hrtf_comparison' --exp_name=$(exp_name) --azimuth=$(azimuth) --participant_number=$(participant_number) --snr=0.0 --freq_bands=$(freq_bands) --max_freq=$(max_freq) --elevations=$(elevations) --mean_subtracted_map=$(mean_subtracted_map) --ear=$(ear) --normalization_type=$(normalization_type) --sigma_smoothing=$(sigma_smoothing) --sigma_gauss_norm=$(sigma_gauss_norm) $(clean)
 ifeq ($(visualization_type),single_hrtf)
 	$(PYTHON_INTERPRETER) src/visualization/hrtf_comparison/visualize_single_hrtf.py --save_figs=$(save_figs) --save_type=$(save_type) --model_name='hrtf_comparison' --exp_name=$(exp_name) --azimuth=$(azimuth) --participant_number=$(participant_number) --snr=$(snr) --freq_bands=$(freq_bands) --max_freq=$(max_freq) --elevations=$(elevations) --mean_subtracted_map=$(mean_subtracted_map) --ear=$(ear) --normalization_type=$(normalization_type) --sigma_smoothing=$(sigma_smoothing) --sigma_gauss_norm=$(sigma_gauss_norm)
+else ifeq ($(visualization_type),all)
+	$(PYTHON_INTERPRETER) src/visualization/hrtf_comparison/visualize_single_hrtf.py --save_figs=$(save_figs) --save_type=$(save_type) --model_name='hrtf_comparison' --exp_name=$(exp_name) --azimuth=$(azimuth) --participant_number=$(participant_number) --snr=$(snr) --freq_bands=$(freq_bands) --max_freq=$(max_freq) --elevations=$(elevations) --mean_subtracted_map=$(mean_subtracted_map) --ear=$(ear) --normalization_type=$(normalization_type) --sigma_smoothing=$(sigma_smoothing) --sigma_gauss_norm=$(sigma_gauss_norm)
+	$(PYTHON_INTERPRETER) src/visualization/hrtf_comparison/visualize_default.py --save_figs=$(save_figs) --save_type=$(save_type) --model_name='hrtf_comparison' --exp_name=$(exp_name) --azimuth=$(azimuth) --participant_number=$(participant_number) --snr=$(snr) --freq_bands=$(freq_bands) --max_freq=$(max_freq) --elevations=$(elevations) --mean_subtracted_map=$(mean_subtracted_map) --ear=$(ear) --normalization_type=$(normalization_type) --sigma_smoothing=$(sigma_smoothing) --sigma_gauss_norm=$(sigma_gauss_norm)
 else
 	$(PYTHON_INTERPRETER) src/visualization/hrtf_comparison/visualize_default.py --save_figs=$(save_figs) --save_type=$(save_type) --model_name='hrtf_comparison' --exp_name=$(exp_name) --azimuth=$(azimuth) --participant_number=$(participant_number) --snr=$(snr) --freq_bands=$(freq_bands) --max_freq=$(max_freq) --elevations=$(elevations) --mean_subtracted_map=$(mean_subtracted_map) --ear=$(ear) --normalization_type=$(normalization_type) --sigma_smoothing=$(sigma_smoothing) --sigma_gauss_norm=$(sigma_gauss_norm)
 endif
@@ -124,6 +133,21 @@ map_learning:
 	# create model file
 	$(PYTHON_INTERPRETER) src/models/map_learning_exp/map_learning.py --model_name='map_learning' --exp_name=$(exp_name) --azimuth=$(azimuth) --n_trials=$(n_trials) --snr=$(snr) --freq_bands=$(freq_bands) --max_freq=$(max_freq) --elevations=$(elevations) --mean_subtracted_map=$(mean_subtracted_map) --ear=$(ear) --normalization_type=$(normalization_type) --sigma_smoothing=$(sigma_smoothing) --sigma_gauss_norm=$(sigma_gauss_norm) $(clean)
 	$(PYTHON_INTERPRETER) src/visualization/map_learning/visualize_default.py --save_figs=$(save_figs) --save_type=$(save_type) --model_name='map_learning' --exp_name=$(exp_name) --azimuth=$(azimuth) --n_trials=$(n_trials) --snr=$(snr) --freq_bands=$(freq_bands) --max_freq=$(max_freq) --elevations=$(elevations) --mean_subtracted_map=$(mean_subtracted_map) --ear=$(ear) --normalization_type=$(normalization_type) --sigma_smoothing=$(sigma_smoothing) --sigma_gauss_norm=$(sigma_gauss_norm)
+
+
+parameter_sweep:
+	test $(exp_name)
+
+	# create model file
+	$(PYTHON_INTERPRETER) src/models/parameter_sweep_exp/parameter_sweep.py --model_name='parameter_sweep' --exp_name=$(exp_name) --azimuth=$(azimuth) --snr=$(snr) --freq_bands=$(freq_bands) --max_freq=$(max_freq) --elevations=$(elevations) --mean_subtracted_map=$(mean_subtracted_map) --ear=$(ear) --normalization_type=$(normalization_type)  $(clean)
+	$(PYTHON_INTERPRETER) src/visualization/parameter_sweep/visualize_default.py --save_figs=$(save_figs) --save_type=$(save_type) --model_name='parameter_sweep' --exp_name=$(exp_name) --azimuth=$(azimuth) --snr=$(snr) --freq_bands=$(freq_bands) --max_freq=$(max_freq) --elevations=$(elevations) --mean_subtracted_map=$(mean_subtracted_map) --ear=$(ear) --normalization_type=$(normalization_type)
+
+
+# run all models and visualizations
+all: 	single_participant all_participants different_learned_maps hrtf_comparison map_learning
+
+
+
 
 
 
