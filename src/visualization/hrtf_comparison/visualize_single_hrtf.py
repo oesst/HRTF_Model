@@ -102,7 +102,7 @@ def main(save_figs=False, save_type='svg', model_name='hrtf_comparison', exp_nam
             if not fig_save_path.exists():
                 fig_save_path.mkdir(parents=True, exist_ok=True)
             logger.info('Saving figures to ' + fig_save_path.as_posix())
-            plt.savefig((fig_save_path / (exp_name +'_'+str(participant_number)+ '_raw_hrtfs.' + save_type)).as_posix(), dpi=300, transparent=True)
+            plt.savefig((fig_save_path / (model_name + '_' + exp_name + '_'+str(participant_number)+ '_raw_hrtfs.' + save_type)).as_posix(), dpi=300, transparent=True)
             plt.close()
 
         else:

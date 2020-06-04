@@ -120,4 +120,4 @@ def get_localization_coefficients_score(x_test, y_test):
 
 def create_exp_name(values):
     # receives an array of values and returns a unique experiment name from these values
-    return '_'.join([ str(i) for i in values]) + '.npy'
+    return '_'.join([ str(float(i)) if type(i) == int  else str(i) for i in values ]) + '.npy'

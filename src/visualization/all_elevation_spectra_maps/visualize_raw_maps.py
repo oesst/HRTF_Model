@@ -164,7 +164,7 @@ def main(save_figs=False, save_type='svg', model_name='elevation_spectra_maps', 
                     fig_save_path = ROOT / 'reports' / 'figures' / model_name / exp_name_str / ('participant_' + str(par))
                     if not fig_save_path.exists():
                         fig_save_path.mkdir(parents=True, exist_ok=True)
-                    plt.savefig((fig_save_path / (exp_name + '_raw_maps_contra_' + str(sound) +
+                    plt.savefig((fig_save_path / (model_name + '_' + exp_name + '_raw_maps_contra_' + str(sound) +
                                                   '.' + save_type)).as_posix(), dpi=300, transparent=True)
                     logger.info('Writing File :' + fig_save_path.name +'_' (exp_name + '_raw_maps_contra_' + str(sound) + '.' + save_type))
                     print(save_type)

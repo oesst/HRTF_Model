@@ -161,7 +161,7 @@ def main(save_figs=False, save_type='svg', model_name='all_participants', exp_na
             if not fig_save_path.exists():
                 fig_save_path.mkdir(parents=True, exist_ok=True)
             logger.info('Saving figures to ' + fig_save_path.as_posix())
-            plt.savefig((fig_save_path / (exp_name + '_localization_sounds.' + save_type)).as_posix(),
+            plt.savefig((fig_save_path / (model_name + '_' + exp_name + '_localization_sounds.' + save_type)).as_posix(),
                         dpi=300, bbox_extra_artists=(lgd,), bbox_inches='tight')
 
         else:

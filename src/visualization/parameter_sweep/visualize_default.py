@@ -49,8 +49,7 @@ def main(save_figs=False, save_type='svg', model_name='parameter_sweep', exp_nam
 
     elevations = np.arange(0, elevations, 1)
 
-    sigma_smoothing_vals = np.arange(0.1, 3.0, 0.05)
-    sigma_gauss_norm_vals = np.arange(0.1, 3.0, 0.05)
+
     ########################################################################
     ########################################################################
 
@@ -65,12 +64,13 @@ def main(save_figs=False, save_type='svg', model_name='parameter_sweep', exp_nam
         # try to load the model files
         with open(exp_file.as_posix(), 'rb') as f:
             logger.info('Reading model data from file')
-            [scores] = pickle.load(f)
+            [scores,sigma_smoothing_vals,sigma_gauss_norm_vals] = pickle.load(f)
 
         fig = plt.figure(figsize=(20, 5))
         axes = fig.subplots(1,3,sharex=True,sharey=True)
         ax = axes[0]
-        p = ax.pcolormesh(sigma_smoothing_vals, sigma_gauss_norm_vals, np.squeeze(scores[:, :, 0]), vmin=-0.1, vmax=1.0)
+        p = ax.pcolormesh(sigma_smoothing_vals, sigma_gauss_norm_vals, np.squeeze(scores[:, :, 0]),linewidth=0,rasterized=True)
+        p.set_edgecolor('face')
         ax.set_xlabel(r'Gauss Normalization $\sigma$')
         ax.set_ylabel(r'Smoothing $\sigma$')
         # ax.set_title('Gain')
@@ -79,7 +79,8 @@ def main(save_figs=False, save_type='svg', model_name='parameter_sweep', exp_nam
         cbar.ax.get_yaxis().labelpad = 15
 
         ax = axes[1]
-        p = ax.pcolormesh(sigma_smoothing_vals, sigma_gauss_norm_vals, np.squeeze(scores[:, :, 1]))
+        p = ax.pcolormesh(sigma_smoothing_vals, sigma_gauss_norm_vals, np.squeeze(scores[:, :, 1]),linewidth=0,rasterized=True)
+        p.set_edgecolor('face')
         ax.set_xlabel(r'Gauss Normalization $\sigma$')
         # ax.set_ylabel('Smoothing Sigma')
         # ax.set_title('Bias')
@@ -88,7 +89,8 @@ def main(save_figs=False, save_type='svg', model_name='parameter_sweep', exp_nam
         cbar.ax.get_yaxis().labelpad = 15
 
         ax = axes[2]
-        p = ax.pcolormesh(sigma_smoothing_vals, sigma_gauss_norm_vals, np.squeeze(scores[1:, 1:, 2]), vmin=0.0)
+        p = ax.pcolormesh(sigma_smoothing_vals, sigma_gauss_norm_vals, np.squeeze(scores[:, :, 2]),linewidth=0,rasterized=True)
+        p.set_edgecolor('face')
         ax.set_xlabel(r'Gauss Normalization $\sigma$')
         # ax.set_ylabel('Smoothing Sigma')
         # ax.set_title('Score')
@@ -103,7 +105,7 @@ def main(save_figs=False, save_type='svg', model_name='parameter_sweep', exp_nam
             if not fig_save_path.exists():
                 fig_save_path.mkdir(parents=True, exist_ok=True)
             logger.info('Saving figures to ' + fig_save_path.as_posix())
-            plt.savefig((fig_save_path / (exp_name + '_sweep.' + save_type)).as_posix(), dpi=300)
+            plt.savefig((fig_save_path / (model_name + '_' + exp_name + '_sweep.' + save_type)).as_posix(), dpi=300)
         else:
             plt.show()
     else:

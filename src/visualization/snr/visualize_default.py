@@ -96,41 +96,41 @@ def main(save_figs=False, save_type='svg', model_name='all_participants', exp_na
         y = scores_tmp[:, 1, 1]
         sns.regplot(x=snrs_all, y=y, x_estimator=np.mean, order=2, ax=ax, color=hp_vis.C1, label='Mono-Mean')
 
-        y = scores_tmp[:, 2, 1]
+        y = scores_tmp[:, 2, 1]plt.savefig((fig_save_path / (model_name + '_' + exp_name + '
         sns.regplot(x=snrs_all, y=y, x_estimator=np.mean, order=2, ax=ax, color=hp_vis.C2, label='Bin')
 
-        y = scores_tmp[:, 3, 1]
+        y=scores_tmp[:, 3, 1]
         sns.regplot(x=snrs_all, y=y, x_estimator=np.mean, order=2, ax=ax, color=hp_vis.C3, label='Bin-Mean')
         ax.set_ylabel('Bias')
         ax.set_xlabel('SNR')
         ax.set_ylim([0.0, 30])
 
-        ax = fig.add_subplot(1, 3, 3)
-        y = scores_tmp[:, 0, 2]
+        ax=fig.add_subplot(1, 3, 3)
+        y=scores_tmp[:, 0, 2]
         sns.regplot(x=snrs_all, y=y, x_estimator=np.mean, order=2, ax=ax, color=hp_vis.C0, label='Monaural')
 
-        y = scores_tmp[:, 1, 2]
+        y=scores_tmp[:, 1, 2]
         sns.regplot(x=snrs_all, y=y, x_estimator=np.mean, order=2, ax=ax, color=hp_vis.C1, label='Mono-Mean')
 
-        y = scores_tmp[:, 2, 2]
+        y=scores_tmp[:, 2, 2]
         sns.regplot(x=snrs_all, y=y, x_estimator=np.mean, order=2, ax=ax, color=hp_vis.C2, label='Binaural')
 
-        y = scores_tmp[:, 3, 2]
+        y=scores_tmp[:, 3, 2]
         sns.regplot(x=snrs_all, y=y, x_estimator=np.mean, order=2, ax=ax, color=hp_vis.C3, label='Bin-Mean')
         ax.set_ylabel('Score')
         ax.set_xlabel('SNR')
         ax.set_ylim([0.0, 1.4])
 
-        lgd = ax.legend(loc='upper center', bbox_to_anchor=(1.35, 0.8))
+        lgd=ax.legend(loc='upper center', bbox_to_anchor=(1.35, 0.8))
 
         plt.tight_layout()
 
         if save_figs:
-            fig_save_path = ROOT / 'reports' / 'figures' / model_name / exp_name_str
+            fig_save_path=ROOT / 'reports' / 'figures' / model_name / exp_name_str
             if not fig_save_path.exists():
                 fig_save_path.mkdir(parents=True, exist_ok=True)
             logger.info('Saving figures to ' + fig_save_path.as_posix())
-            plt.savefig((fig_save_path / (exp_name + '_localization.' + save_type)).as_posix(), dpi=300)
+            plt.savefig((fig_save_path / (model_name + '_' + exp_name + '_localization.' + save_type)).as_posix(), dpi=300)
         else:
             plt.show()
     else:
@@ -139,7 +139,7 @@ def main(save_figs=False, save_type='svg', model_name='all_participants', exp_na
 
 
 if __name__ == '__main__':
-    log_fmt = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    log_fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
     logging.basicConfig(level=logging.INFO, format=log_fmt)
 
     main()

@@ -133,7 +133,7 @@ def main():
     # define max frequency for gammatone filter bank
     max_freqs = np.array([16000, 20000])
 
-    # participant_numbers = participant_numbers[::-1]
+    participant_numbers = participant_numbers[::-1]
     # snrs = snrs[::-1]
     # freq_bandss = freq_bandss[::-1]
 

@@ -41,6 +41,7 @@ def main(model_name='parameter_sweep', exp_name='default', azimuth=12, snr=0.2, 
     # participant_numbers = np.array([1, 2, 3, 8, 9, 10, 11,
     #                                 12, 15, 17, 18, 19, 20, 21, 27, 28, 33, 40])
 
+
     participant_numbers = np.array([1, 2, 3, 8, 9, 10, 11,
                                     12, 15, 17, 18, 19, 20,
                                     21, 27, 28, 33, 40, 44,
@@ -55,8 +56,8 @@ def main(model_name='parameter_sweep', exp_name='default', azimuth=12, snr=0.2, 
 
     elevations = np.arange(0, elevations, 1)
 
-    sigma_smoothing_vals = np.arange(0.1, 3.0, 0.05)
-    sigma_gauss_norm_vals = np.arange(0.1, 3.0, 0.05)
+    sigma_smoothing_vals = np.arange(1, 3.0, 0.1)
+    sigma_gauss_norm_vals = np.arange(1, 3.0, 0.1)
     ########################################################################
     ########################################################################
 
@@ -71,7 +72,7 @@ def main(model_name='parameter_sweep', exp_name='default', azimuth=12, snr=0.2, 
         # try to load the model files
         with exp_file.open('rb') as f:
             logger.info('Reading model data from file')
-            [scores] = pickle.load(f)
+            [scores,sigma_smoothing_vals,sigma_gauss_norm_vals] = pickle.load(f)
     else:
 
         scores = np.zeros((sigma_smoothing_vals.shape[0], sigma_gauss_norm_vals.shape[0], 3))
@@ -106,7 +107,7 @@ def main(model_name='parameter_sweep', exp_name='default', azimuth=12, snr=0.2, 
                     # x_bin[i_par, :, :, :], y_bin[i_par, :, :] = hp.localize_sound(psd_binaural, learned_map)
 
                     # localize the sounds and save the results
-                    x_test, y_test = hp.localize_sound(psd_binaural_mean, learned_map)
+                    x_test, y_test = hp.localize_sound(psd_binaural, learned_map)
                     x_test, y_test = hp_vis.scale_v(x_test, y_test, len(elevations))
                     scores[i_smooth,i_gauss,:] += hp.get_localization_coefficients_score(x_test, y_test)
         # get the mean scores over participants
@@ -116,7 +117,7 @@ def main(model_name='parameter_sweep', exp_name='default', azimuth=12, snr=0.2, 
         exp_path.mkdir(parents=True, exist_ok=True)
         with exp_file.open('wb') as f:
             logger.info('Creating model file')
-            pickle.dump([scores], f)
+            pickle.dump([scores,sigma_smoothing_vals,sigma_gauss_norm_vals], f)
 
 
 if __name__ == '__main__':

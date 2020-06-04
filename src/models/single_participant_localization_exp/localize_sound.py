@@ -60,8 +60,8 @@ def process_inputs(psd_all_i, psd_all_c, ear='ipsi', normalization_type='sum_1',
 @click.option('--mean_subtracted_map', default=True, help='Should the learned map be mean subtracted. Default is True')
 @click.option('--ear', default='contra', help='Which ear should be used, contra or ipsi. Default is contra')
 @click.option('--normalization_type', default='sum_1', help='Which normalization type should be used sum_1, l1, l2. Default is sum_1')
-@click.option('--sigma_smoothing', default=0, help='Sigma for smoothing kernel. 0 is off. Default is 0.')
-@click.option('--sigma_gauss_norm', default=1, help='Sigma for gauss normalization. 0 is off. Default is 1.')
+@click.option('--sigma_smoothing', default=0.0, help='Sigma for smoothing kernel. 0 is off. Default is 0.')
+@click.option('--sigma_gauss_norm', default=1.0, help='Sigma for gauss normalization. 0 is off. Default is 1.')
 @click.option('--clean', is_flag=True)
 def main(model_name='single_participant', exp_name='single_participant_default', azimuth=12, participant_number=9, snr=0.2, freq_bands=24, max_freq=20000, elevations=25, mean_subtracted_map=True, ear='ipsi', normalization_type='sum_1', sigma_smoothing=0, sigma_gauss_norm=1, clean=False):
     """ This script takes the filtered data and tries to localize sounds with a learned map
