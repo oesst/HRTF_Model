@@ -143,8 +143,18 @@ parameter_sweep:
 	$(PYTHON_INTERPRETER) src/visualization/parameter_sweep/visualize_default.py --save_figs=$(save_figs) --save_type=$(save_type) --model_name='parameter_sweep' --exp_name=$(exp_name) --azimuth=$(azimuth) --snr=$(snr) --freq_bands=$(freq_bands) --max_freq=$(max_freq) --elevations=$(elevations) --mean_subtracted_map=$(mean_subtracted_map) --ear=$(ear) --normalization_type=$(normalization_type)
 
 
+snr_exp:
+	test $(exp_name)
+
+	# create model file
+	$(PYTHON_INTERPRETER) src/models/snr_exp/snr.py --model_name='snr_experiment' --exp_name=$(exp_name) --azimuth=$(azimuth)  --freq_bands=$(freq_bands) --max_freq=$(max_freq) --elevations=$(elevations) --mean_subtracted_map=$(mean_subtracted_map) --ear=$(ear) --normalization_type=$(normalization_type) --sigma_smoothing=$(sigma_smoothing) --sigma_gauss_norm=$(sigma_gauss_norm) $(clean)
+	$(PYTHON_INTERPRETER) src/visualization/snr/visualize_default.py --save_figs=$(save_figs) --save_type=$(save_type) --model_name='snr_experiment' --exp_name=$(exp_name) --azimuth=$(azimuth) --freq_bands=$(freq_bands) --max_freq=$(max_freq) --elevations=$(elevations) --mean_subtracted_map=$(mean_subtracted_map) --ear=$(ear) --normalization_type=$(normalization_type) --sigma_smoothing=$(sigma_smoothing) --sigma_gauss_norm=$(sigma_gauss_norm)
+
+
+
+
 # run all models and visualizations
-all: 	single_participant all_participants different_learned_maps hrtf_comparison map_learning
+all: 	single_participant all_participants different_learned_maps hrtf_comparison map_learning parameter_sweep
 
 
 

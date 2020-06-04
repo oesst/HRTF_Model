@@ -49,8 +49,8 @@ def main(save_figs=False, save_type='svg', model_name='parameter_sweep', exp_nam
 
     elevations = np.arange(0, elevations, 1)
 
-    sigma_smoothing_vals = np.arange(0.1, 3.0, 0.5)
-    sigma_gauss_norm_vals = np.arange(0.1, 3.0, 0.5)
+    sigma_smoothing_vals = np.arange(0.1, 3.0, 0.05)
+    sigma_gauss_norm_vals = np.arange(0.1, 3.0, 0.05)
     ########################################################################
     ########################################################################
 
