@@ -115,22 +115,22 @@ def main(save_figs=False, save_type='svg', model_name='all_participants', exp_na
             # sns.set_palette('muted')
             # my_pal = sns.color_palette("hls", 8)
         fig = plt.figure(figsize=(20, 5))
-        my_pal = [(0.2980392156862745, 0.4470588235294118, 0.6901960784313725), (0.3333333333333333, 0.6588235294117647, 0.40784313725490196), (0.7686274509803922, 0.3058823529411765, 0.3215686274509804),
-                  (0.5058823529411764, 0.4470588235294118, 0.6980392156862745), (0.8, 0.7254901960784313, 0.4549019607843137), (0.39215686274509803, 0.7098039215686275, 0.803921568627451)]
+        my_pal = [(	31/255, 119/255, 180/255), (0.3333333333333333, 0.6588235294117647, 0.40784313725490196), (0.7686274509803922, 0.3058823529411765, 0.3215686274509804),
+                  (0.5058823529411764, 0.4470588235294118, 0.6980392156862745)]
 
         ax = fig.add_subplot(1, 3, 1)
         ax.set_ylabel('Gain')
-        sns.boxplot(data=coeff_ms.T, showfliers=True, palette=my_pal, ax=ax, linewidth=3)
+        sns.boxplot(data=coeff_ms.T, showfliers=True, palette=hp_vis.MY_COLORS, ax=ax, linewidth=3)
         ax.set_xticklabels(['Mono', 'Mono\n-Mean', 'Bin', 'Bin\n-Mean'])
 
         ax = fig.add_subplot(1, 3, 2)
         ax.set_ylabel('Bias')
-        sns.boxplot(data=coeff_bs.T, showfliers=True, palette=my_pal, ax=ax, linewidth=3)
+        sns.boxplot(data=coeff_bs.T, showfliers=True, palette=hp_vis.MY_COLORS, ax=ax, linewidth=3)
         ax.set_xticklabels(['Mono', 'Mono\n-Mean', 'Bin', 'Bin\n-Mean'])
 
         ax = fig.add_subplot(1, 3, 3)
         ax.set_ylabel('Score')
-        sns.boxplot(data=scores.T, showfliers=True, palette=my_pal, ax=ax, linewidth=3)
+        sns.boxplot(data=scores.T, showfliers=True, palette=hp_vis.MY_COLORS, ax=ax, linewidth=3)
         ax.set_xticklabels(['Mono', 'Mono\n-Mean', 'Bin', 'Bin\n-Mean'])
 
         if save_figs:

@@ -8,6 +8,8 @@ import numpy as np
 import click
 import seaborn as sns
 import pandas as pd
+
+
 hp_vis.set_layout(15)
 
 
@@ -71,28 +73,29 @@ def main(save_figs=False, save_type='svg', model_name='all_participants', exp_na
 
         localization_method = ['Monoaural', 'Mono - Mean', 'Binaural', 'Bin - Mean']
         # ALL participant
-        fig = plt.figure()
+        fig = plt.figure(figsize=(20, 7))
         # walk over linear regression values (gain,bias,score)
         for i in range(3):
             ax = fig.add_subplot(1, 3, 1 + i)
             trials = np.reshape(trial_used_ss, (trial_used_ss.shape[0] * trial_used_ss.shape[1]))
             x = trials
-            bins = 100
+            bins = 25
+
             data = np.reshape(mono_res, (mono_res.shape[0] * mono_res.shape[1], mono_res.shape[2]))
             y = data[:, i]
-            sns.regplot(x=x, y=y, x_bins=bins, x_estimator=np.mean, fit_reg=False, logx=True, ax=ax, x_ci='ci', truncate=True, label='Monoaural')
+            sns.regplot(x=x, y=y, x_bins=bins, x_estimator=np.mean, fit_reg=True, logx=True, ax=ax, x_ci='ci', truncate=True, label='Monoaural')
 
             data = np.reshape(mono_mean_res, (mono_mean_res.shape[0] * mono_mean_res.shape[1], mono_mean_res.shape[2]))
             y = data[:, i]
-            sns.regplot(x=x, y=y, x_bins=bins, x_estimator=np.mean, fit_reg=False, logx=True, ax=ax, x_ci='ci', truncate=True, label='Mono - Mean')
+            sns.regplot(x=x, y=y, x_bins=bins, x_estimator=np.mean, fit_reg=True, logx=True, ax=ax, x_ci='ci', truncate=True, label='Mono - Mean')
 
             data = np.reshape(bin_res, (bin_res.shape[0] * bin_res.shape[1], bin_res.shape[2]))
             y = data[:, i]
-            sns.regplot(x=x, y=y, x_bins=bins, x_estimator=np.mean, fit_reg=False, logx=True, ax=ax, x_ci='ci', truncate=True, label='Binaural')
+            sns.regplot(x=x, y=y, x_bins=bins, x_estimator=np.mean, fit_reg=True, logx=True, ax=ax, x_ci='ci', truncate=True, label='Binaural')
 
             data = np.reshape(bin_mean_res, (bin_mean_res.shape[0] * bin_mean_res.shape[1], bin_mean_res.shape[2]))
             y = data[:, i]
-            sns.regplot(x=x, y=y, x_bins=bins, x_estimator=np.mean, fit_reg=False, logx=True, ax=ax, x_ci='ci', truncate=True, label='Bin - Mean')
+            sns.regplot(x=x, y=y, x_bins=bins, x_estimator=np.mean, fit_reg=True, logx=True, ax=ax, x_ci='ci', truncate=True, label='Bin - Mean')
             # sns.regplot(x=x, y=y,  ax=ax,label='Bin - Mean')
             ax.set_xlim([0, 200])
 
@@ -103,7 +106,7 @@ def main(save_figs=False, save_type='svg', model_name='all_participants', exp_na
                 ax.set_ylim([-0.1, 1.3])
 
             if i == 1:
-                ax.set_ylim([-0.0, 10])
+                ax.set_ylim([-0.0, 12])
 
             # ax.scatter(trials, data[:, i])
 

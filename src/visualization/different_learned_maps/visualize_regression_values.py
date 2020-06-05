@@ -103,8 +103,6 @@ def main(save_figs=False, save_type='svg', model_name='different_learned_maps', 
 
         fig = plt.figure(figsize=(20, 20))
         axes = fig.subplots(4, 3, sharex=True, sharey=False)
-        my_pal = [(0.2980392156862745, 0.4470588235294118, 0.6901960784313725), (0.3333333333333333, 0.6588235294117647, 0.40784313725490196), (0.7686274509803922, 0.3058823529411765, 0.3215686274509804),
-                  (0.5058823529411764, 0.4470588235294118, 0.6980392156862745), (0.8, 0.7254901960784313, 0.4549019607843137), (0.39215686274509803, 0.7098039215686275, 0.803921568627451)]
 
         # plot regression line for each participant
         for i_map in range(4):
@@ -149,19 +147,19 @@ def main(save_figs=False, save_type='svg', model_name='different_learned_maps', 
                 ax1.set_title('Bin - mean', rotation='vertical', x=-0.2, y=0.7)
 
             ax1.set_ylabel('Gain')
-            sns.boxplot(data=coeff_ms.T, showfliers=True, palette=my_pal, ax=ax1, linewidth=3)
+            sns.boxplot(data=coeff_ms.T, showfliers=True, palette=hp_vis.MY_COLORS, ax=ax1, linewidth=3)
             ax1.set_ylim([0, 1])
             if i_map == 3:
                 ax1.set_xticklabels(['Mono', 'Mono\n-Mean', 'Bin', 'Bin\n-Mean'])
 
             ax2.set_ylabel('Bias')
-            sns.boxplot(data=coeff_bs.T, showfliers=True, palette=my_pal, ax=ax2, linewidth=3)
+            sns.boxplot(data=coeff_bs.T, showfliers=True, palette=hp_vis.MY_COLORS, ax=ax2, linewidth=3)
             # ax2.set_ylim([0,20])
             if i_map == 3:
                 ax2.set_xticklabels(['Mono', 'Mono\n-Mean', 'Bin', 'Bin\n-Mean'])
 
             ax3.set_ylabel('Score')
-            sns.boxplot(data=scores.T, showfliers=True, palette=my_pal, ax=ax3, linewidth=3)
+            sns.boxplot(data=scores.T, showfliers=True, palette=hp_vis.MY_COLORS, ax=ax3, linewidth=3)
             ax3.set_ylim([0, 1])
             if i_map == 3:
                 ax3.set_xticklabels(['Mono', 'Mono\n-Mean', 'Bin', 'Bin\n-Mean'])

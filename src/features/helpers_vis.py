@@ -14,10 +14,13 @@ import src.features.filters as filters
 
 
 # Define some colors
-C0 = [0.2980392156862745, 0.4470588235294118, 0.6901960784313725]
-C1 = [0.3333333333333333, 0.6588235294117647, 0.40784313725490196]
-C2 = [0.7686274509803922, 0.3058823529411765, 0.3215686274509804]
-C3 = [0.5058823529411764, 0.4470588235294118, 0.6980392156862745]
+C0 = [31 / 255, 119 / 255, 180 / 255]
+C1 = [255 / 255, 127 / 255, 14 / 255]
+C2 = [44 / 255, 160 / 255, 44 / 255]
+C3 = [214 / 255, 39 / 255, 40 / 255]
+
+
+MY_COLORS = [C0, C1, C2, C3]
 
 
 class LinearReg():
@@ -76,11 +79,11 @@ def removeOutliers(x, outlierConstant=1.5):
 
 def scale_v(x_test, y_test, n_elevations):
     a = x_test[:, :, 1] / n_elevations
-    a = a * (n_elevations-1)*5.625 - 45
+    a = a * (n_elevations - 1) * 5.625 - 45
     x_test[:, :, 1] = a
 
     a = y_test[:, :] / n_elevations
-    a = a * (n_elevations-1)*5.625 - 45
+    a = a * (n_elevations - 1) * 5.625 - 45
     y_test[:, :] = a
 
     return x_test, y_test
@@ -89,13 +92,13 @@ def scale_v(x_test, y_test, n_elevations):
 def plot_localization_result(x_test, y_test, ax, sound_files, scale_values=False, linear_reg=True, disp_values=False, scatter_data=True, reg_color=""):
     n_sound_types = len(sound_files)
     if scale_values:
-        x_test, y_test = scale_v(x_test, y_test,x_test.shape[0])
+        x_test, y_test = scale_v(x_test, y_test, x_test.shape[0])
 
     x_test = np.reshape(x_test, (x_test.shape[0] * x_test.shape[1], 2))
     y_test = np.reshape(y_test, (y_test.shape[0] * y_test.shape[1]))
 
     ax.plot(np.arange(np.ceil(np.min(x_test)), np.ceil(np.max(x_test))), np.arange(
-        np.ceil(np.min(x_test)), np.ceil(np.max(x_test))), color='grey', linestyle='--', alpha=0.3,label='_nolegend_')
+        np.ceil(np.min(x_test)), np.ceil(np.max(x_test))), color='grey', linestyle='--', alpha=0.3, label='_nolegend_')
 
     # error_mse = 0
     for i in range(0, n_sound_types):
@@ -250,7 +253,7 @@ def plot_elevation_map(data, sounds, figsize=(25, 5)):
         plt.colorbar(c)
 
 
-def set_axis(ax,n_elevations=25, label=False):
+def set_axis(ax, n_elevations=25, label=False):
     if label:
         ax.set_xlabel('True Elevation [deg]')
     t = np.zeros(6)
@@ -281,10 +284,10 @@ def set_axis(ax,n_elevations=25, label=False):
     else:
         t[0] = -55
         t[1] = -45
-        t[2] = -45 + ((n_elevations * 5.625) / 2.5) *1
-        t[3] = -45 + ((n_elevations * 5.625) / 2.5) *2
-        t[4] = -45 + ((n_elevations * 5.625) / 2.5) *3
-        t[5] = -45 + ((n_elevations * 5.625) / 2.5) *4
+        t[2] = -45 + ((n_elevations * 5.625) / 2.5) * 1
+        t[3] = -45 + ((n_elevations * 5.625) / 2.5) * 2
+        t[4] = -45 + ((n_elevations * 5.625) / 2.5) * 3
+        t[5] = -45 + ((n_elevations * 5.625) / 2.5) * 4
         ax.set_xticks(t[1:-1])
         ax.set_yticks(t[1:-1])
     return ax
@@ -297,7 +300,6 @@ def set_axis(ax,n_elevations=25, label=False):
 #
 #
 #     return ax
-
 
 
 class ERBFormatter(mpl.ticker.EngFormatter):
