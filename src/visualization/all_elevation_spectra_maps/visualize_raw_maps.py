@@ -22,7 +22,7 @@ SOUND_FILES = list(SOUND_FILES.glob('**/*.wav'))
 
 # Define whether figures should be saved
 @click.command()
-#@click.option('--save_figs', default=False, help='Save the figures.')
+# @click.option('--save_figs', default=False, help='Save the figures.')
 @click.option('--save_figs', type=click.BOOL, default=False, help='Save figures')
 @click.option('--save_type', default='svg', help='Define the format figures are saved.')
 @click.option('--model_name', default='single_participant', help='Defines the model name.')
@@ -41,6 +41,10 @@ def main(save_figs=False, save_type='svg', model_name='elevation_spectra_maps', 
     ########################################################################
     ######################## Set parameters ################################
     ########################################################################
+    normalize = False
+    time_window = 0.1  # time window in sec
+
+    elevations = np.arange(0, elevations, 1)
 
     # make sure save type is given
     if not save_type or len(save_type) == 0:
@@ -57,24 +61,28 @@ def main(save_figs=False, save_type='svg', model_name='elevation_spectra_maps', 
                                         137, 147, 148, 152, 153,
                                         154, 155, 156, 158, 162,
                                         163, 165])
+
+        exp_name_str = hp.create_exp_name([exp_name, time_window, int(snr * 100), freq_bands, max_freq,
+                                           len(participant_numbers), (azimuth - 12) * 10, normalize, len(elevations)])
+        exp_path = ROOT / 'models' / model_name
+        exp_file = exp_path / exp_name_str
     else:
         # participant_numbers are given. need to be cast to int array
         participant_numbers = np.array([int(i) for i in participant_numbers.split(',')])
         print(participant_numbers)
 
-    normalize = False
-    time_window = 0.1  # time window in sec
+        exp_name_str = hp.create_exp_name([exp_name, time_window, int(snr * 100), freq_bands, max_freq,
+                                           participant_numbers, (azimuth - 12) * 10, normalize, len(elevations)])
+        exp_path = ROOT / 'models' / model_name
+        exp_file = exp_path / exp_name_str
 
-    elevations = np.arange(0, elevations, 1)
+
     ########################################################################
     ########################################################################
 
     # create unique experiment name
     # create unique experiment name
-    exp_name_str = hp.create_exp_name([exp_name, time_window, int(snr * 100), freq_bands, max_freq,
-                                       participant_numbers, (azimuth - 12) * 10, normalize, len(elevations)])
-    exp_path = ROOT / 'models' / model_name
-    exp_file = exp_path / exp_name_str
+
 
     # set tick labels
 
@@ -103,7 +111,7 @@ def main(save_figs=False, save_type='svg', model_name='elevation_spectra_maps', 
     fig_size = (7, 5)
     # fig_size = (20, 14)
 
-    formatter = hp_vis.ERBFormatter(100, 18000, unit='', places=0)
+    formatter = hp_vis.ERBFormatter(100, max_freq, unit='', places=0)
 
     # check if model results exist already and load
     if exp_path.exists() and exp_file.is_file():
@@ -136,12 +144,13 @@ def main(save_figs=False, save_type='svg', model_name='elevation_spectra_maps', 
                 # ax.set_yticklabels(t[1:-1])
 
                 if save_figs:
-                    fig_save_path = ROOT / 'reports' / 'figures' / model_name / ('participant_' + str(par))
+                    fig_save_path = ROOT / 'reports' / 'figures' / model_name / exp_name_str / ('participant_' + str(par))
                     if not fig_save_path.exists():
                         fig_save_path.mkdir(parents=True, exist_ok=True)
-                    plt.savefig((fig_save_path / (exp_name + '_raw_maps_ipsi_' + str(sound) + '.' + save_type)).as_posix(), dpi=300, transparent=True)
+                    path_final = (fig_save_path / (model_name + '_' + exp_name + '_raw_maps_ipsi_' + str(sound) + '.' + save_type)).as_posix()
+                    plt.savefig(path_final, dpi=300, transparent=True)
+                    logger.info('Writing File :' + path_final)
                     plt.close()
-
                 else:
                     plt.show()
 
@@ -164,10 +173,9 @@ def main(save_figs=False, save_type='svg', model_name='elevation_spectra_maps', 
                     fig_save_path = ROOT / 'reports' / 'figures' / model_name / exp_name_str / ('participant_' + str(par))
                     if not fig_save_path.exists():
                         fig_save_path.mkdir(parents=True, exist_ok=True)
-                    plt.savefig((fig_save_path / (model_name + '_' + exp_name + '_raw_maps_contra_' + str(sound) +
-                                                  '.' + save_type)).as_posix(), dpi=300, transparent=True)
-                    logger.info('Writing File :' + fig_save_path.name +'_' (exp_name + '_raw_maps_contra_' + str(sound) + '.' + save_type))
-                    print(save_type)
+                    path_final = (fig_save_path / (model_name + '_' + exp_name + '_raw_maps_contra_' + str(sound) + '.' + save_type)).as_posix()
+                    plt.savefig(path_final, dpi=300, transparent=True)
+                    logger.info('Writing File :' + path_final)
                     plt.close()
                 else:
                     plt.show()

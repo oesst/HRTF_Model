@@ -68,6 +68,10 @@ def main(model_name='elevation_spectra_maps', exp_name='unfiltered', azimuth=12,
     ######################## Set parameters ################################
     ########################################################################
 
+    normalize = False
+    time_window = 0.1  # time window in sec
+
+    elevations = np.arange(0, elevations, 1)
     # if participant_numbers is not given we use all of them
     if not participant_numbers:
         participant_numbers = np.array([1, 2, 3, 8, 9, 10, 11,
@@ -79,23 +83,24 @@ def main(model_name='elevation_spectra_maps', exp_name='unfiltered', azimuth=12,
                                         137, 147, 148, 152, 153,
                                         154, 155, 156, 158, 162,
                                         163, 165])
+
+        exp_name_str = hp.create_exp_name([exp_name, time_window, int(snr * 100), freq_bands, max_freq,
+                                           len(participant_numbers), (azimuth - 12) * 10, normalize, len(elevations)])
+        exp_path = ROOT / 'models' / model_name
+        exp_file = exp_path / exp_name_str
     else:
         # participant_numbers are given. need to be cast to int array
         participant_numbers = np.array([int(i) for i in participant_numbers.split(',')])
         print(participant_numbers)
 
-    normalize = False
-    time_window = 0.1  # time window in sec
+        exp_name_str = hp.create_exp_name([exp_name, time_window, int(snr * 100), freq_bands, max_freq,
+                                           participant_numbers, (azimuth - 12) * 10, normalize, len(elevations)])
+        exp_path = ROOT / 'models' / model_name
+        exp_file = exp_path / exp_name_str
 
-    elevations = np.arange(0, elevations, 1)
     ########################################################################
     ########################################################################
 
-    # create unique experiment name
-    exp_name_str = hp.create_exp_name([exp_name, time_window, int(snr * 100), freq_bands, max_freq, participant_numbers, (azimuth - 12) * 10, normalize, len(elevations)])
-
-    exp_path = ROOT / 'models' / model_name
-    exp_file = exp_path / exp_name_str
     # check if model results exist already and load
     if not clean and exp_path.exists() and exp_file.is_file():
         # try to load the model files

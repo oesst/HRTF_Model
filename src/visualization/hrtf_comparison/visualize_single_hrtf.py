@@ -78,7 +78,8 @@ def main(save_figs=False, save_type='svg', model_name='hrtf_comparison', exp_nam
         a = ax.pcolormesh(np.linspace(0, 1, data.shape[1]), np.linspace(-45, end_el, data.shape[0]),
                           data, shading='gouraud', linewidth=0, rasterized=True)
         formatter = hp_vis.ERBFormatter(100, max_freq, unit='', places=0)
-        ax.xaxis.set_major_formatter(formatter)
+        # ax.xaxis.set_major_formatter(formatter)
+        ax.set_xticklabels(np.linspace(0,max_freq,len(ax.get_xticks())))
         plt.colorbar(a)
         ax.set_title('Ipsilateral')
         ax.set_xlabel('Frequency [Hz]')
