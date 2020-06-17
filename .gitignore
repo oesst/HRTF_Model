@@ -8,6 +8,8 @@ __pycache__/
 # Images
 *.png
 
+reports
+
 # Distribution / packaging
 .Python
 env/
