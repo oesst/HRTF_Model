@@ -87,11 +87,9 @@ def centre_freqs(fs, num_freqs, l_cutoff, h_cutoff):
 
     # center frquencies from literature (https://de.wikipedia.org/wiki/Frequenzgruppe)
 
-    if num_freqs == 24:
-        return np.array([50, 150, 250, 350, 455, 570, 700, 845, 1000, 1175, 1375, 1600, 1860, 2160, 2525, 2925, 3425, 4050, 4850, 5850, 7050, 8600, 10750, 13750])
-    else:
-        # default cfs
-        return erb_space(low_freq=l_cutoff, high_freq=h_cutoff, num=num_freqs)
+
+    # default cfs
+    return erb_space(low_freq=l_cutoff, high_freq=h_cutoff, num=num_freqs)
 
 
 def make_erb_filters(fs, centre_freqs, width=1.0):
