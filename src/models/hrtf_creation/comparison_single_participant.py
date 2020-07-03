@@ -95,7 +95,7 @@ def main(model_name='hrtf_creation', exp_name='single_participant', azimuth=12, 
         # try to load the model files
         with exp_file.open('rb') as f:
             logger.info('Reading model data from file')
-            [hrtfs_i, hrtfs_c] = pickle.load(f)
+            [hrtfs_i, hrtfs_c, freqs] = pickle.load(f)
     else:
 
         hrtfs_c, hrtfs_i,freqs = generateHRTFs_stft.create_data(

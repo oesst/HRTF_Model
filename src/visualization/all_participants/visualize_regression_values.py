@@ -121,17 +121,17 @@ def main(save_figs=False, save_type='svg', model_name='all_participants', exp_na
         ax = fig.add_subplot(1, 3, 1)
         ax.set_ylabel('Gain')
         sns.boxplot(data=coeff_ms.T, showfliers=True, palette=hp_vis.MY_COLORS, ax=ax, linewidth=3)
-        ax.set_xticklabels(['Mono', 'Mono\n-Mean', 'Bin', 'Bin\n-Mean'])
+        ax.set_xticklabels(['Mono', 'Mono\n-Prior', 'Bin', 'Bin\n-Prior'])
 
         ax = fig.add_subplot(1, 3, 2)
         ax.set_ylabel('Bias')
         sns.boxplot(data=coeff_bs.T, showfliers=True, palette=hp_vis.MY_COLORS, ax=ax, linewidth=3)
-        ax.set_xticklabels(['Mono', 'Mono\n-Mean', 'Bin', 'Bin\n-Mean'])
+        ax.set_xticklabels(['Mono', 'Mono\n-Prior', 'Bin', 'Bin\n-Prior'])
 
         ax = fig.add_subplot(1, 3, 3)
         ax.set_ylabel('Score')
         sns.boxplot(data=scores.T, showfliers=True, palette=hp_vis.MY_COLORS, ax=ax, linewidth=3)
-        ax.set_xticklabels(['Mono', 'Mono\n-Mean', 'Bin', 'Bin\n-Mean'])
+        ax.set_xticklabels(['Mono', 'Mono\n-Prior', 'Bin', 'Bin\n-Prior'])
 
         if save_figs:
             fig_save_path = ROOT / 'reports' / 'figures' / model_name / exp_name_str

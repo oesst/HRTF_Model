@@ -109,7 +109,7 @@ def main(save_figs=False, save_type='svg', model_name='all_participants', exp_na
             # Monoaural Data (Ipsilateral), Mean Subtracted
             hp_vis.plot_localization_result(x_mono_mean[:, i_sound], y_mono_mean[:, i_sound], ax2, SOUND_FILES,
                                             scale_values=True, linear_reg=True, scatter_data=False)
-            ax2.set_title('Mono - Mean')
+            ax2.set_title('Mono - Prior')
             hp_vis.set_axis(ax2, len(elevations))
             ax2.set_xlabel('True Elevation [deg]')
 
@@ -125,7 +125,7 @@ def main(save_figs=False, save_type='svg', model_name='all_participants', exp_na
 
             hp_vis.plot_localization_result(x_bin_mean[:, i_sound], y_bin_mean[:, i_sound], ax4, SOUND_FILES,
                                             scale_values=True, linear_reg=True, scatter_data=False)
-            ax4.set_title('Bin - Mean')
+            ax4.set_title('Bin - Prior')
             hp_vis.set_axis(ax4, len(elevations))
             ax4.set_xlabel('True Elevation [deg]')
 

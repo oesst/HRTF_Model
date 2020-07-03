@@ -140,23 +140,20 @@ def main(save_figs=False, save_type='svg', model_name='different_learned_maps', 
             if i_map == 0:
                 ax1.set_title('Monoaural', rotation='vertical', x=-0.2, y=0.7)
             elif i_map == 1:
-                ax1.set_title('Mono - Mean', rotation='vertical', x=-0.2, y=0.8)
+                ax1.set_title('Mono - Prior', rotation='vertical', x=-0.2, y=0.8)
             elif i_map == 2:
                 ax1.set_title('Binaural', rotation='vertical', x=-0.2, y=0.6)
             else:
-                ax1.set_title('Bin - mean', rotation='vertical', x=-0.2, y=0.7)
+                ax1.set_title('Bin - Prior', rotation='vertical', x=-0.2, y=0.7)
 
             ax1.set_ylabel('Gain')
             sns.boxplot(data=coeff_ms.T, showfliers=True, palette=hp_vis.MY_COLORS, ax=ax1, linewidth=3)
             ax1.set_ylim([0, 1])
-            if i_map == 3:
-                ax1.set_xticklabels(['Mono', 'Mono\n-Mean', 'Bin', 'Bin\n-Mean'])
 
             ax2.set_ylabel('Bias')
             sns.boxplot(data=coeff_bs.T, showfliers=True, palette=hp_vis.MY_COLORS, ax=ax2, linewidth=3)
             # ax2.set_ylim([0,20])
-            if i_map == 3:
-                ax2.set_xticklabels(['Mono', 'Mono\n-Mean', 'Bin', 'Bin\n-Mean'])
+
 
             ax3.set_ylabel('Score')
             sns.boxplot(data=scores.T, showfliers=True, palette=hp_vis.MY_COLORS, ax=ax3, linewidth=3)

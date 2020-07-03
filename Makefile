@@ -107,7 +107,7 @@ hrtf_comparison:
 	test $(visualization_type)
 
 	# create model file
-	$(PYTHON_INTERPRETER) src/models/hrtf_comparison_exp/comparison_single_participant.py --model_name='hrtf_creation' --exp_name=$(exp_name) --azimuth=$(azimuth) --participant_number=$(participant_number) --snr=$(snr) --freq_bands=$(freq_bands) --max_freq=$(max_freq) --elevations=$(elevations) --mean_subtracted_map=$(mean_subtracted_map) --ear=$(ear) --normalization_type=$(normalization_type) --sigma_smoothing=$(sigma_smoothing) --sigma_gauss_norm=$(sigma_gauss_norm) $(clean)
+	$(PYTHON_INTERPRETER) src/models/hrtf_comparison_exp/comparison_single_participant.py --model_name='hrtf_comparison' --exp_name=$(exp_name) --azimuth=$(azimuth) --participant_number=$(participant_number) --snr=$(snr) --freq_bands=$(freq_bands) --max_freq=$(max_freq) --elevations=$(elevations) --mean_subtracted_map=$(mean_subtracted_map) --ear=$(ear) --normalization_type=$(normalization_type) --sigma_smoothing=$(sigma_smoothing) --sigma_gauss_norm=$(sigma_gauss_norm) $(clean)
 	$(PYTHON_INTERPRETER) src/visualization/hrtf_comparison/visualize_default.py --save_figs=$(save_figs) --save_type=$(save_type) --model_name='hrtf_comparison' --exp_name=$(exp_name) --azimuth=$(azimuth) --participant_number=$(participant_number) --snr=$(snr) --freq_bands=$(freq_bands) --max_freq=$(max_freq) --elevations=$(elevations) --mean_subtracted_map=$(mean_subtracted_map) --ear=$(ear) --normalization_type=$(normalization_type) --sigma_smoothing=$(sigma_smoothing) --sigma_gauss_norm=$(sigma_gauss_norm)
 
 hrtf_creation:
@@ -127,10 +127,22 @@ create_elevation_spectra_maps:
 map_learning:
 	test $(exp_name)
 	test $(n_trials)
+	test $(visualization_type)
 
 	# create model file
+ifeq ($(visualization_type),all_maps)
+	$(PYTHON_INTERPRETER) src/models/map_learning_exp/map_learning_all_maps.py --model_name='map_learning_all_maps' --exp_name=$(exp_name) --azimuth=$(azimuth) --n_trials=$(n_trials) --snr=$(snr) --freq_bands=$(freq_bands) --max_freq=$(max_freq) --elevations=$(elevations) --mean_subtracted_map=$(mean_subtracted_map) --ear=$(ear) --normalization_type=$(normalization_type) --sigma_smoothing=$(sigma_smoothing) --sigma_gauss_norm=$(sigma_gauss_norm) $(clean)
+	$(PYTHON_INTERPRETER) src/visualization/map_learning/visualize_all_maps.py --save_figs=$(save_figs) --save_type=$(save_type) --model_name='map_learning_all_maps' --exp_name=$(exp_name) --azimuth=$(azimuth) --n_trials=$(n_trials) --snr=$(snr) --freq_bands=$(freq_bands) --max_freq=$(max_freq) --elevations=$(elevations) --mean_subtracted_map=$(mean_subtracted_map) --ear=$(ear) --normalization_type=$(normalization_type) --sigma_smoothing=$(sigma_smoothing) --sigma_gauss_norm=$(sigma_gauss_norm)
+else ifeq ($(visualization_type),all)
+	$(PYTHON_INTERPRETER) src/models/map_learning_exp/map_learning_all_maps.py --model_name='map_learning_all_maps' --exp_name=$(exp_name) --azimuth=$(azimuth) --n_trials=$(n_trials) --snr=$(snr) --freq_bands=$(freq_bands) --max_freq=$(max_freq) --elevations=$(elevations) --mean_subtracted_map=$(mean_subtracted_map) --ear=$(ear) --normalization_type=$(normalization_type) --sigma_smoothing=$(sigma_smoothing) --sigma_gauss_norm=$(sigma_gauss_norm) $(clean)
+	$(PYTHON_INTERPRETER) src/visualization/map_learning/visualize_all_maps.py --save_figs=$(save_figs) --save_type=$(save_type) --model_name='map_learning_all_maps' --exp_name=$(exp_name) --azimuth=$(azimuth) --n_trials=$(n_trials) --snr=$(snr) --freq_bands=$(freq_bands) --max_freq=$(max_freq) --elevations=$(elevations) --mean_subtracted_map=$(mean_subtracted_map) --ear=$(ear) --normalization_type=$(normalization_type) --sigma_smoothing=$(sigma_smoothing) --sigma_gauss_norm=$(sigma_gauss_norm)
 	$(PYTHON_INTERPRETER) src/models/map_learning_exp/map_learning.py --model_name='map_learning' --exp_name=$(exp_name) --azimuth=$(azimuth) --n_trials=$(n_trials) --snr=$(snr) --freq_bands=$(freq_bands) --max_freq=$(max_freq) --elevations=$(elevations) --mean_subtracted_map=$(mean_subtracted_map) --ear=$(ear) --normalization_type=$(normalization_type) --sigma_smoothing=$(sigma_smoothing) --sigma_gauss_norm=$(sigma_gauss_norm) $(clean)
 	$(PYTHON_INTERPRETER) src/visualization/map_learning/visualize_default.py --save_figs=$(save_figs) --save_type=$(save_type) --model_name='map_learning' --exp_name=$(exp_name) --azimuth=$(azimuth) --n_trials=$(n_trials) --snr=$(snr) --freq_bands=$(freq_bands) --max_freq=$(max_freq) --elevations=$(elevations) --mean_subtracted_map=$(mean_subtracted_map) --ear=$(ear) --normalization_type=$(normalization_type) --sigma_smoothing=$(sigma_smoothing) --sigma_gauss_norm=$(sigma_gauss_norm)
+else
+	$(PYTHON_INTERPRETER) src/models/map_learning_exp/map_learning.py --model_name='map_learning' --exp_name=$(exp_name) --azimuth=$(azimuth) --n_trials=$(n_trials) --snr=$(snr) --freq_bands=$(freq_bands) --max_freq=$(max_freq) --elevations=$(elevations) --mean_subtracted_map=$(mean_subtracted_map) --ear=$(ear) --normalization_type=$(normalization_type) --sigma_smoothing=$(sigma_smoothing) --sigma_gauss_norm=$(sigma_gauss_norm) $(clean)
+	$(PYTHON_INTERPRETER) src/visualization/map_learning/visualize_default.py --save_figs=$(save_figs) --save_type=$(save_type) --model_name='map_learning' --exp_name=$(exp_name) --azimuth=$(azimuth) --n_trials=$(n_trials) --snr=$(snr) --freq_bands=$(freq_bands) --max_freq=$(max_freq) --elevations=$(elevations) --mean_subtracted_map=$(mean_subtracted_map) --ear=$(ear) --normalization_type=$(normalization_type) --sigma_smoothing=$(sigma_smoothing) --sigma_gauss_norm=$(sigma_gauss_norm)
+endif
+
 
 
 parameter_sweep:

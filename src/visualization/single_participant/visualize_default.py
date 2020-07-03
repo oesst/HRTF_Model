@@ -93,7 +93,7 @@ def main(save_figs=False, save_type='svg', model_name='single_participant', exp_
         ax = fig.add_subplot(1, 4, 2)
         hp_vis.plot_localization_result(
             x_mono_mean, y_mono_mean, ax, SOUND_FILES, scale_values=True, linear_reg=True, disp_values=True)
-        ax.set_title('Mono - Mean')
+        ax.set_title('Mono - Prior')
         hp_vis.set_axis(ax, len(elevations))
         ax.set_xlabel('True Elevation [deg]')
 
@@ -109,7 +109,7 @@ def main(save_figs=False, save_type='svg', model_name='single_participant', exp_
         ax = fig.add_subplot(1, 4, 4)
         hp_vis.plot_localization_result(
             x_bin_mean, y_bin_mean, ax, SOUND_FILES, scale_values=True, linear_reg=True, disp_values=True)
-        ax.set_title('Bin - Mean')
+        ax.set_title('Bin - Prior')
         hp_vis.set_axis(ax, len(elevations))
         ax.set_xlabel('True Elevation [deg]')
 

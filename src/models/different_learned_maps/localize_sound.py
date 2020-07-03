@@ -50,6 +50,10 @@ def main(model_name='different_learned_maps', exp_name='localization_default', a
                                     154, 155, 156, 158, 162,
                                     163, 165])
 
+    # participant_numbers = np.array([1, 2, 3, 8, 9, 10, 11,
+    #                                 12, 15, 17, 18, 19, 20,
+    #                                 21, 27, 28, 33, 40])
+
     normalize = False
     time_window = 0.1  # time window in sec
 

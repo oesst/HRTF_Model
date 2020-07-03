@@ -20,7 +20,7 @@ ROOT = Path(__file__).resolve().parents[2]
 # Define up to which frequency the data should be generated
 
 
-def create_data(freq_bands=24, participant_number=19, snr=0.2, normalize=False, azimuth=13, time_window=0.1, max_freq=18000):
+def create_data(freq_bands=24, participant_number=19, snr=0.2, normalize=False, azimuth=13, time_window=0.1, max_freq=18000, clean=False):
 
     str_r = 'data/processed_' + str(max_freq) + 'Hz/binaural_right_0_gammatone_' + str(time_window) + '_window_{0:03d}'.format(participant_number) + '_cipic_' + str(
         int(snr * 100)) + '_srn_' + str(freq_bands) + '_channels_' + str((azimuth - 12) * 10) + '_azi_' + str(normalize) + '_norm_flat_spectrum.npy'
@@ -38,7 +38,7 @@ def create_data(freq_bands=24, participant_number=19, snr=0.2, normalize=False, 
     fs = 44100
 
     # check if we can load the data from a file
-    if path_data_r.is_file() and path_data_l.is_file():
+    if not clean and path_data_r.is_file() and path_data_l.is_file():
         print('Data set found. Loading from file : ' + str_r)
         return np.load(path_data_r), np.load(path_data_l)
     else:
@@ -93,7 +93,7 @@ def create_data(freq_bands=24, participant_number=19, snr=0.2, normalize=False, 
         np.save(path_data_r.absolute(), psd_all_c)
         np.save(path_data_l.absolute(), psd_all_i)
 
-        return psd_all_c, psd_all_i
+        return psd_all_c, psd_all_i, np.arange(0,freq_bands)
 
 
 def main():

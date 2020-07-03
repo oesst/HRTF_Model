@@ -24,7 +24,7 @@ SOUND_FILES = list(SOUND_FILES.glob('**/*.wav'))
 @click.option('--save_figs', type=click.BOOL, default=False, help='Save figures')
 @click.option('--save_type', default='svg', help='Define the format figures are saved.')
 @click.option('--model_name', default='map_learning', help='Defines the model name.')
-@click.option('--exp_name', default='learning_default', help='Defines the experiment name')
+@click.option('--exp_name', default='localization_all_maps', help='Defines the experiment name')
 @click.option('--azimuth', default=12, help='Azimuth for which localization is done. Default is 12')
 @click.option('--snr', default=0.2, help='Signal to noise ration to use. Default is 0.2')
 @click.option('--freq_bands', default=128, help='Amount of frequency bands to use. Default is 128')
@@ -37,10 +37,10 @@ SOUND_FILES = list(SOUND_FILES.glob('**/*.wav'))
 @click.option('--sigma_smoothing', default=0, help='Sigma for smoothing kernel. 0 is off. Default is 0.')
 @click.option('--sigma_gauss_norm', default=1, help='Sigma for gauss normalization. 0 is off. Default is 1.')
 @click.option('--clean', is_flag=True)
-def main(save_figs=False, save_type='svg', model_name='all_participants', exp_name='localization_default', azimuth=12, snr=0.2, n_trials=100, freq_bands=24, max_freq=20000, elevations=25, mean_subtracted_map=True, ear='ipsi', normalization_type='sum_1', sigma_smoothing=0, sigma_gauss_norm=1, clean=False):
+def main(save_figs=False, save_type='svg', model_name='map_learning', exp_name='localization_all_maps', azimuth=12, snr=0.2, n_trials=100, freq_bands=24, max_freq=20000, elevations=25, mean_subtracted_map=True, ear='ipsi', normalization_type='sum_1', sigma_smoothing=0, sigma_gauss_norm=1, clean=False):
 
     logger = logging.getLogger(__name__)
-    logger.info('Showing map learning results for all participants')
+    logger.info('Showing map learning results for all participants over differently learned maps')
 
     ########################################################################
     ######################## Set parameters ################################
@@ -68,57 +68,64 @@ def main(save_figs=False, save_type='svg', model_name='all_participants', exp_na
     if exp_path.exists() and exp_file.is_file():
         # try to load the model files
         with open(exp_file.as_posix(), 'rb') as f:
-            logger.info('Reading model data from file')
+            logger.info('Reading model data from file',)
             [mono_res, mono_mean_res, bin_res, bin_mean_res, trial_used_ss] = pickle.load(f)
 
         # ALL participant
-        fig = plt.figure(figsize=(20, 7))
-        # walk over linear regression values (gain,bias,score)
-        for i in range(3):
-            ax = fig.add_subplot(1, 3, 1 + i)
-            trials = np.reshape(trial_used_ss, (trial_used_ss.shape[0] * trial_used_ss.shape[1]))
-            x = trials
-            bins = 25
+        fig = plt.figure(figsize=(20, 10))
+        axes = fig.subplots(4,3)
+        # walk over maps
+        for i_maps in range(4):
+            # walk over linear regression values (gain,bias,score)
+            for i in range(3):
+                ax = axes[i_maps,i]
 
-            data = np.reshape(mono_res, (mono_res.shape[0] * mono_res.shape[1], mono_res.shape[2]))
-            y = data[:, i]
-            sns.regplot(x=x, y=y, x_bins=bins, x_estimator=np.mean, fit_reg=True, logx=True, ax=ax, x_ci='ci', truncate=True, label='Monoaural')
+                trials = np.reshape(trial_used_ss[i_maps], (trial_used_ss[i_maps].shape[0] * trial_used_ss[i_maps].shape[1]))
+                x = trials
+                bins = 25
 
-            data = np.reshape(mono_mean_res, (mono_mean_res.shape[0] * mono_mean_res.shape[1], mono_mean_res.shape[2]))
-            y = data[:, i]
-            sns.regplot(x=x, y=y, x_bins=bins, x_estimator=np.mean, fit_reg=True, logx=True, ax=ax, x_ci='ci', truncate=True, label='Mono - Prior')
+                data = np.reshape(mono_res[i_maps], (mono_res[i_maps].shape[0] * mono_res[i_maps].shape[1], mono_res[i_maps].shape[2]))
+                y = data[:, i]
+                # sns.regplot(x=x, y=y, x_bins=bins, x_estimator=np.mean, fit_reg=True, logx=True, ax=ax, x_ci='ci', truncate=True, label='Monoaural')
+                sns.regplot(x=x, y=y, x_bins=bins, x_estimator=np.mean, fit_reg=True, logx=False, order=7, ax=ax, x_ci='ci', truncate=True, label='Monoaural')
 
-            data = np.reshape(bin_res, (bin_res.shape[0] * bin_res.shape[1], bin_res.shape[2]))
-            y = data[:, i]
-            sns.regplot(x=x, y=y, x_bins=bins, x_estimator=np.mean, fit_reg=True, logx=True, ax=ax, x_ci='ci', truncate=True, label='Binaural')
+                data = np.reshape(mono_mean_res[i_maps], (mono_mean_res[i_maps].shape[0] * mono_mean_res[i_maps].shape[1], mono_mean_res[i_maps].shape[2]))
+                y = data[:, i]
+                # sns.regplot(x=x, y=y, x_bins=bins, x_estimator=np.mean, fit_reg=True, logx=True, ax=ax, x_ci='ci', truncate=True, label='Mono - Prior')
+                sns.regplot(x=x, y=y, x_bins=bins, x_estimator=np.mean, fit_reg=True, logx=False, order=7, ax=ax, x_ci='ci', truncate=True, label='Mono - Prior')
 
-            data = np.reshape(bin_mean_res, (bin_mean_res.shape[0] * bin_mean_res.shape[1], bin_mean_res.shape[2]))
-            y = data[:, i]
-            sns.regplot(x=x, y=y, x_bins=bins, x_estimator=np.mean, fit_reg=True, logx=True, ax=ax, x_ci='ci', truncate=True, label='Bin - Prior')
-            # sns.regplot(x=x, y=y,  ax=ax,label='Bin - Prior')
-            ax.set_xlim([0, 200])
+                data = np.reshape(bin_res[i_maps], (bin_res[i_maps].shape[0] * bin_res[i_maps].shape[1], bin_res[i_maps].shape[2]))
+                y = data[:, i]
+                # sns.regplot(x=x, y=y, x_bins=bins, x_estimator=np.mean, fit_reg=True, logx=True, ax=ax, x_ci='ci', truncate=True, label='Binaural')
+                sns.regplot(x=x, y=y, x_bins=bins, x_estimator=np.mean, fit_reg=True, logx=False, order=7, ax=ax, x_ci='ci', truncate=True, label='Binaural')
 
-            if i == 2:
-                lgd = ax.legend(loc=(1.03, 0.04))
+                data = np.reshape(bin_mean_res[i_maps], (bin_mean_res[i_maps].shape[0] * bin_mean_res[i_maps].shape[1], bin_mean_res[i_maps].shape[2]))
+                y = data[:, i]
+                # sns.regplot(x=x, y=y, x_bins=bins, x_estimator=np.mean, fit_reg=True, logx=True, ax=ax, x_ci='ci', truncate=True, label='Bin - Prior')
+                sns.regplot(x=x, y=y, x_bins=bins, x_estimator=np.mean, fit_reg=True, logx=False, order=7, ax=ax, x_ci='ci', truncate=True, label='Bin - Prior')
+                ax.set_xlim([0, 200])
 
-            if i == 0 or i == 2:
-                ax.set_ylim([-0.1, 1.3])
+                if i == 2:
+                    lgd = ax.legend(loc=(1.03, 0.04))
 
-            if i == 1:
-                ax.set_ylim([-0.0, 12])
+                if i == 0 or i == 2:
+                    ax.set_ylim([-0.1, 1.3])
 
-            # ax.scatter(trials, data[:, i])
+                if i == 1:
+                    ax.set_ylim([-0.0, 12])
 
-            # do the labeling
-            if i == 0:
-                ax.set_ylabel('Gain')
-            if i == 1:
-                ax.set_ylabel('Bias')
-            if i == 2:
-                ax.set_ylabel('Score')
+                # ax.scatter(trials, data[:, i])
 
-            # if i == 2:
-            ax.set_xlabel('# of Presented Sounds')
+                # do the labeling
+                if i == 0:
+                    ax.set_ylabel('Gain')
+                if i == 1:
+                    ax.set_ylabel('Bias')
+                if i == 2:
+                    ax.set_ylabel('Score')
+
+                if i_maps == 3:
+                    ax.set_xlabel('# of Presented Sounds')
 
         if save_figs:
             fig_save_path = ROOT / 'reports' / 'figures' / model_name / exp_name_str

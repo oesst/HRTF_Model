@@ -74,7 +74,8 @@ def main(save_figs=False, save_type='svg', model_name='hrtf_creation', exp_name=
         # Monoaural Data (Ipsilateral), No Mean Subtracted
         ax = fig.add_subplot(1, 2, 1)
         # a = ax.pcolormesh(np.squeeze(hrtfs_i[:,:-5]))
-        data = hrtfs_i[:, 5:-5]
+        data = hrtfs_i[:, :]
+        print(data.shape)
         a = ax.pcolormesh(np.linspace(0, 1, data.shape[1]), np.linspace(-45, end_el, data.shape[0]),
                           data, shading='gouraud', linewidth=0, rasterized=True)
         # formatter = hp_vis.ERBFormatter(100, max_freq, unit='', places=0)
@@ -86,7 +87,7 @@ def main(save_figs=False, save_type='svg', model_name='hrtf_creation', exp_name=
         ax.set_ylabel('Elevations [deg]')
 
         ax = fig.add_subplot(1, 2, 2)
-        data = hrtfs_c[:, 5:-5]
+        data = hrtfs_c[:, :]
 
         a = ax.pcolormesh(np.linspace(0, 1, data.shape[1]), np.linspace(-45, end_el, data.shape[0]),
                           data, shading='gouraud', linewidth=0, rasterized=True)

@@ -112,7 +112,7 @@ def main(save_figs=False, save_type='svg', model_name='different_learned_maps', 
                                             scale_values=True, linear_reg=True, scatter_data=False)
 
                 if i_map == 0:
-                    ax2.set_title('Mono - Mean')
+                    ax2.set_title('Mono - Prior')
                 hp_vis.set_axis(ax2, len(elevations))
                 if i_map == 3:
                     ax2.set_xlabel('True Elevation [deg]')
@@ -131,7 +131,7 @@ def main(save_figs=False, save_type='svg', model_name='different_learned_maps', 
                 hp_vis.plot_localization_result(x_bin_mean[i_par], y_bin_mean[i_par], ax4, SOUND_FILES,
                                             scale_values=True, linear_reg=True, scatter_data=False)
                 if i_map == 0:
-                    ax4.set_title('Bin - Mean')
+                    ax4.set_title('Bin - Prior')
                 hp_vis.set_axis(ax4, len(elevations))
                 if i_map == 3:
                     ax4.set_xlabel('True Elevation [deg]')

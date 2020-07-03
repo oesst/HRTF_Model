@@ -4,7 +4,7 @@ import logging
 from pathlib import Path
 from src.data import generateData
 from src.features import helpers as hp
-# from src.visualization import helpers as hpVis
+from src.features import helpers_vis as hpVis
 import numpy as np
 import pickle
 import matplotlib.pyplot as plt
@@ -135,9 +135,11 @@ def main(model_name='single_participant', exp_name='single_participant_default',
     # # plt.suptitle('Single Participant')
     # # Monoaural Data (Ipsilateral), No Mean Subtracted
     # ax = fig.add_subplot(1, 4, 1)
-    # hpVis.plot_localization_result(x_mono, y_mono, ax, SOUND_FILES, scale_values=True, linear_reg=True)
+    # # hpVis.plot_localization_result(x_mono, y_mono, ax, SOUND_FILES, scale_values=True, linear_reg=True)
+    # ax.pcolormesh(learned_map)
+    # print(learned_map)
     # ax.set_title('Monoaural')
-    # hpVis.set_axis(ax)
+    # # hpVis.set_axis(ax)
     # ax.set_ylabel('Estimated Elevation [deg]')
     # plt.show()
 

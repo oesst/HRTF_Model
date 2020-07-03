@@ -91,6 +91,7 @@ def create_data(freq_bands=24, participant_number=19, snr=0.2, normalize=False, 
                 psd_all_c[i, i_elevs, :] = window_means
                 #################################################
 
+
         np.save(path_data_r.absolute(), psd_all_c)
         np.save(path_data_l.absolute(), psd_all_i)
 
