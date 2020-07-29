@@ -1,14 +1,6 @@
 import numpy as np
 from matplotlib import cm
 import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
-from scipy.signal import welch
-from itertools import islice
-import matplotlib as mpl
-from scipy.spatial import distance
-from sklearn.linear_model import LinearRegression
-from scipy.ndimage import gaussian_filter1d
-import seaborn as sns
 import matplotlib as mpl
 import src.features.filters as filters
 

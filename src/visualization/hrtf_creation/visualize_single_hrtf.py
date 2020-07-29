@@ -59,6 +59,10 @@ def main(save_figs=False, save_type='svg', model_name='hrtf_creation', exp_name=
     exp_path = ROOT / 'models' / model_name
     exp_file = exp_path / exp_name_str
     # check if model results exist already and load
+
+    # set formatter for this plot
+    formatter = hp_vis.ERBFormatter(100, max_freq, unit='', places=0)
+
     if exp_path.exists() and exp_file.is_file():
         # try to load the model files
         with open(exp_file.as_posix(), 'rb') as f:
@@ -74,31 +78,34 @@ def main(save_figs=False, save_type='svg', model_name='hrtf_creation', exp_name=
         # Monoaural Data (Ipsilateral), No Mean Subtracted
         ax = fig.add_subplot(1, 2, 1)
         # a = ax.pcolormesh(np.squeeze(hrtfs_i[:,:-5]))
-        data = hrtfs_i[:, :]
+        data = hrtfs_i[:, 5:]
         print(data.shape)
         a = ax.pcolormesh(np.linspace(0, 1, data.shape[1]), np.linspace(-45, end_el, data.shape[0]),
                           data, shading='gouraud', linewidth=0, rasterized=True)
-        # formatter = hp_vis.ERBFormatter(100, max_freq, unit='', places=0)
-        # ax.xaxis.set_major_formatter(formatter)
-        ax.set_xticklabels(np.linspace(0,max_freq/1000,len(ax.get_xticks())))
-        plt.colorbar(a)
+        ax.xaxis.set_major_formatter(formatter)
+        # ax.set_xticklabels(np.linspace(0,max_freq/1000,len(ax.get_xticks())))
+        cbar = plt.colorbar(a)
+        cbar.ax.get_yaxis().labelpad = 20
+        cbar.set_label('Decibels [dB]', rotation=270)
         ax.set_title('Ipsilateral')
         ax.set_xlabel('Frequency [kHz]')
         ax.set_ylabel('Elevations [deg]')
 
         ax = fig.add_subplot(1, 2, 2)
-        data = hrtfs_c[:, :]
+        data = hrtfs_c[:, 5:]
 
         a = ax.pcolormesh(np.linspace(0, 1, data.shape[1]), np.linspace(-45, end_el, data.shape[0]),
                           data, shading='gouraud', linewidth=0, rasterized=True)
-        # formatter = hp_vis.ERBFormatter(100, max_freq, unit='', places=0)
-        # ax.xaxis.set_major_formatter(formatter)
-        ax.set_xticklabels(np.linspace(0,max_freq/1000,len(ax.get_xticks())))
+        ax.xaxis.set_major_formatter(formatter)
+        # ax.set_xticklabels(np.linspace(0,max_freq/1000,len(ax.get_xticks())))
         ax.set_title('Contralateral')
         ax.set_xlabel('Frequency [kHz]')
         ax.set_ylabel('Elevations [deg]')
 
-        plt.colorbar(a)
+        cbar = plt.colorbar(a)
+        cbar.ax.get_yaxis().labelpad = 20
+        cbar.set_label('Decibels [dB]', rotation=270)
+
 
         if save_figs:
             fig_save_path = ROOT / 'reports' / 'figures' / model_name / exp_name_str

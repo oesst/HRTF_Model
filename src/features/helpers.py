@@ -73,6 +73,10 @@ def create_map(psd, mean_subtracted_map=True):
         learned_map = np.mean(psd, axis=0)
         mean_learned_map = np.mean(learned_map, axis=0)
         learned_map = learned_map - mean_learned_map
+        print(psd.shape)
+        print(learned_map.shape)
+        print(mean_learned_map.shape)
+
     else:
         learned_map = np.mean(psd, axis=0)
         learned_map = learned_map

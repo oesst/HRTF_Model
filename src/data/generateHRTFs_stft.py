@@ -40,7 +40,7 @@ def create_data(freq_bands=24, participant_number=19, snr=0.2, normalize=False, 
     # Default gammatone-based spectrogram parameters
     twin = time_window
     thop = twin / 2
-    fmin = 100
+    fmin = 20
     fmax = max_freq
     fs = 44100
 
