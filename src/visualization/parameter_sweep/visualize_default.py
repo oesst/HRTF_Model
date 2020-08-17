@@ -101,7 +101,7 @@ def main(save_figs=False, save_type='svg', model_name='parameter_sweep', exp_nam
         plt.tight_layout()
 
         if save_figs:
-            fig_save_path = ROOT / 'reports' / 'figures' / model_name / exp_name_str
+            fig_save_path = ROOT / 'reports' / 'figures' / exp_name_str / model_name
             if not fig_save_path.exists():
                 fig_save_path.mkdir(parents=True, exist_ok=True)
             logger.info('Saving figures to ' + fig_save_path.as_posix())
