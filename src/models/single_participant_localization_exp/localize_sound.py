@@ -16,36 +16,6 @@ SOUND_FILES = ROOT / 'data/raw/sound_samples/'
 SOUND_FILES = list(SOUND_FILES.glob('**/*.wav'))
 
 
-def process_inputs(psd_all_i, psd_all_c, ear='ipsi', normalization_type='sum_1', sigma_smoothing=0, sigma_gauss_norm=1):
-    # filter the data
-    psd_mono_c = hp.filter_dataset(psd_all_c, normalization_type=normalization_type,
-                                   sigma_smoothing=sigma_smoothing, sigma_gauss_norm=sigma_gauss_norm)
-    psd_mono_i = hp.filter_dataset(psd_all_i, normalization_type=normalization_type,
-                                   sigma_smoothing=sigma_smoothing, sigma_gauss_norm=sigma_gauss_norm)
-
-    # integrate the signals and filter
-    if ear.find('contra') >= 0:
-        psd_binaural = hp.filter_dataset(
-            psd_mono_c / (psd_mono_i + psd_mono_c), normalization_type=normalization_type, sigma_smoothing=0, sigma_gauss_norm=0)
-    else:
-        psd_binaural = hp.filter_dataset(
-            psd_mono_i / (psd_mono_i + psd_mono_c), normalization_type=normalization_type, sigma_smoothing=0, sigma_gauss_norm=0)
-
-    # calculate different input sounds. should be 4 of them (mono,mono-mean,bin, bin-mean)
-    if ear.find('contra') >= 0:
-        psd_mono = psd_mono_c
-    else:
-        psd_mono = psd_mono_i
-
-    psd_mono_mean = psd_mono - \
-        np.transpose(np.tile(np.mean(psd_mono, axis=1), [
-                     psd_mono.shape[1], 1, 1]), [1, 0, 2])
-    psd_binaural = psd_binaural
-    psd_binaural_mean = psd_binaural - \
-        np.transpose(np.tile(np.mean(psd_binaural, axis=1), [
-                     psd_binaural.shape[1], 1, 1]), [1, 0, 2])
-
-    return psd_mono, psd_mono_mean, psd_binaural, psd_binaural_mean
 
 # Define whether figures should be saved
 @click.command()
@@ -106,11 +76,14 @@ def main(model_name='single_participant', exp_name='single_participant_default',
         psd_all_i = psd_all_i[:, elevations, :]
 
         # filter data and integrate it
-        psd_mono, psd_mono_mean, psd_binaural, psd_binaural_mean = process_inputs(
+        psd_mono, psd_mono_mean, psd_binaural, psd_binaural_mean = hp.process_inputs(
             psd_all_i, psd_all_c, ear, normalization_type, sigma_smoothing, sigma_gauss_norm)
 
         # create map from defined processed data
-        learned_map = hp.create_map(psd_binaural, mean_subtracted_map)
+        if mean_subtracted_map:
+            learned_map = psd_binaural_mean.mean(0)
+        else:
+            learned_map = psd_binaural.mean(0)
 
         # localize the sounds and save the results
         x_mono, y_mono = hp.localize_sound(psd_mono, learned_map)
@@ -136,8 +109,8 @@ def main(model_name='single_participant', exp_name='single_participant_default',
     # # Monoaural Data (Ipsilateral), No Mean Subtracted
     # ax = fig.add_subplot(1, 4, 1)
     # # hpVis.plot_localization_result(x_mono, y_mono, ax, SOUND_FILES, scale_values=True, linear_reg=True)
-    # ax.pcolormesh(learned_map)
-    # print(learned_map)
+    # ax.pcolormesh(psd_binaural_mean.mean(0))
+    # print(psd_binaural_mean)
     # ax.set_title('Monoaural')
     # # hpVis.set_axis(ax)
     # ax.set_ylabel('Estimated Elevation [deg]')

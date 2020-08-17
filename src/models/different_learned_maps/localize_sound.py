@@ -63,7 +63,7 @@ def main(model_name='different_learned_maps', exp_name='localization_default', a
 
     # create unique experiment name
     exp_name_str = hp.create_exp_name([exp_name, normalization_type, sigma_smoothing, sigma_gauss_norm, mean_subtracted_map,
-                                       time_window, int(snr * 100), freq_bands, max_freq, (azimuth - 12) * 10, normalize, len(elevations),ear])
+                                       time_window, int(snr * 100), freq_bands, max_freq, (azimuth - 12) * 10, normalize, len(elevations), ear])
 
     exp_path = ROOT / 'models' / model_name
     exp_file = exp_path / exp_name_str
@@ -71,7 +71,7 @@ def main(model_name='different_learned_maps', exp_name='localization_default', a
     if not clean and exp_path.exists() and exp_file.is_file():
         # try to load the model files
         with exp_file.open('rb') as f:
-            logger.info('Reading model data from file'+exp_file.as_posix())
+            logger.info('Reading model data from file' + exp_file.as_posix())
             [x_mono, y_mono, x_mono_mean, y_mono_mean, x_bin,
                 y_bin, x_bin_mean, y_bin_mean] = pickle.load(f)
     else:
@@ -103,14 +103,14 @@ def main(model_name='different_learned_maps', exp_name='localization_default', a
                 # create map from defined processed data
 
                 if i_map == 0:
-                    learned_map = hp.create_map(psd_mono, False)
+                    learned_map = psd_mono.mean(0)
                 elif i_map == 1:
-                    learned_map = hp.create_map(psd_mono, True)
+                    learned_map = psd_mono_mean.mean(0)
                 elif i_map == 2:
-                    learned_map = hp.create_map(psd_binaural, False)
+                    learned_map = psd_binaural.mean(0)
                 elif i_map == 3:
                     # bina_mean
-                    learned_map = hp.create_map(psd_binaural, True)
+                    learned_map = psd_binaural_mean.mean(0)
                 else:
                     logger.error('Something went wrong in if i_map statement')
 

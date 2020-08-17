@@ -114,28 +114,28 @@ def main(model_name = 'map_learning', exp_name = 'localization_all_maps', azimut
                     # monaural condition
                     if i_maps == 0:
                         # get only the defined sounds and elevations
-                        tmp_data = np.zeros(psd_binaural.shape)
+                        tmp_data = np.zeros(psd_mono.shape)
                         tmp_data[sounds_ind[0], sounds_ind[1], :] = psd_mono[sounds_ind[0], sounds_ind[1], :]
                         # create learned_map
-                        learned_map = hp.create_map(tmp_data, False)
+                        learned_map = psd_mono.mean(0)
                     elif i_maps == 1:
                         # get only the defined sounds and elevations
-                        tmp_data = np.zeros(psd_binaural.shape)
-                        tmp_data[sounds_ind[0], sounds_ind[1], :] = psd_mono[sounds_ind[0], sounds_ind[1], :]
+                        tmp_data = np.zeros(psd_mono_mean.shape)
+                        tmp_data[sounds_ind[0], sounds_ind[1], :] = psd_mono_mean[sounds_ind[0], sounds_ind[1], :]
                         # create learned_map
-                        learned_map = hp.create_map(tmp_data, True)
+                        learned_map = psd_mono_mean.mean(0)
                     elif i_maps == 2:
                         # get only the defined sounds and elevations
                         tmp_data = np.zeros(psd_binaural.shape)
                         tmp_data[sounds_ind[0], sounds_ind[1], :] = psd_binaural[sounds_ind[0], sounds_ind[1], :]
                         # create learned_map
-                        learned_map = hp.create_map(tmp_data, False)
+                        learned_map = psd_binaural.mean(0)
                     elif i_maps == 3:
                         # get only the defined sounds and elevations
-                        tmp_data = np.zeros(psd_binaural.shape)
-                        tmp_data[sounds_ind[0], sounds_ind[1], :] = psd_binaural[sounds_ind[0], sounds_ind[1], :]
+                        tmp_data = np.zeros(psd_binaural_mean.shape)
+                        tmp_data[sounds_ind[0], sounds_ind[1], :] = psd_binaural_mean[sounds_ind[0], sounds_ind[1], :]
                         # create learned_map
-                        learned_map = hp.create_map(tmp_data, True)
+                        learned_map = psd_binaural_mean.mean(0)
 
                     # store the map
                     # learned_maps_participants[i_par, :, :] = learned_map

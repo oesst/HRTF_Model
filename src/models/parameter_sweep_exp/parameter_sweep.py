@@ -94,7 +94,10 @@ def main(model_name='parameter_sweep', exp_name='default', azimuth=12, snr=0.2, 
                         psd_all_i, psd_all_c, ear, normalization_type, sigma_smooth, sigma_gauss)
 
                     # create map from defined processed data
-                    learned_map = hp.create_map(psd_binaural, mean_subtracted_map)
+                    if mean_subtracted_map:
+                        learned_map = psd_binaural_mean.mean(0)
+                    else:
+                        learned_map = psd_binaural.mean(0)
 
                     # # localize the sounds and save the results
                     # x_mono[i_par, :, :, :], y_mono[i_par, :] = hp.localize_sound(psd_mono, learned_map)

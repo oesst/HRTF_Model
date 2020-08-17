@@ -71,6 +71,7 @@ def main(model_name='all_participants', exp_name='localization_default', azimuth
             logger.info('Reading model data from file')
             [x_mono, y_mono, x_mono_mean, y_mono_mean, x_bin,
                 y_bin, x_bin_mean, y_bin_mean] = pickle.load(f)
+            print(x_mono.shape)
     else:
 
         x_mono = np.zeros((len(participant_numbers), len(SOUND_FILES), len(elevations), 2))
@@ -96,7 +97,10 @@ def main(model_name='all_participants', exp_name='localization_default', azimuth
                 psd_all_i, psd_all_c, ear, normalization_type, sigma_smoothing, sigma_gauss_norm)
 
             # create map from defined processed data
-            learned_map = hp.create_map(psd_binaural, mean_subtracted_map)
+            if mean_subtracted_map:
+                learned_map = psd_binaural_mean.mean(0)
+            else:
+                learned_map = psd_binaural.mean(0)
 
             # localize the sounds and save the results
             x_mono[i_par, :, :, :], y_mono[i_par, :] = hp.localize_sound(psd_mono, learned_map)

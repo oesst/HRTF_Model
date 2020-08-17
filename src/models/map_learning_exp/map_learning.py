@@ -109,12 +109,16 @@ def main(model_name='all_participants', exp_name='localization_default', azimuth
                 sounds_ind = np.unravel_index(ind, (psd_all_c.shape[0], psd_all_c.shape[1]))
 
                 # get only the defined sounds and elevations
-                tmp_data = np.zeros(psd_binaural.shape)
-                tmp_data[sounds_ind[0], sounds_ind[1], :] =psd_binaural[sounds_ind[0], sounds_ind[1], :]
-
 
                 # create learned_map
-                learned_map = hp.create_map(tmp_data, mean_subtracted_map)
+                if mean_subtracted_map:
+                    tmp_data = np.zeros(psd_binaural_mean.shape)
+                    tmp_data[sounds_ind[0], sounds_ind[1], :] = psd_binaural_mean[sounds_ind[0], sounds_ind[1], :]
+                    learned_map = tmp_data.mean(0)
+                else:
+                    tmp_data = np.zeros(psd_binaural.shape)
+                    tmp_data[sounds_ind[0], sounds_ind[1], :] = psd_binaural[sounds_ind[0], sounds_ind[1], :]
+                    learned_map = tmp_data.mean(0)
                 # store the map
                 # learned_maps_participants[i_par, :, :] = learned_map
                 # store the number of sounds used

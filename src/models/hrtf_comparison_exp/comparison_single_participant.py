@@ -17,38 +17,6 @@ SOUND_FILES = ROOT / 'data/raw/sound_samples/'
 SOUND_FILES = list(SOUND_FILES.glob('**/*.wav'))
 
 
-def process_inputs(psd_all_i, psd_all_c, ear='ipsi', normalization_type='sum_1', sigma_smoothing=0, sigma_gauss_norm=1):
-    # filter the data
-    psd_mono_c = hp.filter_dataset(psd_all_c, normalization_type=normalization_type,
-                                   sigma_smoothing=sigma_smoothing, sigma_gauss_norm=sigma_gauss_norm)
-    psd_mono_i = hp.filter_dataset(psd_all_i, normalization_type=normalization_type,
-                                   sigma_smoothing=sigma_smoothing, sigma_gauss_norm=sigma_gauss_norm)
-
-    # integrate the signals and filter
-    if ear.find('contra') >= 0:
-        psd_binaural = hp.filter_dataset(
-            psd_mono_c / psd_mono_i, normalization_type=normalization_type, sigma_smoothing=0, sigma_gauss_norm=0)
-    else:
-        psd_binaural = hp.filter_dataset(
-            psd_mono_i / psd_mono_c, normalization_type=normalization_type, sigma_smoothing=0, sigma_gauss_norm=0)
-
-    # calculate different input sounds. should be 4 of them (mono,mono-mean,bin, bin-mean)
-    if ear.find('contra') >= 0:
-        psd_mono = psd_mono_c
-    else:
-        psd_mono = psd_mono_i
-
-    psd_mono_mean = psd_mono - \
-        np.transpose(np.tile(np.mean(psd_mono, axis=1), [
-                     psd_mono.shape[1], 1, 1]), [1, 0, 2])
-    psd_binaural = psd_binaural
-    psd_binaural_mean = psd_binaural - \
-        np.transpose(np.tile(np.mean(psd_binaural, axis=1), [
-                     psd_binaural.shape[1], 1, 1]), [1, 0, 2])
-
-    return psd_mono, psd_mono_mean, psd_binaural, psd_binaural_mean
-
-
 def pearson2d(A, B):
     """ Calculate a 2d pearson correlation index """
     A_ = A - A.mean()
@@ -109,14 +77,14 @@ def main(model_name='hrtf_comparison', exp_name='single_participant', azimuth=12
             freq_bands, participant_number, snr, normalize, azimuth, time_window, max_freq=max_freq)
 
         # filter data and integrate it
-        psd_mono, psd_mono_mean, psd_binaural, psd_binaural_mean = process_inputs(
+        psd_mono, psd_mono_mean, psd_binaural, psd_binaural_mean = hp.process_inputs(
             psd_all_i, psd_all_c, ear, normalization_type, sigma_smoothing, sigma_gauss_norm)
 
         # create map from defined processed data
-        learned_map_mono = hp.create_map(psd_mono, False)
-        learned_map_mono_mean = hp.create_map(psd_mono, True)
-        learned_map_bin = hp.create_map(psd_binaural, False)
-        learned_map_bin_mean = hp.create_map(psd_binaural, True)
+        learned_map_mono = psd_mono.mean(0)
+        learned_map_mono_mean = psd_mono_mean.mean(0)
+        learned_map_bin = psd_binaural.mean(0)
+        learned_map_bin_mean = psd_binaural_mean.mean(0)
         # learned_map = hp.create_map(psd_mono, False)
         # Get the actual HRTF
         hrtfs_c, hrtfs_i = generateHRTFs.create_data(
@@ -125,17 +93,17 @@ def main(model_name='hrtf_comparison', exp_name='single_participant', azimuth=12
         # filter data and integrate it
         # hrtfs_c = hp.filter_dataset(hrtfs_c, normalization_type=normalization_type,
         #                                sigma_smoothing=0, sigma_gauss_norm=0)
-        hrtfs_i, psd_mono_mean, psd_binaural, psd_binaural_mean = process_inputs(
+        hrtfs_i, psd_mono_mean, psd_binaural, psd_binaural_mean = hp.process_inputs(
             hrtfs_i, hrtfs_c, 'ipsi', normalization_type, sigma_smoothing, sigma_gauss_norm)
 
-        hrtfs_c, psd_mono_mean, psd_binaural, psd_binaural_mean = process_inputs(
+        hrtfs_c, psd_mono_mean, psd_binaural, psd_binaural_mean = hp.process_inputs(
             hrtfs_i, hrtfs_c, 'contra', normalization_type, sigma_smoothing, sigma_gauss_norm)
 
         # remove mean for later comparison
         hrtfs_c = np.squeeze(hrtfs_c[0, elevations, :])
-        hrtfs_c -= hrtfs_c.mean()
+        hrtfs_c /= hrtfs_c.mean()
         hrtfs_i = np.squeeze(hrtfs_i[0, elevations, :])
-        hrtfs_i -= hrtfs_i.mean()
+        hrtfs_i /= hrtfs_i.mean()
 
         # remove unwanted elevations
         learned_map_mono = learned_map_mono[elevations, :]

@@ -92,7 +92,10 @@ def main(model_name='snr_experiment', exp_name='default', azimuth=12, freq_bands
                     psd_all_i, psd_all_c, ear, normalization_type, sigma_smoothing, sigma_gauss_norm)
 
                 # create map from defined processed data
-                learned_map = hp.create_map(psd_binaural, mean_subtracted_map)
+                if mean_subtracted_map:
+                    learned_map = psd_binaural_mean.mean(0)
+                else:
+                    learned_map = psd_binaural.mean(0)
 
                 # localize the sounds and save the results
                 x_test, y_test = hp.localize_sound(psd_mono, learned_map)
