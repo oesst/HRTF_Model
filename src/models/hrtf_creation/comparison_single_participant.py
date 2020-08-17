@@ -17,37 +17,6 @@ SOUND_FILES = ROOT / 'data/raw/sound_samples/'
 SOUND_FILES = list(SOUND_FILES.glob('**/*.wav'))
 
 
-def process_inputs(psd_all_i, psd_all_c, ear='ipsi', normalization_type='sum_1', sigma_smoothing=0, sigma_gauss_norm=1):
-    # filter the data
-    psd_mono_c = hp.filter_dataset(psd_all_c, normalization_type=normalization_type,
-                                   sigma_smoothing=sigma_smoothing, sigma_gauss_norm=sigma_gauss_norm)
-    psd_mono_i = hp.filter_dataset(psd_all_i, normalization_type=normalization_type,
-                                   sigma_smoothing=sigma_smoothing, sigma_gauss_norm=sigma_gauss_norm)
-
-    # integrate the signals and filter
-    if ear.find('contra') >= 0:
-        psd_binaural = hp.filter_dataset(
-            psd_mono_c / psd_mono_i, normalization_type=normalization_type, sigma_smoothing=0, sigma_gauss_norm=0)
-    else:
-        psd_binaural = hp.filter_dataset(
-            psd_mono_i / psd_mono_c, normalization_type=normalization_type, sigma_smoothing=0, sigma_gauss_norm=0)
-
-    # calculate different input sounds. should be 4 of them (mono,mono-mean,bin, bin-mean)
-    if ear.find('contra') >= 0:
-        psd_mono = psd_mono_c
-    else:
-        psd_mono = psd_mono_i
-
-    psd_mono_mean = psd_mono - \
-        np.transpose(np.tile(np.mean(psd_mono, axis=1), [
-                     psd_mono.shape[1], 1, 1]), [1, 0, 2])
-    psd_binaural = psd_binaural
-    psd_binaural_mean = psd_binaural - \
-        np.transpose(np.tile(np.mean(psd_binaural, axis=1), [
-                     psd_binaural.shape[1], 1, 1]), [1, 0, 2])
-
-    return psd_mono, psd_mono_mean, psd_binaural, psd_binaural_mean
-
 
 
 

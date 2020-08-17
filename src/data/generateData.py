@@ -116,7 +116,7 @@ def main():
 
     # Parameter to test
     snrs = np.arange(0, 1.1, 0.1)  # Signal to noise ratio
-    snrs = np.array([0.2])  # Signal to noise ratio
+    # snrs = np.array([0.2])  # Signal to noise ratio
     # snrs = np.array([0.2])  # Signal to noise ratio
     # freq_bandss = np.array([32, 64, 128]) # Frequency bands in resulting data
     freq_bandss = np.array([128])  # Frequency bands in resulting data

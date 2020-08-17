@@ -87,8 +87,7 @@ def main(model_name='hrtf_comparison', exp_name='single_participant', azimuth=12
         learned_map_bin_mean = psd_binaural_mean.mean(0)
         # learned_map = hp.create_map(psd_mono, False)
         # Get the actual HRTF
-        hrtfs_c, hrtfs_i = generateHRTFs.create_data(
-            freq_bands, participant_number, snr, normalize, azimuth, time_window, max_freq=max_freq)
+        hrtfs_c, hrtfs_i, _ = generateHRTFs.create_data(freq_bands, participant_number, snr, normalize, azimuth, time_window, max_freq=max_freq, clean=clean)
 
         # filter data and integrate it
         # hrtfs_c = hp.filter_dataset(hrtfs_c, normalization_type=normalization_type,
