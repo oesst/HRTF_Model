@@ -115,8 +115,8 @@ def main():
     time_window = 0.1  # time window for spectrogram in sec
 
     # Parameter to test
-    snrs = np.arange(0, 1.1, 0.1)  # Signal to noise ratio
-    # snrs = np.array([0.2])  # Signal to noise ratio
+    # snrs = np.arange(0, 1.1, 0.1)  # Signal to noise ratio
+    snrs = np.array([0.2])  # Signal to noise ratio
     # snrs = np.array([0.2])  # Signal to noise ratio
     # freq_bandss = np.array([32, 64, 128]) # Frequency bands in resulting data
     freq_bandss = np.array([128])  # Frequency bands in resulting data
@@ -134,7 +134,7 @@ def main():
     # define max frequency for gammatone filter bank
     max_freqs = np.array([20000])
 
-    participant_numbers = participant_numbers[::-1]
+    # participant_numbers = participant_numbers[::-1]
     # snrs = snrs[::-1]
     # freq_bandss = freq_bandss[::-1]
 

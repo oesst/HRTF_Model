@@ -62,10 +62,10 @@ def process_inputs(psd_all_i, psd_all_c, ear='ipsi', normalization_type='sum_1',
     # create binaural signal without incorporated prior information
     if ear.find('contra') >= 0:
         psd_binaural = filter_dataset(
-            psd_mono_c / (psd_mono_i + psd_mono_c), normalization_type=normalization_type, sigma_smoothing=0, sigma_gauss_norm=0)
+            psd_mono_c / (psd_mono_i), normalization_type=normalization_type, sigma_smoothing=0, sigma_gauss_norm=0)
     else:
         psd_binaural = filter_dataset(
-            psd_mono_i / (psd_mono_i + psd_mono_c), normalization_type=normalization_type, sigma_smoothing=0, sigma_gauss_norm=0)
+            psd_mono_i / (psd_mono_c), normalization_type=normalization_type, sigma_smoothing=0, sigma_gauss_norm=0)
 
     # integrate the prior integrating signals and filter
     if ear.find('contra') >= 0:
