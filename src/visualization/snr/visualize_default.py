@@ -25,6 +25,7 @@ SOUND_FILES = list(SOUND_FILES.glob('**/*.wav'))
 @click.option('--exp_name', default='default', help='Defines the experiment name')
 @click.option('--azimuth', default=12, help='Azimuth for which localization is done. Default is 12')
 @click.option('--freq_bands', default=128, help='Amount of frequency bands to use. Default is 128')
+@click.option('--snr', default=0.2, help='Signal to noise ration to use. Default is 0.2')
 @click.option('--max_freq', default=20000, help='Max frequency to use. Default is 20000')
 @click.option('--elevations', default=25, help='Number of elevations to use 0-n. Default is 25 which equals 0-90 deg')
 @click.option('--mean_subtracted_map', default=True, help='Should the learned map be mean subtracted. Default is True')
@@ -33,7 +34,7 @@ SOUND_FILES = list(SOUND_FILES.glob('**/*.wav'))
 @click.option('--sigma_smoothing', default=0, help='Sigma for smoothing kernel. 0 is off. Default is 0.')
 @click.option('--sigma_gauss_norm', default=1, help='Sigma for gauss normalization. 0 is off. Default is 1.')
 @click.option('--clean', is_flag=True)
-def main(save_figs=False, save_type='svg', model_name='all_participants', exp_name='localization_default', azimuth=12, freq_bands=24, max_freq=20000, elevations=25, mean_subtracted_map=True, ear='ipsi', normalization_type='sum_1', sigma_smoothing=0, sigma_gauss_norm=1, clean=False):
+def main(save_figs=False, save_type='svg', model_name='all_participants', exp_name='localization_default', azimuth=12, freq_bands=24, max_freq=20000, elevations=25, snr=0.2, mean_subtracted_map=True, ear='ipsi', normalization_type='sum_1', sigma_smoothing=0, sigma_gauss_norm=1, clean=False):
 
     logger = logging.getLogger(__name__)
     logger.info('Showing localization results for all participants')
@@ -126,7 +127,9 @@ def main(save_figs=False, save_type='svg', model_name='all_participants', exp_na
         plt.tight_layout()
 
         if save_figs:
-            fig_save_path = ROOT / 'reports' / 'figures' / model_name / exp_name_str
+            exp_name_str = hp.create_exp_name([exp_name, normalization_type, sigma_smoothing, sigma_gauss_norm, mean_subtracted_map, time_window, int(
+            snr * 100), freq_bands, max_freq, (azimuth - 12) * 10, normalize, len(elevations), ear])
+            fig_save_path = ROOT / 'reports' / 'figures' / exp_name_str / model_name
             if not fig_save_path.exists():
                 fig_save_path.mkdir(parents=True, exist_ok=True)
             logger.info('Saving figures to ' + fig_save_path.as_posix())

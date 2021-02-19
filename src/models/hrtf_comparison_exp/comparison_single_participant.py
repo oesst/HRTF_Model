@@ -87,22 +87,23 @@ def main(model_name='hrtf_comparison', exp_name='single_participant', azimuth=12
         learned_map_bin_mean = psd_binaural_mean.mean(0)
         # learned_map = hp.create_map(psd_mono, False)
         # Get the actual HRTF
-        hrtfs_c, hrtfs_i, _ = generateHRTFs.create_data(freq_bands, participant_number, snr, normalize, azimuth, time_window, max_freq=max_freq, clean=clean)
+        hrtfs_c, hrtfs_i, _ = generateHRTFs.create_data(freq_bands, participant_number, snr, normalize,
+                                                        azimuth, time_window, max_freq=max_freq, clean=clean)
 
         # filter data and integrate it
         # hrtfs_c = hp.filter_dataset(hrtfs_c, normalization_type=normalization_type,
         #                                sigma_smoothing=0, sigma_gauss_norm=0)
-        hrtfs_i, psd_mono_mean, psd_binaural, psd_binaural_mean = hp.process_inputs(
-            hrtfs_i, hrtfs_c, 'ipsi', normalization_type, sigma_smoothing, sigma_gauss_norm)
-
         hrtfs_c, psd_mono_mean, psd_binaural, psd_binaural_mean = hp.process_inputs(
             hrtfs_i, hrtfs_c, 'contra', normalization_type, sigma_smoothing, sigma_gauss_norm)
 
+        hrtfs_i, psd_mono_mean, psd_binaural, psd_binaural_mean = hp.process_inputs(
+            hrtfs_i, hrtfs_c, 'ipsi', normalization_type, sigma_smoothing, sigma_gauss_norm)
+
         # remove mean for later comparison
         hrtfs_c = np.squeeze(hrtfs_c[0, elevations, :])
-        hrtfs_c /= hrtfs_c.mean()
+        hrtfs_c -= hrtfs_c.mean()
         hrtfs_i = np.squeeze(hrtfs_i[0, elevations, :])
-        hrtfs_i /= hrtfs_i.mean()
+        hrtfs_i -= hrtfs_i.mean()
 
         # remove unwanted elevations
         learned_map_mono = learned_map_mono[elevations, :]

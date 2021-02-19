@@ -128,6 +128,8 @@ def main(save_figs=False, save_type='svg', model_name='map_learning', exp_name='
                     ax.set_xlabel('# of Presented Sounds')
 
         if save_figs:
+            exp_name_str = hp.create_exp_name([exp_name, normalization_type, sigma_smoothing, sigma_gauss_norm, mean_subtracted_map, time_window, int(
+            snr * 100), freq_bands, max_freq, (azimuth - 12) * 10, normalize, len(elevations), ear])
             fig_save_path = ROOT / 'reports' / 'figures' / exp_name_str / model_name
             if not fig_save_path.exists():
                 fig_save_path.mkdir(parents=True, exist_ok=True)

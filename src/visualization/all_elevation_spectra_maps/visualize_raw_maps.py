@@ -80,38 +80,11 @@ def main(save_figs=False, save_type='svg', model_name='elevation_spectra_maps', 
     ########################################################################
     ########################################################################
 
-    # create unique experiment name
-    # create unique experiment name
-
-
-    # set tick labels
-
-    # if len(elevations) == 50:
-    #
-    #     t = np.zeros(8)
-    #     t[0] = -55
-    #     t[1] = -45
-    #     t[2] = -45 + 1 * 68
-    #     t[3] = -45 + 2 * 68
-    #     t[4] = -45 + 3 * 68
-    #     t[5] = -45 + 4 * 68
-    #     t[6] = 230
-    #     t[7] = 230
-    # else:
-    #     t = np.zeros(8)
-    #     t[0] = -55
-    #     t[1] = -45
-    #     t[2] = -45 + 1 * 27
-    #     t[3] = -45 + 2 * 27
-    #     t[4] = -45 + 3 * 27
-    #     t[5] = -45 + 4 * 27
-    #     t[6] = -45 + 5 * 27
-    #     t[7] = 100
 
     fig_size = (7, 5)
     # fig_size = (20, 14)
 
-    formatter = hp_vis.ERBFormatter(100, max_freq, unit='', places=0)
+    formatter = hp_vis.ERBFormatter(20, max_freq, unit='', places=0)
 
     # check if model results exist already and load
     if exp_path.exists() and exp_file.is_file():

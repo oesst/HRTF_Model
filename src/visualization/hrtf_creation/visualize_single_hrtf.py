@@ -61,7 +61,7 @@ def main(save_figs=False, save_type='svg', model_name='hrtf_creation', exp_name=
     # check if model results exist already and load
 
     # set formatter for this plot
-    formatter = hp_vis.ERBFormatter(100, max_freq, unit='', places=0)
+    formatter = hp_vis.ERBFormatter(20, max_freq, unit='', places=0)
 
     if exp_path.exists() and exp_file.is_file():
         # try to load the model files
@@ -108,6 +108,8 @@ def main(save_figs=False, save_type='svg', model_name='hrtf_creation', exp_name=
 
 
         if save_figs:
+            exp_name_str = hp.create_exp_name([exp_name, normalization_type, sigma_smoothing, sigma_gauss_norm, mean_subtracted_map, time_window, int(
+            snr * 100), freq_bands, max_freq, (azimuth - 12) * 10, normalize, len(elevations), ear])
             fig_save_path = ROOT / 'reports' / 'figures' / exp_name_str / model_name
             if not fig_save_path.exists():
                 fig_save_path.mkdir(parents=True, exist_ok=True)

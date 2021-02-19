@@ -21,12 +21,18 @@ SOUND_FILES = list(SOUND_FILES.glob('**/*.wav'))
 # Define up to which frequency the data should be generated
 
 
-def create_data(freq_bands=24, participant_number=19, snr=0.2, normalize=False, azimuth=12, time_window=0.1, max_freq=20000):
+def create_data(freq_bands=24, participant_number=19, snr=0.2, normalize=False, azimuth=12, time_window=0.1, max_freq=20000,diff_noise=False):
 
-    str_r = 'data/processed_' + str(max_freq) + 'Hz/binaural_right_0_gammatone_' + str(time_window) + '_window_{0:03d}'.format(participant_number) + '_cipic_' + str(
-        int(snr * 100)) + '_srn_' + str(freq_bands) + '_channels_' + str((azimuth - 12) * 10) + '_azi_' + str(normalize) + '_norm.npy'
-    str_l = 'data/processed_' + str(max_freq) + 'Hz/binaural_left_0_gammatone_' + str(time_window) + '_window_{0:03d}'.format(participant_number) + '_cipic_' + str(
-        int(snr * 100)) + '_srn_' + str(freq_bands) + '_channels_' + str((azimuth - 12) * 10) + '_azi_' + str(normalize) + '_norm.npy'
+    if diff_noise:
+        str_r = 'data/processed_' + str(max_freq) + 'Hz_noise/binaural_right_0_gammatone_' + str(time_window) + '_window_{0:03d}'.format(participant_number) + '_cipic_' + str(
+            int(snr * 100)) + '_srn_' + str(freq_bands) + '_channels_' + str((azimuth - 12) * 10) + '_azi_' + str(normalize) + '_norm.npy'
+        str_l = 'data/processed_' + str(max_freq) + 'Hz_noise/binaural_left_0_gammatone_' + str(time_window) + '_window_{0:03d}'.format(participant_number) + '_cipic_' + str(
+            int(snr * 100)) + '_srn_' + str(freq_bands) + '_channels_' + str((azimuth - 12) * 10) + '_azi_' + str(normalize) + '_norm.npy'
+    else:
+        str_r = 'data/processed_' + str(max_freq) + 'Hz/binaural_right_0_gammatone_' + str(time_window) + '_window_{0:03d}'.format(participant_number) + '_cipic_' + str(
+            int(snr * 100)) + '_srn_' + str(freq_bands) + '_channels_' + str((azimuth - 12) * 10) + '_azi_' + str(normalize) + '_norm.npy'
+        str_l = 'data/processed_' + str(max_freq) + 'Hz/binaural_left_0_gammatone_' + str(time_window) + '_window_{0:03d}'.format(participant_number) + '_cipic_' + str(
+            int(snr * 100)) + '_srn_' + str(freq_bands) + '_channels_' + str((azimuth - 12) * 10) + '_azi_' + str(normalize) + '_norm.npy'
 
     path_data_r = ROOT / str_r
     path_data_l = ROOT / str_l
