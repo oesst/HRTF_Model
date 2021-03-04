@@ -36,7 +36,7 @@ SOUND_FILES = list(SOUND_FILES.glob('**/*.wav'))
 def main(save_figs=False, save_type='svg', model_name='elevation_spectra_maps', exp_name='unfiltered', azimuth=12, participant_numbers=None, snr=0.2, freq_bands=24, max_freq=20000, elevations=25, clean=False):
 
     logger = logging.getLogger(__name__)
-    logger.info('Showing localization results for all participants')
+    logger.info('Plotting elevation spectra map for different sounds')
 
     ########################################################################
     ######################## Set parameters ################################
@@ -96,12 +96,11 @@ def main(save_figs=False, save_type='svg', model_name='elevation_spectra_maps', 
         ipsi_maps = ipsi_maps[:, :, elevations, :]
         contra_maps = contra_maps[:, :, elevations, :]
 
-        # plot regression line for each participant
         for i_par, par in enumerate(participant_numbers):
 
             for i_sound, sound in enumerate(SOUND_FILES):
                 sound = sound.name.split('.')[0]
-                # CONTRA
+                # IPSI
                 fig = plt.figure(figsize=fig_size)
                 ax = fig.add_subplot(1, 1, 1)
                 ax.set_title(sound)

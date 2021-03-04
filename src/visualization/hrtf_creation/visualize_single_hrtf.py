@@ -83,7 +83,7 @@ def main(save_figs=False, save_type='svg', model_name='hrtf_creation', exp_name=
         a = ax.pcolormesh(np.linspace(0, 1, data.shape[1]), np.linspace(-45, end_el, data.shape[0]),
                           data, shading='gouraud', linewidth=0, rasterized=True)
         ax.xaxis.set_major_formatter(formatter)
-        # ax.set_xticklabels(np.linspace(0,max_freq/1000,len(ax.get_xticks())))
+        # d
         cbar = plt.colorbar(a)
         cbar.ax.get_yaxis().labelpad = 20
         cbar.set_label('Decibels [dB]', rotation=270)
