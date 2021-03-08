@@ -87,7 +87,7 @@ def main(model_name='map_learning', exp_name='localization_all_maps', azimuth=12
 
             # create or read the data. psd_all_c = (sounds,elevations,frequency bands)
             psd_all_c, psd_all_i = generateData.create_data(
-                freq_bands, par, snr, normalize, azimuth, time_window, max_freq=max_freq)
+                freq_bands, par, snr, normalize, azimuth, time_window, max_freq=max_freq, diff_noise=True)
 
             # Take only given elevations
             psd_all_c = psd_all_c[:, elevations, :]
@@ -101,6 +101,11 @@ def main(model_name='map_learning', exp_name='localization_all_maps', azimuth=12
             # create or read the data. psd_all_c = (sounds,elevations,frequency bands)
             psd_all_c_diff_noise, psd_all_i_diff_noise = generateData.create_data(
                 freq_bands, par, snr, normalize, azimuth, time_window, max_freq=max_freq, diff_noise=True)
+
+            # Take only given elevations
+            psd_all_c_diff_noise = psd_all_c_diff_noise[:, elevations, :]
+            psd_all_i_diff_noise = psd_all_i_diff_noise[:, elevations, :]
+            
             # filter data and integrate it
             psd_mono_diff_noise, psd_mono_mean_diff_noise, psd_binaural_diff_noise, psd_binaural_mean_diff_noise = hp.process_inputs(
                 psd_all_i_diff_noise, psd_all_c_diff_noise, ear, normalization_type, sigma_smoothing, sigma_gauss_norm)

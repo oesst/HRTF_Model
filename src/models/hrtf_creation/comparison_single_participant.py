@@ -3,6 +3,7 @@ import click
 import logging
 from pathlib import Path
 from src.data import generateHRTFs_stft
+from src.data import generateHRTFs
 from src.data import generateData
 from src.features import helpers as hp
 from src.features import helpers_vis as hpVis
@@ -15,9 +16,6 @@ ROOT = Path(__file__).resolve().parents[3]
 SOUND_FILES = ROOT / 'data/raw/sound_samples/'
 # create a list of the sound files
 SOUND_FILES = list(SOUND_FILES.glob('**/*.wav'))
-
-
-
 
 
 # Define whether figures should be saved
@@ -36,18 +34,25 @@ SOUND_FILES = list(SOUND_FILES.glob('**/*.wav'))
 @click.option('--sigma_smoothing', default=0, help='Sigma for smoothing kernel. 0 is off. Default is 0.')
 @click.option('--sigma_gauss_norm', default=1, help='Sigma for gauss normalization. 0 is off. Default is 1.')
 @click.option('--clean', is_flag=True)
-def main(model_name='hrtf_creation', exp_name='single_participant', azimuth=12, participant_number=9, snr=0.0, freq_bands=24, max_freq=20000, elevations=25, mean_subtracted_map=True, ear='ipsi', normalization_type='sum_1', sigma_smoothing=0, sigma_gauss_norm=1, clean=False):
+def main(model_name='hrtf_creation', exp_name='single_participant', azimuth=12, participant_number=9, snr=0.0, freq_bands=128, max_freq=20000, elevations=25, mean_subtracted_map=True, ear='ipsi', normalization_type='sum_1', sigma_smoothing=0, sigma_gauss_norm=1, clean=False):
     """ This script calculates the correlation coefficient between the ipsi- and contralateral HRTF and the learned maps for a single participant.
     """
     logger = logging.getLogger(__name__)
     logger.info(
-        'Comparing learned HRTF maps with the actual HRTF of a participant')
+        'Just get the HRTFs of the given participant')
 
     ########################################################################
     ######################## Set parameters ################################
     ########################################################################
     normalize = False
     time_window = 0.1  # time window in sec
+
+    ### IMPORTANT ###
+    # Use 128 freq_bands for better displaying
+    freq_bands = 128
+    logger.info('############## IMPORTANT ###############')
+    logger.info('############## Using 128 frequency by default! ###############')
+
 
     elevations = np.arange(0, elevations, 1)
     ########################################################################
@@ -67,7 +72,7 @@ def main(model_name='hrtf_creation', exp_name='single_participant', azimuth=12, 
             [hrtfs_i, hrtfs_c, freqs] = pickle.load(f)
     else:
 
-        hrtfs_c, hrtfs_i,freqs = generateHRTFs_stft.create_data(
+        hrtfs_c, hrtfs_i, freqs = generateHRTFs.create_data(
             freq_bands, participant_number, snr, normalize, azimuth, time_window, max_freq=max_freq, clean=clean)
 
         # # remove mean for later comparison

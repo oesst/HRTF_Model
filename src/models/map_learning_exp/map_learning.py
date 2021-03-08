@@ -16,6 +16,8 @@ SOUND_FILES = ROOT / 'data/raw/sound_samples/'
 SOUND_FILES = list(SOUND_FILES.glob('**/*.wav'))
 
 # Define whether figures should be saved
+
+
 @click.command()
 @click.option('--model_name', default='map_learning', help='Defines the model name.')
 @click.option('--exp_name', default='learning_default', help='Defines the experiment name')
@@ -83,11 +85,11 @@ def main(model_name='all_participants', exp_name='localization_default', azimuth
         trial_used_ss = np.zeros((len(participant_numbers), n_trials))
 
         for i_par, par in enumerate(participant_numbers):
-            logger.info('Localizing {0:d} trials for participant {1:d}. \n'.format(n_trials,par))
+            logger.info('Localizing {0:d} trials for participant {1:d}. \n'.format(n_trials, par))
 
             # create or read the data. psd_all_c = (sounds,elevations,frequency bands)
             psd_all_c, psd_all_i = generateData.create_data(
-                freq_bands, par, snr, normalize, azimuth, time_window, max_freq=max_freq,diff_noise=False)
+                freq_bands, par, snr, normalize, azimuth, time_window, max_freq=max_freq, diff_noise=False)
 
             # Take only given elevations
             psd_all_c = psd_all_c[:, elevations, :]
@@ -96,7 +98,6 @@ def main(model_name='all_participants', exp_name='localization_default', azimuth
             # filter data and integrate it
             psd_mono, psd_mono_mean, psd_binaural, psd_binaural_mean = hp.process_inputs(
                 psd_all_i, psd_all_c, ear, normalization_type, sigma_smoothing, sigma_gauss_norm)
-
 
             ### Load different noise data ###
             # create or read the data. psd_all_c = (sounds,elevations,frequency bands)
@@ -135,6 +136,7 @@ def main(model_name='all_participants', exp_name='localization_default', azimuth
                 # localize the sounds and save the results
                 x, y = hp.localize_sound(psd_mono_diff_noise, learned_map)
                 mono_res[i_par, i_trials, :] = hp.get_localization_coefficients_score(x, y)
+
                 # localize the sounds and save the results
                 x, y = hp.localize_sound(psd_mono_mean_diff_noise, learned_map)
                 mono_mean_res[i_par, i_trials, :] = hp.get_localization_coefficients_score(x, y)

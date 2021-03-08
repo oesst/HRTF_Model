@@ -16,6 +16,8 @@ SOUND_FILES = ROOT / 'data/raw/sound_samples/'
 SOUND_FILES = list(SOUND_FILES.glob('**/*.wav'))
 
 # Define whether figures should be saved
+
+
 @click.command()
 @click.option('--model_name', default='parameter_sweep', help='Defines the model name.')
 @click.option('--exp_name', default='default', help='Defines the experiment name')
@@ -29,8 +31,7 @@ SOUND_FILES = list(SOUND_FILES.glob('**/*.wav'))
 @click.option('--normalization_type', default='sum_1', help='Which normalization type should be used sum_1, l1, l2. Default is sum_1')
 @click.option('--clean', is_flag=True)
 def main(model_name='parameter_sweep', exp_name='default', azimuth=12, snr=0.2, freq_bands=128, max_freq=20000, elevations=25, mean_subtracted_map=True, ear='ipsi', normalization_type='sum_1', clean=False):
-    """ This script takes the filtered data and tries to localize sounds with a learned map
-        for all participants.
+    """ TODO
     """
     logger = logging.getLogger(__name__)
     logger.info('Parameter Sweep Experiment.')
@@ -78,16 +79,21 @@ def main(model_name='parameter_sweep', exp_name='default', azimuth=12, snr=0.2, 
 
         for i_par, par in enumerate(participant_numbers):
 
-
-            # TODO that's a hack:
-            snr = 0.0
             # create or read the data
             psd_all_c, psd_all_i = generateData.create_data(
-                freq_bands, par, snr, normalize, azimuth, time_window, max_freq=max_freq)
+                freq_bands, par, snr, normalize, azimuth, time_window, max_freq=max_freq, diff_noise=False)
 
             # Take only given elevations
             psd_all_c = psd_all_c[:, elevations, :]
             psd_all_i = psd_all_i[:, elevations, :]
+
+            ### Get different noise data ###
+            psd_all_c_diff_noise, psd_all_i_diff_noise = generateData.create_data(
+                freq_bands, par, snr, normalize, azimuth, time_window, max_freq=max_freq, diff_noise=True)
+
+            # Take only given elevations
+            psd_all_c_diff_noise = psd_all_c_diff_noise[:, elevations, :]
+            psd_all_i_diff_noise = psd_all_i_diff_noise[:, elevations, :]
 
             for i_smooth, sigma_smooth in enumerate(sigma_smoothing_vals):
                 for i_gauss, sigma_gauss in enumerate(sigma_gauss_norm_vals):
@@ -102,6 +108,10 @@ def main(model_name='parameter_sweep', exp_name='default', azimuth=12, snr=0.2, 
                     else:
                         learned_map = psd_binaural.mean(0)
 
+                    # filter data and integrate it
+                    psd_mono_diff_noise, psd_mono_mean_diff_noise, psd_binaural_diff_noise, psd_binaural_mean_diff_noise = hp.process_inputs(
+                        psd_all_i_diff_noise, psd_all_c_diff_noise, ear, normalization_type, sigma_smooth, sigma_gauss)
+
                     # # localize the sounds and save the results
                     # x_mono[i_par, :, :, :], y_mono[i_par, :] = hp.localize_sound(psd_mono, learned_map)
                     #
@@ -112,7 +122,7 @@ def main(model_name='parameter_sweep', exp_name='default', azimuth=12, snr=0.2, 
                     # x_bin[i_par, :, :, :], y_bin[i_par, :, :] = hp.localize_sound(psd_binaural, learned_map)
 
                     # localize the sounds and save the results
-                    x_test, y_test = hp.localize_sound(psd_binaural, learned_map)
+                    x_test, y_test = hp.localize_sound(psd_binaural_diff_noise, learned_map)
                     x_test, y_test = hp_vis.scale_v(x_test, y_test, len(elevations))
                     scores[i_smooth, i_gauss, :] += hp.get_localization_coefficients_score(x_test, y_test)
         # get the mean scores over participants
