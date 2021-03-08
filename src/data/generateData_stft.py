@@ -12,6 +12,7 @@ from scipy import io
 import scipy.signal as sp
 from src.features import gtgram
 
+import matplotlib.pyplot as plt
 import librosa
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -29,24 +30,19 @@ def create_data(freq_bands=24, participant_number=19, snr=0.2, normalize=False, 
     dir_name = ROOT / ('data/processed_' + str(max_freq) + 'Hz/')
 
     str_r = 'binaural_right_0_gammatone_' + str(time_window) + '_window_{0:03d}'.format(participant_number) + '_cipic_' + str(
-        int(snr * 100)) + '_srn_' + str(freq_bands) + '_channels_' + str((azimuth - 12) * 10) + '_azi_' + str(normalize) + '_norm_flat_spectrum_stft.npy'
+        int(snr * 100)) + '_srn_' + str(freq_bands) + '_channels_' + str((azimuth - 12) * 10) + '_azi_' + str(normalize) + '_norm_stft.npy'
     str_l = 'binaural_left_0_gammatone_' + str(time_window) + '_window_{0:03d}'.format(participant_number) + '_cipic_' + str(
-        int(snr * 100)) + '_srn_' + str(freq_bands) + '_channels_' + str((azimuth - 12) * 10) + '_azi_' + str(normalize) + '_norm_flat_spectrum_stft.npy'
+        int(snr * 100)) + '_srn_' + str(freq_bands) + '_channels_' + str((azimuth - 12) * 10) + '_azi_' + str(normalize) + '_norm_stft.npy'
 
     path_data_r = dir_name / str_r
     path_data_l = dir_name / str_l
 
-    # Default gammatone-based spectrogram parameters
-    twin = time_window
-    thop = twin / 2
-    fmin = 20
-    fmax = max_freq
-    fs = 44100
+
 
     # check if we can load the data from a file
     if not clean and path_data_r.is_file() and path_data_l.is_file():
         print('Data set found. Loading from file : ' + str_r)
-        return np.load(path_data_r), np.load(path_data_l),None
+        return np.load(path_data_r), np.load(path_data_l), None
     else:
         print('Creating HRTFs : ' + str_l)
         # read the HRIR data
@@ -59,35 +55,51 @@ def create_data(freq_bands=24, participant_number=19, snr=0.2, normalize=False, 
         # get the data for the right ear
         hrir_r = hrir_mat['hrir_r']
         # use always all elevations -> 50
-        psd_all_i = np.zeros((1, 25, int(freq_bands / 2 + 1)))
-        psd_all_c = np.zeros((1, 25, int(freq_bands / 2 + 1)))
-        # temporal_means = np.zeros((hrir_elevs.shape[0],87))
-        for i_elevs in range(psd_all_i.shape[1]):
-            # use a flat spectrum
-            signal = (np.random.rand(fs) * 2 - 1) * 0.25
+        psd_all_i = np.zeros((len(SOUND_FILES), 25, int(freq_bands / 2 + 1)))
+        psd_all_c = np.zeros((len(SOUND_FILES), 25, int(freq_bands / 2 + 1)))
+        for i in range(0,psd_all_i.shape[0]):
+            logging.info("Creating dataset for sound: " + SOUND_FILES[i].name)
+            for i_elevs in range(psd_all_i.shape[1]):
+                # load a sound sample
+                signal = sf.read(SOUND_FILES[i].as_posix())[0]
 
-            # read the hrir for a specific location
-            hrir_elevs = np.squeeze(hrir_l[azimuth, i_elevs, :])
-            # filter signal
-            signal_elevs = sp.lfilter(hrir_elevs, 1, signal)
+                # read the hrir for a specific location
+                hrir_elevs = np.squeeze(hrir_l[azimuth, i_elevs, :])
+                # filter the signal
+                signal_elevs = sp.filtfilt(hrir_elevs, 1, signal)
+                # add noise to the signal
+                signal_elevs = (1 - snr) * signal_elevs + snr * np.random.random(signal_elevs.shape[0]) * signal.max()
 
-            # read the hrir for a specific location
-            hrir_elevs = np.squeeze(hrir_r[azimuth, i_elevs, :])
-            # filter signal
-            signal_elevs_c = sp.lfilter(hrir_elevs, 1, signal)
+                # read the hrir for a specific location
+                hrir_elevs = np.squeeze(hrir_r[azimuth, i_elevs, :])
+                # filter the signal
+                signal_elevs_c = sp.filtfilt(hrir_elevs, 1, signal)
+                # add noise to the signal
+                signal_elevs_c = (1 - snr) * signal_elevs_c + snr * np.random.random(signal_elevs_c.shape[0]) * signal.max()
 
-            y = np.abs(librosa.stft(signal_elevs, n_fft=freq_bands))
-            y = np.mean(y, axis=1)
-            psd_all_i[0, i_elevs, :] = np.log10(y + np.finfo(np.float32).eps) * 20
 
-            y = np.abs(librosa.stft(signal_elevs_c, n_fft=freq_bands))
-            y = np.mean(y, axis=1)
-            psd_all_c[0, i_elevs, :] = np.log10(y + np.finfo(np.float32).eps) * 20
+                # Default gammatone-based spectrogram parameters
+                twin = time_window
+                thop = twin / 2
+                fmin = 100
+                fmax = max_freq
+                fs = 44100
 
+                y = np.abs(librosa.stft(signal_elevs, n_fft=freq_bands))
+                window_means = np.mean(y, axis=1)
+                psd_all_i[i, i_elevs, :] = np.log10(window_means + np.finfo(np.float32).eps) * 20
+
+                y = np.abs(librosa.stft(signal_elevs_c, n_fft=freq_bands))
+                window_means = np.mean(y, axis=1)
+                psd_all_c[i, i_elevs, :] = np.log10(window_means + np.finfo(np.float32).eps) * 20
+
+            # plt.pcolormesh(psd_all_c[i,:,:])
+            # plt.colorbar()
+            # plt.show()
         freqs = librosa.fft_frequencies(sr=fs, n_fft=freq_bands)
 
         # cut off frequencies at the end and beginning 100
-        indis = np.logical_and(100 <= freqs, freqs < max_freq)
+        indis = np.logical_and(fmin <= freqs, freqs < fmax)
         # f_original = freqs[indis]
         psd_all_i = psd_all_i[:, :, indis]
         psd_all_c = psd_all_c[:, :, indis]

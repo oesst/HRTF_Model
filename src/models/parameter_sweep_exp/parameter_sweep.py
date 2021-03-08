@@ -78,6 +78,9 @@ def main(model_name='parameter_sweep', exp_name='default', azimuth=12, snr=0.2, 
 
         for i_par, par in enumerate(participant_numbers):
 
+
+            # TODO that's a hack:
+            snr = 0.0
             # create or read the data
             psd_all_c, psd_all_i = generateData.create_data(
                 freq_bands, par, snr, normalize, azimuth, time_window, max_freq=max_freq)

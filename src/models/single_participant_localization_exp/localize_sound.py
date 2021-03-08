@@ -69,7 +69,7 @@ def main(model_name='single_participant', exp_name='single_participant_default',
         exp_path.mkdir(parents=True, exist_ok=True)
         # create or read the data
         psd_all_c, psd_all_i = generateData.create_data(
-            freq_bands, participant_number, snr, normalize, azimuth, time_window,max_freq=max_freq)
+            freq_bands, participant_number, snr, normalize, azimuth, time_window, max_freq=max_freq, diff_noise=False)
 
         # Take only given elevations
         psd_all_c = psd_all_c[:, elevations, :]
@@ -84,6 +84,18 @@ def main(model_name='single_participant', exp_name='single_participant_default',
             learned_map = psd_binaural_mean.mean(0)
         else:
             learned_map = psd_binaural.mean(0)
+
+        # create or read the data
+        psd_all_c, psd_all_i = generateData.create_data(
+            freq_bands, participant_number, snr, normalize, azimuth, time_window, max_freq=max_freq, diff_noise=True)
+
+        # Take only given elevations
+        psd_all_c = psd_all_c[:, elevations, :]
+        psd_all_i = psd_all_i[:, elevations, :]
+
+        # filter data and integrate it
+        psd_mono, psd_mono_mean, psd_binaural, psd_binaural_mean = hp.process_inputs(
+            psd_all_i, psd_all_c, ear, normalization_type, sigma_smoothing, sigma_gauss_norm)
 
         # localize the sounds and save the results
         x_mono, y_mono = hp.localize_sound(psd_mono, learned_map)

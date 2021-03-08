@@ -2,7 +2,7 @@
 import logging
 import click
 from pathlib import Path
-from src.data import generateData
+from src.data import generateData_stft
 from src.features import helpers as hp
 # from src.visualization import helpers as hpVis
 import numpy as np
@@ -77,13 +77,13 @@ def main(model_name='elevation_spectra_maps', exp_name='unfiltered', azimuth=12,
             [ipsi_maps,contra_maps] = pickle.load(f)
     else:
 
-        ipsi_maps = np.zeros((len(participant_numbers), len(SOUND_FILES), len(elevations), freq_bands))
-        contra_maps = np.zeros((len(participant_numbers), len(SOUND_FILES), len(elevations), freq_bands))
+        ipsi_maps = np.zeros((len(participant_numbers), len(SOUND_FILES), len(elevations), 58))
+        contra_maps = np.zeros((len(participant_numbers), len(SOUND_FILES), len(elevations), 58))
 
         for i_par, par in enumerate(participant_numbers):
 
             # create or read the data
-            psd_all_c, psd_all_i = generateData.create_data(
+            psd_all_c, psd_all_i,_ = generateData_stft.create_data(
                 freq_bands, par, snr, normalize, azimuth, time_window,max_freq=max_freq)
 
             # Take only given elevations

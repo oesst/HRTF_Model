@@ -16,6 +16,8 @@ SOUND_FILES = ROOT / 'data/raw/sound_samples/'
 SOUND_FILES = list(SOUND_FILES.glob('**/*.wav'))
 
 # Define whether figures should be saved
+
+
 @click.command()
 @click.option('--model_name', default='map_learning', help='Defines the model name.')
 @click.option('--exp_name', default='localization_all_maps', help='Defines the experiment name')
@@ -31,7 +33,7 @@ SOUND_FILES = list(SOUND_FILES.glob('**/*.wav'))
 @click.option('--sigma_smoothing', default=0, help='Sigma for smoothing kernel. 0 is off. Default is 0.')
 @click.option('--sigma_gauss_norm', default=1, help='Sigma for gauss normalization. 0 is off. Default is 1.')
 @click.option('--clean', is_flag=True)
-def main(model_name = 'map_learning', exp_name = 'localization_all_maps', azimuth=12, snr=0.2, freq_bands=24, max_freq=20000, elevations=25, mean_subtracted_map=True, ear='ipsi', n_trials=100, normalization_type='sum_1', sigma_smoothing=0, sigma_gauss_norm=1, clean=False):
+def main(model_name='map_learning', exp_name='localization_all_maps', azimuth=12, snr=0.2, freq_bands=24, max_freq=20000, elevations=25, mean_subtracted_map=True, ear='ipsi', n_trials=100, normalization_type='sum_1', sigma_smoothing=0, sigma_gauss_norm=1, clean=False):
     """ Learns the elevation spectra map gradually over presented sounds and saves the localization quality for each trial
     """
     logger = logging.getLogger(__name__)
@@ -74,16 +76,14 @@ def main(model_name = 'map_learning', exp_name = 'localization_all_maps', azimut
     else:
 
         # store only the localization coefficeints (gain,bias,score)
-        mono_res = np.zeros((4,len(participant_numbers), n_trials, 3))
-        mono_mean_res = np.zeros((4,len(participant_numbers), n_trials, 3))
-        bin_res = np.zeros((4,len(participant_numbers), n_trials, 3))
-        bin_mean_res = np.zeros((4,len(participant_numbers), n_trials, 3))
-        trial_used_ss = np.zeros((4,len(participant_numbers), n_trials))
-
-        # learned_maps_participants = np.zeros((len(participant_numbers), len(elevations), freq_bands))
+        mono_res = np.zeros((4, len(participant_numbers), n_trials, 3))
+        mono_mean_res = np.zeros((4, len(participant_numbers), n_trials, 3))
+        bin_res = np.zeros((4, len(participant_numbers), n_trials, 3))
+        bin_mean_res = np.zeros((4, len(participant_numbers), n_trials, 3))
+        trial_used_ss = np.zeros((4, len(participant_numbers), n_trials))
 
         for i_par, par in enumerate(participant_numbers):
-            logger.info('Localizing {0:d} trials for participant {1:d}. \n'.format(n_trials,par))
+            logger.info('Localizing {0:d} trials for participant {1:d}. \n'.format(n_trials, par))
 
             # create or read the data. psd_all_c = (sounds,elevations,frequency bands)
             psd_all_c, psd_all_i = generateData.create_data(
@@ -97,8 +97,15 @@ def main(model_name = 'map_learning', exp_name = 'localization_all_maps', azimut
             psd_mono, psd_mono_mean, psd_binaural, psd_binaural_mean = hp.process_inputs(
                 psd_all_i, psd_all_c, ear, normalization_type, sigma_smoothing, sigma_gauss_norm)
 
-            # walk over test n_trials, in this case the number of sound samples
+            ### Load different noise data ###
+            # create or read the data. psd_all_c = (sounds,elevations,frequency bands)
+            psd_all_c_diff_noise, psd_all_i_diff_noise = generateData.create_data(
+                freq_bands, par, snr, normalize, azimuth, time_window, max_freq=max_freq, diff_noise=True)
+            # filter data and integrate it
+            psd_mono_diff_noise, psd_mono_mean_diff_noise, psd_binaural_diff_noise, psd_binaural_mean_diff_noise = hp.process_inputs(
+                psd_all_i_diff_noise, psd_all_c_diff_noise, ear, normalization_type, sigma_smoothing, sigma_gauss_norm)
 
+            # walk over test n_trials, in this case the number of sound samples
             for i_trials in range(n_trials):
 
                 # decide how many sound samples should be used for the map. this is between 1 and number_of_sounds * number_of_elevations
@@ -143,18 +150,18 @@ def main(model_name = 'map_learning', exp_name = 'localization_all_maps', azimut
                     trial_used_ss[i_maps, i_par, i_trials] = number_of_ss
 
                     # localize the sounds and save the results
-                    x, y = hp.localize_sound(psd_mono, learned_map)
+                    x, y = hp.localize_sound(psd_mono_diff_noise, learned_map)
                     mono_res[i_maps, i_par, i_trials, :] = hp.get_localization_coefficients_score(x, y)
                     # localize the sounds and save the results
-                    x, y = hp.localize_sound(psd_mono_mean, learned_map)
+                    x, y = hp.localize_sound(psd_mono_mean_diff_noise, learned_map)
                     mono_mean_res[i_maps, i_par, i_trials, :] = hp.get_localization_coefficients_score(x, y)
 
                     # localize the sounds and save the results
-                    x, y = hp.localize_sound(psd_binaural, learned_map)
+                    x, y = hp.localize_sound(psd_binaural_diff_noise, learned_map)
                     bin_res[i_maps, i_par, i_trials, :] = hp.get_localization_coefficients_score(x, y)
 
                     # localize the sounds and save the results
-                    x, y = hp.localize_sound(psd_binaural_mean, learned_map)
+                    x, y = hp.localize_sound(psd_binaural_mean_diff_noise, learned_map)
                     bin_mean_res[i_maps, i_par, i_trials, :] = hp.get_localization_coefficients_score(x, y)
 
         # create Path

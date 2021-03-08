@@ -88,7 +88,7 @@ def main(model_name='different_learned_maps', exp_name='localization_default', a
 
             # create or read the data
             psd_all_c, psd_all_i = generateData.create_data(
-                freq_bands, par, snr, normalize, azimuth, time_window, max_freq=max_freq)
+                freq_bands, par, snr, normalize, azimuth, time_window, max_freq=max_freq, diff_noise=False)
 
             # Take only given elevations
             psd_all_c = psd_all_c[:, elevations, :]
@@ -97,6 +97,19 @@ def main(model_name='different_learned_maps', exp_name='localization_default', a
             # filter data and integrate it
             psd_mono, psd_mono_mean, psd_binaural, psd_binaural_mean = hp.process_inputs(
                 psd_all_i, psd_all_c, ear, normalization_type, sigma_smoothing, sigma_gauss_norm)
+
+            ### Read different noise data ###
+            # create or read the data
+            psd_all_c_diff_noise, psd_all_i_diff_noise = generateData.create_data(
+                freq_bands, par, snr, normalize, azimuth, time_window, max_freq=max_freq, diff_noise=True)
+
+            # Take only given elevations
+            psd_all_c_diff_noise = psd_all_c_diff_noise[:, elevations, :]
+            psd_all_i_diff_noise = psd_all_i_diff_noise[:, elevations, :]
+
+            # filter data and integrate it
+            psd_mono_diff_noise, psd_mono_mean_diff_noise, psd_binaural_diff_noise, psd_binaural_mean_diff_noise = hp.process_inputs(
+                psd_all_i_diff_noise, psd_all_c_diff_noise, ear, normalization_type, sigma_smoothing, sigma_gauss_norm)
 
             # walk over the 4 different maps: mono, mono_mean, bina, bina_mean
             for i_map in range(4):
@@ -115,16 +128,16 @@ def main(model_name='different_learned_maps', exp_name='localization_default', a
                     logger.error('Something went wrong in if i_map statement')
 
                 # localize the sounds and save the results
-                x_mono[i_map, i_par, :, :, :], y_mono[i_map, i_par, :] = hp.localize_sound(psd_mono, learned_map)
+                x_mono[i_map, i_par, :, :, :], y_mono[i_map, i_par, :] = hp.localize_sound(psd_mono_diff_noise, learned_map)
 
                 # localize the sounds and save the results
-                x_mono_mean[i_map, i_par, :, :, :], y_mono_mean[i_map, i_par, :, :] = hp.localize_sound(psd_mono_mean, learned_map)
+                x_mono_mean[i_map, i_par, :, :, :], y_mono_mean[i_map, i_par, :, :] = hp.localize_sound(psd_mono_mean_diff_noise, learned_map)
 
                 # localize the sounds and save the results
-                x_bin[i_map, i_par, :, :, :], y_bin[i_map, i_par, :, :] = hp.localize_sound(psd_binaural, learned_map)
+                x_bin[i_map, i_par, :, :, :], y_bin[i_map, i_par, :, :] = hp.localize_sound(psd_binaural_diff_noise, learned_map)
 
                 # localize the sounds and save the results
-                x_bin_mean[i_map, i_par, :, :, :], y_bin_mean[i_map, i_par, :, :] = hp.localize_sound(psd_binaural_mean, learned_map)
+                x_bin_mean[i_map, i_par, :, :, :], y_bin_mean[i_map, i_par, :, :] = hp.localize_sound(psd_binaural_mean_diff_noise, learned_map)
 
         # create Path
         exp_path.mkdir(parents=True, exist_ok=True)

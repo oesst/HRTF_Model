@@ -40,7 +40,7 @@ def create_data(freq_bands=24, participant_number=19, snr=0.2, normalize=False, 
     # check if we can load the data from a file
     if not clean and path_data_r.is_file() and path_data_l.is_file():
         print('Data set found. Loading from file : ' + str_r)
-        return np.load(path_data_r), np.load(path_data_l)
+        return np.load(path_data_r), np.load(path_data_l),None
     else:
         print('Creating HRTFs : ' + str_l)
         # read the HRIR data
@@ -53,41 +53,33 @@ def create_data(freq_bands=24, participant_number=19, snr=0.2, normalize=False, 
         # get the data for the right ear
         hrir_r = hrir_mat['hrir_r']
         # use always all elevations -> 50
-        psd_all_i = np.zeros((1, 50, freq_bands))
-        psd_all_c = np.zeros((1, 50, freq_bands))
+        psd_all_i = np.zeros((1, 25, freq_bands))
+        psd_all_c = np.zeros((1, 25, freq_bands))
         # temporal_means = np.zeros((hrir_elevs.shape[0],87))
         for i_elevs in range(psd_all_i.shape[1]):
+            # use a flat spectrum
+            signal = (np.random.rand(fs) * 2 - 1) * 0.25
+
             # read the hrir for a specific location
             hrir_elevs = np.squeeze(hrir_l[azimuth, i_elevs, :])
-            # use a flat spectrum
-            signal = np.ones(fs)
+            # filter signal
+            signal_elevs = sp.lfilter(hrir_elevs, 1, signal)
 
-            # add noise to the signal
-            signal_elevs = (1 - snr) * sp.lfilter(hrir_elevs, 1, signal) + \
-                snr * (signal + np.random.random(signal.shape[0]) * snr)
-
-            ###### TAKE THE ENTIRE SIGNAL #######
-            #         window_means = get_spectrum(signal_elevs,nperseg=welch_nperseg)
-            #####################################
             # read the hrir for a specific location
             hrir_elevs = np.squeeze(hrir_r[azimuth, i_elevs, :])
-
-            # add noise to the signal
-            signal_elevs_c = (1 - snr) * sp.lfilter(hrir_elevs, 1, signal) + \
-                snr * (signal + np.random.random(signal.shape[0]) * snr)
+            # filter signal
+            signal_elevs_c = sp.lfilter(hrir_elevs, 1, signal)
 
             ###### Apply Gammatone Filter Bank ##############
             y = gtgram.gtgram(signal_elevs, fs, twin,
                               thop, freq_bands, fmin, fmax)
-            y = (20 * np.log10(y + 1))
-            window_means = np.mean(y, axis=1)
-            psd_all_i[0, i_elevs, :] = window_means
+            y = np.mean(y, axis=1)
+            psd_all_i[0, i_elevs, :] = np.log10(y + np.finfo(np.float32).eps) * 20
 
             y = gtgram.gtgram(signal_elevs_c, fs,
                               twin, thop, freq_bands, fmin, fmax)
-            y = (20 * np.log10(y + 1))
-            window_means = np.mean(y, axis=1)
-            psd_all_c[0, i_elevs, :] = window_means
+            y = np.mean(y, axis=1)
+            psd_all_c[0, i_elevs, :] = np.log10(y + np.finfo(np.float32).eps) * 20
             #################################################
 
         np.save(path_data_r.absolute(), psd_all_c)

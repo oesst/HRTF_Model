@@ -19,7 +19,7 @@ exp_name= '' # needs to be set
 
 azimuth = 12
 snr = 0.2
-freq_bands = 128
+freq_bands = 24
 max_freq = 20000
 normalize = False
 time_window = 0.1  # time window in sec

@@ -39,8 +39,7 @@ def main(model_name='snr_experiment', exp_name='default', azimuth=12, freq_bands
     ########################################################################
     ######################## Set parameters ################################
     ########################################################################
-    participant_numbers = np.array([1, 2, 3, 8, 9, 10, 11,
-                                    12, 15, 17, 18, 19, 20, 21, 27, 28, 33, 40])
+
 
     participant_numbers = np.array([1, 2, 3, 8, 9, 10, 11,
                                     12, 15, 17, 18, 19, 20,
@@ -57,6 +56,9 @@ def main(model_name='snr_experiment', exp_name='default', azimuth=12, freq_bands
     elevations = np.arange(0, elevations, 1)
 
     snrs = np.arange(0.0, 1.1, 0.1)
+
+    snrs = snrs[::-1]
+    # participant_numbers = participant_numbers[::-1]
 
     ########################################################################
     ########################################################################
@@ -79,9 +81,9 @@ def main(model_name='snr_experiment', exp_name='default', azimuth=12, freq_bands
 
         for i_par, par in enumerate(participant_numbers):
             for i_snr, snr in enumerate(snrs):
-                # create or read the data
+                                # create or read the data
                 psd_all_c, psd_all_i = generateData.create_data(
-                    freq_bands, par, snr, normalize, azimuth, time_window, max_freq=max_freq)
+                    freq_bands, par, snr, normalize, azimuth, time_window, max_freq=max_freq, diff_noise=False)
 
                 # Take only given elevations
                 psd_all_c = psd_all_c[:, elevations, :]
@@ -96,6 +98,19 @@ def main(model_name='snr_experiment', exp_name='default', azimuth=12, freq_bands
                     learned_map = psd_binaural_mean.mean(0)
                 else:
                     learned_map = psd_binaural.mean(0)
+
+                ### Different noise data ####
+                # create or read the data
+                psd_all_c, psd_all_i = generateData.create_data(
+                    freq_bands, par, snr, normalize, azimuth, time_window, max_freq=max_freq, diff_noise=True)
+
+                # Take only given elevations
+                psd_all_c = psd_all_c[:, elevations, :]
+                psd_all_i = psd_all_i[:, elevations, :]
+
+                # filter data and integrate it
+                psd_mono, psd_mono_mean, psd_binaural, psd_binaural_mean = hp.process_inputs(
+                    psd_all_i, psd_all_c, ear, normalization_type, sigma_smoothing, sigma_gauss_norm)
 
                 # localize the sounds and save the results
                 x_test, y_test = hp.localize_sound(psd_mono, learned_map)

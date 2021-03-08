@@ -116,7 +116,7 @@ def main(save_figs=False, save_type='svg', model_name='elevation_spectra_maps', 
                 # ax.set_yticklabels(t[1:-1])
 
                 if save_figs:
-                    fig_save_path = ROOT / 'reports' / 'figures' / model_name / exp_name_str / ('participant_' + str(par))
+                    fig_save_path = ROOT / 'reports' / 'figures' / exp_name_str / model_name  / ('participant_' + str(par))
                     if not fig_save_path.exists():
                         fig_save_path.mkdir(parents=True, exist_ok=True)
                     path_final = (fig_save_path / (model_name + '_' + exp_name + '_raw_maps_ipsi_' + str(sound) + '.' + save_type)).as_posix()
