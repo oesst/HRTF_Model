@@ -90,11 +90,9 @@ def main(model_name='all_participants', exp_name='localization_default', azimuth
             # create or read the data. psd_all_c = (sounds,elevations,frequency bands)
             psd_all_c, psd_all_i = generateData.create_data(
                 freq_bands, par, snr, normalize, azimuth, time_window, max_freq=max_freq, diff_noise=False)
-
             # Take only given elevations
             psd_all_c = psd_all_c[:, elevations, :]
             psd_all_i = psd_all_i[:, elevations, :]
-
             # filter data and integrate it
             psd_mono, psd_mono_mean, psd_binaural, psd_binaural_mean = hp.process_inputs(
                 psd_all_i, psd_all_c, ear, normalization_type, sigma_smoothing, sigma_gauss_norm)
@@ -103,9 +101,13 @@ def main(model_name='all_participants', exp_name='localization_default', azimuth
             # create or read the data. psd_all_c = (sounds,elevations,frequency bands)
             psd_all_c_diff_noise, psd_all_i_diff_noise = generateData.create_data(
                 freq_bands, par, snr, normalize, azimuth, time_window, max_freq=max_freq, diff_noise=True)
+            # Take only given elevations
+            psd_all_c = psd_all_c[:, elevations, :]
+            psd_all_i = psd_all_i[:, elevations, :]
             # filter data and integrate it
             psd_mono_diff_noise, psd_mono_mean_diff_noise, psd_binaural_diff_noise, psd_binaural_mean_diff_noise = hp.process_inputs(
                 psd_all_i_diff_noise, psd_all_c_diff_noise, ear, normalization_type, sigma_smoothing, sigma_gauss_norm)
+
 
             # walk over test n_trials, in this case the number of sound samples
             for i_trials in range(n_trials):

@@ -82,19 +82,19 @@ def main(save_figs=False, save_type='svg', model_name='all_participants', exp_na
 
             data = np.reshape(mono_res, (mono_res.shape[0] * mono_res.shape[1], mono_res.shape[2]))
             y = data[:, i]
-            sns.regplot(x=x, y=y, x_bins=bins, x_estimator=np.mean, fit_reg=True, logx=True, ax=ax, x_ci='ci', truncate=True, label='Monoaural')
+            sns.regplot(x=x, y=y, x_bins=bins, x_estimator=np.mean, fit_reg=True,order=7, logx=False, ax=ax, x_ci='ci', truncate=True, label='Monoaural')
 
             data = np.reshape(mono_mean_res, (mono_mean_res.shape[0] * mono_mean_res.shape[1], mono_mean_res.shape[2]))
             y = data[:, i]
-            sns.regplot(x=x, y=y, x_bins=bins, x_estimator=np.mean, fit_reg=True, logx=True, ax=ax, x_ci='ci', truncate=True, label='Mono - Prior')
+            sns.regplot(x=x, y=y, x_bins=bins, x_estimator=np.mean, fit_reg=True,order=7, logx=False, ax=ax, x_ci='ci', truncate=True, label='Mono - Prior')
 
             data = np.reshape(bin_res, (bin_res.shape[0] * bin_res.shape[1], bin_res.shape[2]))
             y = data[:, i]
-            sns.regplot(x=x, y=y, x_bins=bins, x_estimator=np.mean, fit_reg=True, logx=True, ax=ax, x_ci='ci', truncate=True, label='Binaural')
+            sns.regplot(x=x, y=y, x_bins=bins, x_estimator=np.mean, fit_reg=True,order=7, logx=False, ax=ax, x_ci='ci', truncate=True, label='Binaural')
 
             data = np.reshape(bin_mean_res, (bin_mean_res.shape[0] * bin_mean_res.shape[1], bin_mean_res.shape[2]))
             y = data[:, i]
-            sns.regplot(x=x, y=y, x_bins=bins, x_estimator=np.mean, fit_reg=True, logx=True, ax=ax, x_ci='ci', truncate=True, label='Bin - Prior')
+            sns.regplot(x=x, y=y, x_bins=bins, x_estimator=np.mean, fit_reg=True,order=7, logx=False, ax=ax, x_ci='ci', truncate=True, label='Bin - Prior')
             # sns.regplot(x=x, y=y,  ax=ax,label='Bin - Prior')
             ax.set_xlim([0, 200])
 

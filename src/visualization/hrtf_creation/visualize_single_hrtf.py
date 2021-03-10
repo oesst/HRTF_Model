@@ -89,7 +89,7 @@ def main(save_figs=False, save_type='svg', model_name='hrtf_creation', exp_name=
         cbar.ax.get_yaxis().labelpad = 20
         cbar.set_label('Decibels [dB]', rotation=270)
         ax.set_title('Ipsilateral')
-        ax.set_xlabel('Frequency [kHz]')
+        ax.set_xlabel('Frequency [Hz]')
         ax.set_ylabel('Elevations [deg]')
 
         ax = fig.add_subplot(1, 2, 2)
@@ -100,7 +100,7 @@ def main(save_figs=False, save_type='svg', model_name='hrtf_creation', exp_name=
         ax.xaxis.set_major_formatter(formatter)
         # ax.set_xticklabels(np.linspace(0,max_freq/1000,len(ax.get_xticks())))
         ax.set_title('Contralateral')
-        ax.set_xlabel('Frequency [kHz]')
+        ax.set_xlabel('Frequency [Hz]')
         ax.set_ylabel('Elevations [deg]')
 
         cbar = plt.colorbar(a)

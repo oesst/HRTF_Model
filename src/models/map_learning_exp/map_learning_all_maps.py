@@ -43,17 +43,19 @@ def main(model_name='map_learning', exp_name='localization_all_maps', azimuth=12
     ######################## Set parameters ################################
     ########################################################################
     # participant_numbers = np.array([1, 2, 3, 8, 9, 10, 11,
-    #                                 12, 15, 17, 18, 19, 20, 21, 27, 28, 33, 40])
+    #                                 12, 15, 17, 18, 19, 20,
+    #                                 21, 27, 28, 33, 40, 44,
+    #                                 48, 50, 51, 58, 59, 60,
+    #                                 61, 65, 119, 124, 126,
+    #                                 127, 131, 133, 134, 135,
+    #                                 137, 147, 148, 152, 153,
+    #                                 154, 155, 156, 158, 162,
+    #                                 163, 165])
 
-    participant_numbers = np.array([1, 2, 3, 8, 9, 10, 11,
-                                    12, 15, 17, 18, 19, 20,
-                                    21, 27, 28, 33, 40, 44,
-                                    48, 50, 51, 58, 59, 60,
-                                    61, 65, 119, 124, 126,
-                                    127, 131, 133, 134, 135,
-                                    137, 147, 148, 152, 153,
-                                    154, 155, 156, 158, 162,
-                                    163, 165])
+
+    participant_numbers = np.array([127, 131, 133, 134, 135,])
+
+
     normalize = False
     time_window = 0.1  # time window in sec
 
@@ -87,7 +89,7 @@ def main(model_name='map_learning', exp_name='localization_all_maps', azimuth=12
 
             # create or read the data. psd_all_c = (sounds,elevations,frequency bands)
             psd_all_c, psd_all_i = generateData.create_data(
-                freq_bands, par, snr, normalize, azimuth, time_window, max_freq=max_freq, diff_noise=True)
+                freq_bands, par, snr, normalize, azimuth, time_window, max_freq=max_freq, diff_noise=False)
 
             # Take only given elevations
             psd_all_c = psd_all_c[:, elevations, :]
@@ -105,7 +107,7 @@ def main(model_name='map_learning', exp_name='localization_all_maps', azimuth=12
             # Take only given elevations
             psd_all_c_diff_noise = psd_all_c_diff_noise[:, elevations, :]
             psd_all_i_diff_noise = psd_all_i_diff_noise[:, elevations, :]
-            
+
             # filter data and integrate it
             psd_mono_diff_noise, psd_mono_mean_diff_noise, psd_binaural_diff_noise, psd_binaural_mean_diff_noise = hp.process_inputs(
                 psd_all_i_diff_noise, psd_all_c_diff_noise, ear, normalization_type, sigma_smoothing, sigma_gauss_norm)
@@ -129,25 +131,25 @@ def main(model_name='map_learning', exp_name='localization_all_maps', azimuth=12
                         tmp_data = np.zeros(psd_mono.shape)
                         tmp_data[sounds_ind[0], sounds_ind[1], :] = psd_mono[sounds_ind[0], sounds_ind[1], :]
                         # create learned_map
-                        learned_map = psd_mono.mean(0)
+                        learned_map = tmp_data.mean(0)
                     elif i_maps == 1:
                         # get only the defined sounds and elevations
                         tmp_data = np.zeros(psd_mono_mean.shape)
                         tmp_data[sounds_ind[0], sounds_ind[1], :] = psd_mono_mean[sounds_ind[0], sounds_ind[1], :]
                         # create learned_map
-                        learned_map = psd_mono_mean.mean(0)
+                        learned_map = tmp_data.mean(0)
                     elif i_maps == 2:
                         # get only the defined sounds and elevations
                         tmp_data = np.zeros(psd_binaural.shape)
                         tmp_data[sounds_ind[0], sounds_ind[1], :] = psd_binaural[sounds_ind[0], sounds_ind[1], :]
                         # create learned_map
-                        learned_map = psd_binaural.mean(0)
+                        learned_map = tmp_data.mean(0)
                     elif i_maps == 3:
                         # get only the defined sounds and elevations
                         tmp_data = np.zeros(psd_binaural_mean.shape)
                         tmp_data[sounds_ind[0], sounds_ind[1], :] = psd_binaural_mean[sounds_ind[0], sounds_ind[1], :]
                         # create learned_map
-                        learned_map = psd_binaural_mean.mean(0)
+                        learned_map = tmp_data.mean(0)
 
                     # store the map
                     # learned_maps_participants[i_par, :, :] = learned_map

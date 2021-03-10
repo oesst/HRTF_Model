@@ -16,6 +16,8 @@ SOUND_FILES = ROOT / 'data/raw/sound_samples/'
 SOUND_FILES = list(SOUND_FILES.glob('**/*.wav'))
 
 # Define whether figures should be saved
+
+
 @click.command()
 @click.option('--model_name', default='snr_experiment', help='Defines the model name.')
 @click.option('--exp_name', default='default', help='Defines the experiment name')
@@ -40,11 +42,11 @@ def main(model_name='snr_experiment', exp_name='default', azimuth=12, freq_bands
     ######################## Set parameters ################################
     ########################################################################
 
-
     participant_numbers = np.array([1, 2, 3, 8, 9, 10, 11,
                                     12, 15, 17, 18, 19, 20,
                                     21, 27, 28, 33, 40, 44,
-                                    124, 126,
+                                    48, 50, 51, 58, 59, 60,
+                                    61, 65, 119, 124, 126,
                                     127, 131, 133, 134, 135,
                                     137, 147, 148, 152, 153,
                                     154, 155, 156, 158, 162,
@@ -57,8 +59,8 @@ def main(model_name='snr_experiment', exp_name='default', azimuth=12, freq_bands
 
     snrs = np.arange(0.0, 1.1, 0.1)
 
-    snrs = snrs[::-1]
-    # participant_numbers = participant_numbers[::-1]
+    #snrs = snrs[::-1]
+    #participant_numbers = participant_numbers[::-1]
 
     ########################################################################
     ########################################################################
@@ -81,7 +83,7 @@ def main(model_name='snr_experiment', exp_name='default', azimuth=12, freq_bands
 
         for i_par, par in enumerate(participant_numbers):
             for i_snr, snr in enumerate(snrs):
-                                # create or read the data
+                # create or read the data
                 psd_all_c, psd_all_i = generateData.create_data(
                     freq_bands, par, snr, normalize, azimuth, time_window, max_freq=max_freq, diff_noise=False)
 
