@@ -2,7 +2,7 @@
 
 ==============================
 
-Computational model for sound source localization in the vertical plane based in learned HRTFs from the CIPIC database [[1]](#1).
+Computational model for sound source localization in the vertical plane using binaural integration based on learned HRTFs.
 
 
 ## Experiments
@@ -15,6 +15,11 @@ Experiments described here are found in _src/models/_ as separate folders.
 
 * all_participants_exp: Experiments show localization results over all participants (_localize_sound.py_) in the median plane. A variation of this experiment is the _localize_sound_differten_azi.py_ which allows to choose the azimuth angle from which sounds originate. The learned map remains at 0 &deg;.
 
+* ...
+
+The HRTFs are taken from the CIPIC database  [V. R. Algazi, R. O. Duda, D. M. Thompson and C. Avendano, “The CIPIC HRTF Database,” Proc. 2001 IEEE Workshop on Applications of Signal Processing to Audio and Electroacoustics, pp. 99-102, Mohonk Mountain House, New Paltz, NY, Oct. 21-24, 2001.] (https://www.ece.ucdavis.edu/cipic/spatial-sound/hrtf-data/)
+
+The sound stimuli are taken from the natural sound stimuli set of Josh McDermott's group (see [stimuli](http://mcdermottlab.mit.edu/svnh/Natural-Sound/Stimuli.html)) and have been previously published in [Norman-Haignere et al., 2015, Neuron 88, 1281–1296 December 16, 2015 Elsevier Inc.](http://dx.doi.org/10.1016/j.neuron.2015.11.035) 
 
 ## Installing development requirements
 ------------
