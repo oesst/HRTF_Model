@@ -2,7 +2,7 @@
 
 ==============================
 
-Computational model for sound source localization in the vertical plane based in learned HRTFs from the CIPIC database [[1]](#1).
+Computational model for sound source localization in the vertical plane using binaural integration based on learned HRTFs.
 
 
 ## Experiments
