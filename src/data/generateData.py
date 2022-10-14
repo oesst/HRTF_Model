@@ -12,7 +12,6 @@ from scipy import io
 import scipy.signal as sp
 from src.features import gtgram
 
-import simpleaudio as sa
 import matplotlib.pyplot as plt
 
 ROOT = Path(__file__).resolve().parents[2]

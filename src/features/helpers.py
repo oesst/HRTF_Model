@@ -11,40 +11,61 @@ from scipy.ndimage import gaussian_filter1d
 import seaborn as sns
 from src.features.helpers_vis import LinearReg
 
-def process_inputs(psd_all_i, psd_all_c, ear='ipsi', normalization_type='sum_1', sigma_smoothing=0, sigma_gauss_norm=1):
+
+def process_inputs(
+    psd_all_i, psd_all_c, ear="ipsi", normalization_type="sum_1", sigma_smoothing=0, sigma_gauss_norm=1
+):
     # Normalize the data set separately
-    psd_mono_c = filter_dataset(psd_all_c, normalization_type=normalization_type,
-                                sigma_smoothing=sigma_smoothing, sigma_gauss_norm=sigma_gauss_norm)
-    psd_mono_i = filter_dataset(psd_all_i, normalization_type=normalization_type,
-                                sigma_smoothing=sigma_smoothing, sigma_gauss_norm=sigma_gauss_norm)
+    psd_mono_c = filter_dataset(
+        psd_all_c,
+        normalization_type=normalization_type,
+        sigma_smoothing=sigma_smoothing,
+        sigma_gauss_norm=sigma_gauss_norm,
+    )
+    psd_mono_i = filter_dataset(
+        psd_all_i,
+        normalization_type=normalization_type,
+        sigma_smoothing=sigma_smoothing,
+        sigma_gauss_norm=sigma_gauss_norm,
+    )
 
     # incorporate prior information by dividing it, separately for ipsi and contra lateral ear
-    psd_mono_c_mean = psd_mono_c / \
-        np.transpose(np.tile(np.mean(psd_mono_c, axis=1), [
-                     psd_mono_c.shape[1], 1, 1]), [1, 0, 2])
+    psd_mono_c_mean = psd_mono_c / np.transpose(
+        np.tile(np.mean(psd_mono_c, axis=1), [psd_mono_c.shape[1], 1, 1]), [1, 0, 2]
+    )
 
-    psd_mono_i_mean = psd_mono_i / \
-        np.transpose(np.tile(np.mean(psd_mono_i, axis=1), [
-                     psd_mono_i.shape[1], 1, 1]), [1, 0, 2])
+    psd_mono_i_mean = psd_mono_i / np.transpose(
+        np.tile(np.mean(psd_mono_i, axis=1), [psd_mono_i.shape[1], 1, 1]), [1, 0, 2]
+    )
 
     # create binaural signal without incorporated prior information
-    if ear.find('contra') >= 0:
+    if ear.find("contra") >= 0:
         psd_binaural = filter_dataset(
-            psd_mono_c / (psd_mono_i), normalization_type=normalization_type, sigma_smoothing=0, sigma_gauss_norm=0)
+            psd_mono_c / (psd_mono_i), normalization_type=normalization_type, sigma_smoothing=0, sigma_gauss_norm=0
+        )
     else:
         psd_binaural = filter_dataset(
-            psd_mono_i / (psd_mono_c), normalization_type=normalization_type, sigma_smoothing=0, sigma_gauss_norm=0)
+            psd_mono_i / (psd_mono_c), normalization_type=normalization_type, sigma_smoothing=0, sigma_gauss_norm=0
+        )
 
     # integrate the prior integrating signals and filter
-    if ear.find('contra') >= 0:
+    if ear.find("contra") >= 0:
         psd_binaural_mean = filter_dataset(
-            psd_mono_c_mean / (psd_mono_i_mean), normalization_type=normalization_type, sigma_smoothing=0, sigma_gauss_norm=0)
+            psd_mono_c_mean / (psd_mono_i_mean),
+            normalization_type=normalization_type,
+            sigma_smoothing=0,
+            sigma_gauss_norm=0,
+        )
     else:
         psd_binaural_mean = filter_dataset(
-            psd_mono_i_mean / (psd_mono_c_mean), normalization_type=normalization_type, sigma_smoothing=0, sigma_gauss_norm=0)
+            psd_mono_i_mean / (psd_mono_c_mean),
+            normalization_type=normalization_type,
+            sigma_smoothing=0,
+            sigma_gauss_norm=0,
+        )
 
     # calculate different input sounds. should be 4 of them (mono,mono-mean,bin, bin-mean)
-    if ear.find('contra') >= 0:
+    if ear.find("contra") >= 0:
         psd_mono = psd_mono_c
         psd_mono_mean = psd_mono_c_mean
     else:
@@ -54,7 +75,7 @@ def process_inputs(psd_all_i, psd_all_c, ear='ipsi', normalization_type='sum_1',
     return psd_mono, psd_mono_mean, psd_binaural, psd_binaural_mean
 
 
-def localize_sound(psd_all, data_to_compare, metric='correlation'):
+def localize_sound(psd_all, data_to_compare, metric="correlation"):
 
     x_test = np.zeros((psd_all.shape[0], psd_all.shape[1], 2))
     y_test = np.zeros((psd_all.shape[0], psd_all.shape[1]))
@@ -77,32 +98,32 @@ def localize_sound(psd_all, data_to_compare, metric='correlation'):
     return x_test, y_test
 
 
-def filter_dataset(dataset, normalization_type='sum_1', sigma_smoothing=0, sigma_gauss_norm=0):
+def filter_dataset(dataset, normalization_type="sum_1", sigma_smoothing=0, sigma_gauss_norm=0):
     # applies filter and normalization on dataset. normalization_type can be one of the following: 'sum_1','l2','l1'
     ds = np.copy(dataset)
 
     # first do a smoothing
     if sigma_smoothing > 0:
-        ds = gaussian_filter1d(ds, sigma=sigma_smoothing, mode='nearest', axis=2)
+        ds = gaussian_filter1d(ds, sigma=sigma_smoothing, mode="nearest", axis=2)
 
     # now normalize the data
-    if normalization_type.find('sum_1') >= 0:
+    if normalization_type.find("sum_1") >= 0:
         # print('Sum 1 Normalization')
-        ds = (ds / np.transpose(np.tile(np.sum(ds, axis=2), [ds.shape[2], 1, 1]), [1, 2, 0]))
-    elif normalization_type.find('l1') >= 0:
+        ds = ds / np.transpose(np.tile(np.sum(ds, axis=2), [ds.shape[2], 1, 1]), [1, 2, 0])
+    elif normalization_type.find("l1") >= 0:
         # print('L1 Normalization')
-        ds = (ds - np.transpose(np.tile(np.min(ds, axis=2), [ds.shape[2], 1, 1]), [1, 2, 0]))
-        ds = (ds / np.transpose(np.tile(np.max(ds, axis=2), [ds.shape[2], 1, 1]), [1, 2, 0]))
-    elif normalization_type.find('l2') >= 0:
+        ds = ds - np.transpose(np.tile(np.min(ds, axis=2), [ds.shape[2], 1, 1]), [1, 2, 0])
+        ds = ds / np.transpose(np.tile(np.max(ds, axis=2), [ds.shape[2], 1, 1]), [1, 2, 0])
+    elif normalization_type.find("l2") >= 0:
         # print('L2 Normalization')
-        ds = (ds / np.transpose(np.tile(np.sqrt(np.sum(ds ** 2, axis=2)), [ds.shape[2], 1, 1]), [1, 2, 0]))
+        ds = ds / np.transpose(np.tile(np.sqrt(np.sum(ds**2, axis=2)), [ds.shape[2], 1, 1]), [1, 2, 0])
     else:
-        # print('No Normalization')
+        # print("No Normalization")
         ds = ds
 
         # now divide the data by a gaussian convolved version of it (filter it)
     if sigma_gauss_norm > 0:
-        ds = ds / (gaussian_filter1d(ds, sigma=sigma_gauss_norm, mode='nearest', axis=2))
+        ds = ds / (gaussian_filter1d(ds, sigma=sigma_gauss_norm, mode="nearest", axis=2))
 
     return ds
 
@@ -118,4 +139,4 @@ def get_localization_coefficients_score(x_test, y_test):
 
 def create_exp_name(values):
     # receives an array of values and returns a unique experiment name from these values
-    return '_'.join([str(float(i)) if type(i) == int else str(i) for i in values]) + '.npy'
+    return "_".join([str(float(i)) if type(i) == int else str(i) for i in values]) + ".npy"
