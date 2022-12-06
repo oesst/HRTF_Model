@@ -12,26 +12,58 @@ from scipy import io
 import scipy.signal as sp
 from src.features import gtgram
 
-import librosa
 
 ROOT = Path(__file__).resolve().parents[2]
 # set the path to the sound files
 # create a list of the sound files
 # set the path to the sound files
-SOUND_FILES = ROOT / 'data/raw/sound_samples/'
+SOUND_FILES = ROOT / "data/raw/sound_samples/"
 # create a list of the sound files
-SOUND_FILES = list(SOUND_FILES.glob('**/*.wav'))
+SOUND_FILES = list(SOUND_FILES.glob("**/*.wav"))
 # Define up to which frequency the data should be generated
 
 
-def create_data(freq_bands=24, participant_number=19, snr=0.2, normalize=False, azimuth=13, time_window=0.1, max_freq=18000, clean=False):
+def create_data(
+    freq_bands=24,
+    participant_number=19,
+    snr=0.2,
+    normalize=False,
+    azimuth=13,
+    time_window=0.1,
+    max_freq=18000,
+    clean=False,
+):
 
-    dir_name = ROOT / ('data/processed_' + str(max_freq) + 'Hz/')
+    dir_name = ROOT / ("data/processed_" + str(max_freq) + "Hz/")
 
-    str_r = 'binaural_right_0_gammatone_' + str(time_window) + '_window_{0:03d}'.format(participant_number) + '_cipic_' + str(
-        int(snr * 100)) + '_srn_' + str(freq_bands) + '_channels_' + str((azimuth - 12) * 10) + '_azi_' + str(normalize) + '_norm_flat_spectrum_stft.npy'
-    str_l = 'binaural_left_0_gammatone_' + str(time_window) + '_window_{0:03d}'.format(participant_number) + '_cipic_' + str(
-        int(snr * 100)) + '_srn_' + str(freq_bands) + '_channels_' + str((azimuth - 12) * 10) + '_azi_' + str(normalize) + '_norm_flat_spectrum_stft.npy'
+    str_r = (
+        "binaural_right_0_gammatone_"
+        + str(time_window)
+        + "_window_{0:03d}".format(participant_number)
+        + "_cipic_"
+        + str(int(snr * 100))
+        + "_srn_"
+        + str(freq_bands)
+        + "_channels_"
+        + str((azimuth - 12) * 10)
+        + "_azi_"
+        + str(normalize)
+        + "_norm_flat_spectrum_stft.npy"
+    )
+    str_l = (
+        "binaural_left_0_gammatone_"
+        + str(time_window)
+        + "_window_{0:03d}".format(participant_number)
+        + "_cipic_"
+        + str(int(snr * 100))
+        + "_srn_"
+        + str(freq_bands)
+        + "_channels_"
+        + str((azimuth - 12) * 10)
+        + "_azi_"
+        + str(normalize)
+        + "_norm_flat_spectrum_stft.npy"
+    )
 
     path_data_r = dir_name / str_r
     path_data_l = dir_name / str_l
@@ -45,19 +77,18 @@ def create_data(freq_bands=24, participant_number=19, snr=0.2, normalize=False, 
 
     # check if we can load the data from a file
     if not clean and path_data_r.is_file() and path_data_l.is_file():
-        print('Data set found. Loading from file : ' + str_r)
-        return np.load(path_data_r), np.load(path_data_l),None
+        print("Data set found. Loading from file : " + str_r)
+        return np.load(path_data_r), np.load(path_data_l), None
     else:
-        print('Creating HRTFs : ' + str_l)
+        print("Creating HRTFs : " + str_l)
         # read the HRIR data
-        hrtf_path = (
-            ROOT / 'data/raw/hrtfs/hrir_{0:03d}.mat'.format(participant_number)).resolve()
+        hrtf_path = (ROOT / "data/raw/hrtfs/hrir_{0:03d}.mat".format(participant_number)).resolve()
         hrir_mat = io.loadmat(hrtf_path.as_posix())
 
         # get the data for the left ear
-        hrir_l = hrir_mat['hrir_l']
+        hrir_l = hrir_mat["hrir_l"]
         # get the data for the right ear
-        hrir_r = hrir_mat['hrir_r']
+        hrir_r = hrir_mat["hrir_r"]
         # use always all elevations -> 50
         psd_all_i = np.zeros((1, 25, int(freq_bands / 2 + 1)))
         psd_all_c = np.zeros((1, 25, int(freq_bands / 2 + 1)))
@@ -107,12 +138,12 @@ def create_data(freq_bands=24, participant_number=19, snr=0.2, normalize=False, 
 
 
 def main():
-    """ This script creates data of pure HRTFs.
+    """This script creates data of pure HRTFs.
     That is, a flat signal (np.ones) is filtered with a HRTF and then gammatone transformed to a frequency spectrum.
     This frequency spectrum resembles the HRTF of a participant.
     """
     logger = logging.getLogger(__name__)
-    logger.info('making final data set from raw data')
+    logger.info("making final data set from raw data")
 
     #### Set parameters ####
     ########################
@@ -127,8 +158,7 @@ def main():
     freq_bandss = np.array([128])
     # azimuths = np.arange(0, 25, 1)
     azimuths = np.array([12])
-    participant_numbers = np.array([1, 2, 3, 8, 9, 10, 11,
-                                    12, 15, 17, 18, 19, 20, 21, 27, 28, 33, 40])
+    participant_numbers = np.array([1, 2, 3, 8, 9, 10, 11, 12, 15, 17, 18, 19, 20, 21, 27, 28, 33, 40])
 
     # walk over all parameter combinations
     for _, participant_number in enumerate(participant_numbers):
@@ -136,11 +166,12 @@ def main():
             for _, freq_bands in enumerate(freq_bandss):
                 for _, azimuth in enumerate(azimuths):
                     psd_all_c, psd_all_i = create_data(
-                        freq_bands, participant_number, snr, normalize, azimuth, time_window)
+                        freq_bands, participant_number, snr, normalize, azimuth, time_window
+                    )
 
 
-if __name__ == '__main__':
-    log_fmt = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+if __name__ == "__main__":
+    log_fmt = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
     logging.basicConfig(level=logging.INFO, format=log_fmt)
 
     main()
