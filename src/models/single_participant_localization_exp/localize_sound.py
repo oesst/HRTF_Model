@@ -25,18 +25,18 @@ SOUND_FILES = list(SOUND_FILES.glob("**/*.wav"))
 @click.option("--azimuth", default=12, help="Azimuth for which localization is done. Default is 12")
 @click.option("--participant_number", default=9, help="CIPIC participant number. Default is 9")
 @click.option("--snr", default=0.2, help="Signal to noise ration to use. Default is 0.2")
-@click.option("--freq_bands", default=128, help="Amount of frequency bands to use. Default is 128")
+@click.option("--freq_bands", default=24, help="Amount of frequency bands to use. Default is 128")
 @click.option("--max_freq", default=20000, help="Max frequency to use. Default is 20000")
 @click.option("--elevations", default=25, help="Number of elevations to use 0-n. Default is 25 which equals 0-90 deg")
 @click.option("--mean_subtracted_map", default=True, help="Should the learned map be mean subtracted. Default is True")
 @click.option("--ear", default="contra", help="Which ear should be used, contra or ipsi. Default is contra")
 @click.option(
     "--normalization_type",
-    default="sum_1",
+    default="none",
     help="Which normalization type should be used sum_1, l1, l2. Default is sum_1",
 )
 @click.option("--sigma_smoothing", default=0.0, help="Sigma for smoothing kernel. 0 is off. Default is 0.")
-@click.option("--sigma_gauss_norm", default=1.0, help="Sigma for gauss normalization. 0 is off. Default is 1.")
+@click.option("--sigma_gauss_norm", default=0.0, help="Sigma for gauss normalization. 0 is off. Default is 1.")
 @click.option("--clean", is_flag=True)
 def main(
     model_name="single_participant",
@@ -142,9 +142,11 @@ def main(
         y_mono_mean = np.zeros(y_mono.shape)
 
         motion_spread = 2
+        psd_motion_all_monaural = np.zeros_like(psd_binaural)
 
         for i in range(0 + motion_spread, len(elevations) - motion_spread):
             psd_motion = psd_all_c[:, i, :] / np.mean(psd_all_c[:, i - motion_spread : i + motion_spread, :], axis=1)
+            psd_motion_all_monaural[:, i, :] = psd_motion
             psd_motion = psd_motion[:, None, :]
             print("##### ", psd_motion.shape)
             # localize the sounds and save the results
@@ -152,8 +154,39 @@ def main(
             a[:, :, 1] = i
             x_mono_mean[:, i, :], y_mono_mean[:, i] = a.squeeze(), b.squeeze()
 
-        # localize the sounds and save the results
-        x_bin, y_bin = hp.localize_sound(psd_binaural, learned_map)
+            # localize the sounds and save the results
+
+        x_bin = np.zeros(x_mono.shape)
+        y_bin = np.zeros(y_mono.shape)
+        psd_motion_all_binaural = np.zeros_like(psd_binaural)
+        for i in range(0 + motion_spread, len(elevations) - motion_spread):
+
+            # psd_motion_c = psd_all_c[:, i, :] / np.mean(psd_all_c[:, i - motion_spread : i + motion_spread, :], axis=1)
+
+            # psd_motion_i = psd_all_i[:, i, :] / np.mean(psd_all_i[:, i - motion_spread : i + motion_spread, :], axis=1)
+
+            # if ear.find("contra") >= 0:
+            #     psd_motion = psd_motion_c / psd_motion_i
+            # else:
+            #     psd_motion = psd_motion_i / psd_motion_c
+
+            psd_motion = psd_binaural[:, i, :] / np.mean(
+                psd_binaural[:, i - motion_spread : i + motion_spread, :], axis=1
+            )
+
+            psd_motion_all_binaural[:, i, :] = psd_motion
+            psd_motion = psd_motion[:, None, :]
+            # localize the sounds and save the results
+            a, b = hp.localize_sound(psd_motion, learned_map)
+            a[:, :, 1] = i
+            x_bin[:, i, :], y_bin[:, i] = a.squeeze(), b.squeeze()
+
+        fig, axes = plt.subplots(1, 2, squeeze=False)
+        ax = axes[0, 0]
+        ax.pcolor(psd_motion_all_monaural[0, motion_spread:-motion_spread, :].squeeze())
+        ax = axes[0, 1]
+        ax.pcolor(psd_motion_all_binaural[0, motion_spread:-motion_spread, :].squeeze())
+        plt.show()
 
         # localize the sounds and save the results
         x_bin_mean, y_bin_mean = hp.localize_sound(psd_binaural_mean, learned_map)
