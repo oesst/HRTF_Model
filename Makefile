@@ -84,6 +84,15 @@ else
 endif
 
 
+motion_exp:
+		test $(exp_name)
+		test $(motion_spread)
+		# create model file
+		$(PYTHON_INTERPRETER) src/models/all_participants_motion/localize_sound.py --model_name='all_participants' --exp_name=$(exp_name) --azimuth=$(azimuth) --snr=$(snr) --freq_bands=$(freq_bands) --max_freq=$(max_freq) --elevations=$(elevations) --mean_subtracted_map=$(mean_subtracted_map) --ear=$(ear) --normalization_type=$(normalization_type) --sigma_smoothing=$(sigma_smoothing) --sigma_gauss_norm=$(sigma_gauss_norm) $(clean) --motion_spread=$(motion_spread)
+		# visualization
+		$(PYTHON_INTERPRETER) src/visualization/all_participants_motion/visualize_default.py --save_figs=$(save_figs) --save_type=$(save_type) --model_name='all_participants' --exp_name=$(exp_name) --azimuth=$(azimuth)  --snr=$(snr) --freq_bands=$(freq_bands) --max_freq=$(max_freq) --elevations=$(elevations) --mean_subtracted_map=$(mean_subtracted_map) --ear=$(ear) --normalization_type=$(normalization_type) --sigma_smoothing=$(sigma_smoothing) --sigma_gauss_norm=$(sigma_gauss_norm) --motion_spread=$(motion_spread)
+
+
 different_learned_maps:
 		test $(exp_name)
 		test $(visualization_type)
