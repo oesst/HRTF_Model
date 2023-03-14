@@ -37,6 +37,7 @@ SOUND_FILES = list(SOUND_FILES.glob("**/*.wav"))
 @click.option("--sigma_smoothing", default=0, help="Sigma for smoothing kernel. 0 is off. Default is 0.")
 @click.option("--sigma_gauss_norm", default=1, help="Sigma for gauss normalization. 0 is off. Default is 1.")
 @click.option("--clean", is_flag=True)
+@click.option("--motion_spread", default=0, help="Defines the amount of motion")
 def main(
     save_figs=False,
     save_type="svg",
@@ -53,6 +54,7 @@ def main(
     sigma_smoothing=0,
     sigma_gauss_norm=1,
     clean=False,
+    motion_spread=1,
 ):
 
     logger = logging.getLogger(__name__)
@@ -90,6 +92,7 @@ def main(
             normalize,
             len(elevations),
             ear,
+            motion_spread,
         ]
     )
 
@@ -100,106 +103,72 @@ def main(
         # try to load the model files
         with open(exp_file.as_posix(), "rb") as f:
             logger.info("Reading model data from file")
-            [x_mono, y_mono, x_mono_mean, y_mono_mean, x_bin, y_bin, x_bin_mean, y_bin_mean] = pickle.load(f)
+            [x_mono_motion, y_mono_motion, x_bin_motion, y_bin_motion, motion_spread] = pickle.load(f)
 
         # define which elevations should be used
-        x_mono = x_mono[:, :, elevations, :]
-        y_mono = y_mono[:, :, elevations]
-        x_mono_mean = x_mono_mean[:, :, elevations, :]
-        y_mono_mean = y_mono_mean[:, :, elevations]
-        x_bin = x_bin[:, :, elevations, :]
-        y_bin = y_bin[:, :, elevations]
-        x_bin_mean = x_bin_mean[:, :, elevations, :]
-        y_bin_mean = y_bin_mean[:, :, elevations]
+        x_mono_motion = x_mono_motion[:, :, elevations, :]
+        y_mono_motion = y_mono_motion[:, :, elevations]
+        x_bin_motion = x_bin_motion[:, :, elevations, :]
+        y_bin_motion = y_bin_motion[:, :, elevations]
 
-        fig = plt.figure(figsize=(20, 5))
-        # plt.suptitle('Single Participant')
+        fig = plt.figure(figsize=(10, 5))
+        plt.suptitle("Motion (Spread : {})".format(motion_spread))
         # Monoaural Data (Ipsilateral), No Mean Subtracted
-        ax1 = fig.add_subplot(1, 4, 1)
-        ax2 = fig.add_subplot(1, 4, 2)
-        ax3 = fig.add_subplot(1, 4, 3)
-        ax4 = fig.add_subplot(1, 4, 4)
+        ax2 = fig.add_subplot(1, 2, 1)
+        ax3 = fig.add_subplot(1, 2, 2)
 
         # plot regression line for each participant
-        for i_par in range(x_mono.shape[0]):
-
-            hp_vis.plot_localization_result(
-                x_mono[i_par], y_mono[i_par], ax1, SOUND_FILES, scale_values=True, linear_reg=True, scatter_data=False
-            )
-            ax1.set_title("Monoaural")
-            hp_vis.set_axis(ax1, len(elevations))
-            ax1.set_ylabel("Estimated Elevation [deg]")
-            ax1.set_xlabel("True Elevation [deg]")
+        for i_par in range(x_mono_motion.shape[0]):
 
             # Monoaural Data (Ipsilateral), Mean Subtracted
             hp_vis.plot_localization_result(
-                x_mono_mean[i_par],
-                y_mono_mean[i_par],
+                x_mono_motion[i_par],
+                y_mono_motion[i_par],
                 ax2,
                 SOUND_FILES,
                 scale_values=True,
                 linear_reg=True,
                 scatter_data=False,
             )
-            ax2.set_title("Mono - Prior")
+            ax2.set_title("Monaural Motion")
             hp_vis.set_axis(ax2, len(elevations))
             ax2.set_xlabel("True Elevation [deg]")
 
             # Binaural Data (Ipsilateral), No Mean Subtracted
 
             hp_vis.plot_localization_result(
-                x_bin[i_par], y_bin[i_par], ax3, SOUND_FILES, scale_values=True, linear_reg=True, scatter_data=False
-            )
-            ax3.set_title("Binaural")
-            hp_vis.set_axis(ax3, len(elevations))
-            ax3.set_xlabel("True Elevation [deg]")
-
-            # Binaural Data (Ipsilateral), Mean Subtracted
-
-            hp_vis.plot_localization_result(
-                x_bin_mean[i_par],
-                y_bin_mean[i_par],
-                ax4,
+                x_bin_motion[i_par],
+                y_bin_motion[i_par],
+                ax3,
                 SOUND_FILES,
                 scale_values=True,
                 linear_reg=True,
                 scatter_data=False,
             )
-            ax4.set_title("Bin - Prior")
-            hp_vis.set_axis(ax4, len(elevations))
-            ax4.set_xlabel("True Elevation [deg]")
+            ax3.set_title("Binaural Motion")
+            hp_vis.set_axis(ax3, len(elevations))
+            ax3.set_xlabel("True Elevation [deg]")
 
-        # plot a common regression line
-        x_mono_ = np.reshape(x_mono, (x_mono.shape[0] * x_mono.shape[1], x_mono.shape[2], x_mono.shape[3]))
-        y_mono_ = np.reshape(y_mono, (y_mono.shape[0] * y_mono.shape[1], y_mono.shape[2]))
+            # Binaural Data (Ipsilateral), Mean Subtracted
 
-        x_mono_mean_ = np.reshape(
-            x_mono_mean, (x_mono_mean.shape[0] * x_mono_mean.shape[1], x_mono_mean.shape[2], x_mono_mean.shape[3])
+        x_mono_motion_ = np.reshape(
+            x_mono_motion,
+            (x_mono_motion.shape[0] * x_mono_motion.shape[1], x_mono_motion.shape[2], x_mono_motion.shape[3]),
         )
-        y_mono_mean_ = np.reshape(y_mono_mean, (y_mono_mean.shape[0] * y_mono_mean.shape[1], y_mono_mean.shape[2]))
-
-        x_bin_ = np.reshape(x_bin, (x_bin.shape[0] * x_bin.shape[1], x_bin.shape[2], x_bin.shape[3]))
-        y_bin_ = np.reshape(y_bin, (y_bin.shape[0] * y_bin.shape[1], y_bin.shape[2]))
-
-        x_bin_mean_ = np.reshape(
-            x_bin_mean, (x_bin_mean.shape[0] * x_bin_mean.shape[1], x_bin_mean.shape[2], x_bin_mean.shape[3])
+        y_mono_motion_ = np.reshape(
+            y_mono_motion, (y_mono_motion.shape[0] * y_mono_motion.shape[1], y_mono_motion.shape[2])
         )
-        y_bin_mean_ = np.reshape(y_bin_mean, (y_bin_mean.shape[0] * y_bin_mean.shape[1], y_bin_mean.shape[2]))
+
+        x_bin_motion_ = np.reshape(
+            x_bin_motion, (x_bin_motion.shape[0] * x_bin_motion.shape[1], x_bin_motion.shape[2], x_bin_motion.shape[3])
+        )
+        y_bin_motion_ = np.reshape(
+            y_bin_motion, (y_bin_motion.shape[0] * y_bin_motion.shape[1], y_bin_motion.shape[2])
+        )
 
         hp_vis.plot_localization_result(
-            x_mono_,
-            y_mono_,
-            ax1,
-            SOUND_FILES,
-            scale_values=False,
-            linear_reg=True,
-            disp_values=True,
-            scatter_data=False,
-            reg_color="black",
-        )
-        hp_vis.plot_localization_result(
-            x_mono_mean_,
-            y_mono_mean_,
+            x_mono_motion_,
+            y_mono_motion_,
             ax2,
             SOUND_FILES,
             scale_values=False,
@@ -209,20 +178,9 @@ def main(
             reg_color="black",
         )
         hp_vis.plot_localization_result(
-            x_bin_,
-            y_bin_,
+            x_bin_motion_,
+            y_bin_motion_,
             ax3,
-            SOUND_FILES,
-            scale_values=False,
-            linear_reg=True,
-            disp_values=True,
-            scatter_data=False,
-            reg_color="black",
-        )
-        hp_vis.plot_localization_result(
-            x_bin_mean_,
-            y_bin_mean_,
-            ax4,
             SOUND_FILES,
             scale_values=False,
             linear_reg=True,
