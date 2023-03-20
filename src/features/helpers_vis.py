@@ -3,6 +3,7 @@ from matplotlib import cm
 import matplotlib.pyplot as plt
 import matplotlib as mpl
 import src.features.filters as filters
+import seaborn as sns
 
 
 # Define some colors
@@ -15,8 +16,7 @@ C3 = [214 / 255, 39 / 255, 40 / 255]
 MY_COLORS = [C0, C1, C2, C3]
 
 
-class LinearReg():
-
+class LinearReg:
     def __init__(self, x, y):
         from sklearn.linear_model import LinearRegression
 
@@ -43,8 +43,14 @@ class LinearReg():
             return self.lr_model.score(x, y)
 
     def print_coefficients(self):
-        print('Gain: {0:1.2f}, Bias: {1:1.2f}, , r^2: {2:1.2f}'.format(self.lr_model.coef_[0, 0], self.lr_model.intercept_[0], self.rr))
-        return ('Gain: {0:1.2f},\nBias: {1:1.2f},\n' + r'$r^2$: {2:1.2f}').format(self.lr_model.coef_[0, 0], self.lr_model.intercept_[0], self.rr)
+        print(
+            "Gain: {0:1.2f}, Bias: {1:1.2f}, , r^2: {2:1.2f}".format(
+                self.lr_model.coef_[0, 0], self.lr_model.intercept_[0], self.rr
+            )
+        )
+        return ("Gain: {0:1.2f},\nBias: {1:1.2f},\n" + r"$r^2$: {2:1.2f}").format(
+            self.lr_model.coef_[0, 0], self.lr_model.intercept_[0], self.rr
+        )
 
 
 def get_localization_coefficients_score(x_test, y_test):
@@ -81,7 +87,17 @@ def scale_v(x_test, y_test, n_elevations):
     return x_test, y_test
 
 
-def plot_localization_result(x_test, y_test, ax, sound_files, scale_values=False, linear_reg=True, disp_values=False, scatter_data=True, reg_color=""):
+def plot_localization_result(
+    x_test,
+    y_test,
+    ax,
+    sound_files,
+    scale_values=False,
+    linear_reg=True,
+    disp_values=False,
+    scatter_data=True,
+    reg_color="",
+):
     n_sound_types = len(sound_files)
     if scale_values:
         x_test, y_test = scale_v(x_test, y_test, x_test.shape[0])
@@ -89,8 +105,15 @@ def plot_localization_result(x_test, y_test, ax, sound_files, scale_values=False
     x_test = np.reshape(x_test, (x_test.shape[0] * x_test.shape[1], 2))
     y_test = np.reshape(y_test, (y_test.shape[0] * y_test.shape[1]))
 
-    ax.plot(np.arange(np.ceil(np.min(x_test)), np.ceil(np.max(x_test))), np.arange(
-        np.ceil(np.min(x_test)), np.ceil(np.max(x_test))), color='grey', linestyle='--', alpha=0.3, label='_nolegend_')
+    ax.plot(
+        np.arange(np.ceil(np.min(x_test)), np.ceil(np.max(x_test))),
+        np.arange(np.ceil(np.min(x_test)), np.ceil(np.max(x_test))),
+        color="grey",
+        linestyle="--",
+        alpha=0.7,
+        label="_nolegend_",
+        linewidth=2,
+    )
 
     # error_mse = 0
     for i in range(0, n_sound_types):
@@ -99,7 +122,13 @@ def plot_localization_result(x_test, y_test, ax, sound_files, scale_values=False
         y = y_test[x_test[:, 0] == i]
 
         if scatter_data:
-            ax.scatter(x, y, s=(n_sound_types / (i + 1)) * len(sound_files), alpha=0.85, label=sound_files[i].name.split('.')[0])
+            ax.scatter(
+                x,
+                y,
+                s=(n_sound_types / (i + 1)) * len(sound_files),
+                alpha=0.85,
+                label=sound_files[i].name.split(".")[0],
+            )
         # error_mse += ((y - x) ** 2).mean(axis=0)
 
     # error_mse /= n_sound_types
@@ -109,20 +138,20 @@ def plot_localization_result(x_test, y_test, ax, sound_files, scale_values=False
         [x, y] = lr_model.get_fitted_line()
 
         if scatter_data:
-            ax.plot(x, y, color='black')
+            ax.plot(x, y, color="black")
         else:
             if len(reg_color) > 0:
-                ax.plot(x, y, alpha=0.6, color=reg_color)
+                ax.plot(x, y, alpha=0.2, linewidth=2, color=reg_color)
             else:
-                ax.plot(x, y, alpha=0.6)
+                ax.plot(x, y, alpha=0.2, linewidth=2)
 
         if disp_values:
             text_str = lr_model.print_coefficients()
             # these are matplotlib.patch.Patch properties
-            props = dict(boxstyle='round', facecolor='white', alpha=0.8)
+            props = dict(boxstyle="round", facecolor="white", alpha=0.8)
 
             # place a text box in upper left in axes coords
-            ax.text(0.05, 0.95, text_str, transform=ax.transAxes, verticalalignment='top', bbox=props)
+            ax.text(0.05, 0.95, text_str, transform=ax.transAxes, verticalalignment="top", bbox=props)
 
     # ax.set_xlabel('True Elevation')
     # ax.set_ylabel('Elevation based on WN')
@@ -134,47 +163,49 @@ def plot_localization_result(x_test, y_test, ax, sound_files, scale_values=False
 def set_layout(drawing_size=25, regular_seaborn=False, box_frame=True):
     if regular_seaborn:
         import seaborn as sns
+
         sns.set(color_codes=True)
-        plt.style.use('seaborn-whitegrid')
+        plt.style.use("seaborn-whitegrid")
         # sns.set_context("poster")
         # sns.set(font="Arial")
 
         # plt.style.use('seaborn')
         # sns.set_style("ticks")
     import seaborn as sns
+
     # 21 defines the number of sound types
     # sns.set_palette(sns.color_palette("husl", 21))
-    mpl.rcParams['grid.linestyle'] = ':'
+    mpl.rcParams["grid.linestyle"] = ":"
 
-    mpl.rcParams['font.size'] = drawing_size
-    mpl.rcParams['font.style'] = 'normal'
+    mpl.rcParams["font.size"] = drawing_size
+    mpl.rcParams["font.style"] = "normal"
     # mpl.rcParams['font.family'] = ['Symbol']
 
-    mpl.rcParams['figure.titlesize'] = int(drawing_size * 1.3)
+    mpl.rcParams["figure.titlesize"] = int(drawing_size * 1.3)
 
-    mpl.rcParams['lines.linewidth'] = int(drawing_size / 5)
+    mpl.rcParams["lines.linewidth"] = int(drawing_size / 5)
 
-    mpl.rcParams['axes.labelsize'] = drawing_size
-    mpl.rcParams['axes.titlesize'] = int(drawing_size * 1.3)
-    mpl.rcParams['xtick.labelsize'] = int(drawing_size * 1)
-    mpl.rcParams['ytick.labelsize'] = int(drawing_size * 1)
+    mpl.rcParams["axes.labelsize"] = drawing_size
+    mpl.rcParams["axes.titlesize"] = int(drawing_size * 1.3)
+    mpl.rcParams["xtick.labelsize"] = int(drawing_size * 1)
+    mpl.rcParams["ytick.labelsize"] = int(drawing_size * 1)
 
     if box_frame:
-        mpl.rcParams['legend.fancybox'] = True
-        mpl.rcParams['legend.fontsize'] = int(drawing_size * 1)
-        mpl.rcParams['legend.frameon'] = True
-        mpl.rcParams['legend.framealpha'] = 0.5
+        mpl.rcParams["legend.fancybox"] = True
+        mpl.rcParams["legend.fontsize"] = int(drawing_size * 1)
+        mpl.rcParams["legend.frameon"] = True
+        mpl.rcParams["legend.framealpha"] = 0.5
     else:
-        mpl.rcParams['legend.fancybox'] = False
-        mpl.rcParams['legend.fontsize'] = int(drawing_size * 1)
-        mpl.rcParams['legend.frameon'] = False
-    mpl.rcParams['legend.facecolor'] = 'inherit'
-    mpl.rcParams['legend.edgecolor'] = '0.8'
+        mpl.rcParams["legend.fancybox"] = False
+        mpl.rcParams["legend.fontsize"] = int(drawing_size * 1)
+        mpl.rcParams["legend.frameon"] = False
+    mpl.rcParams["legend.facecolor"] = "inherit"
+    mpl.rcParams["legend.edgecolor"] = "0.8"
 
-    mpl.rcParams['figure.figsize'] = [20.0, 10.0]
-    mpl.rcParams['figure.dpi'] = 100
-    mpl.rcParams['savefig.dpi'] = 400
-    mpl.rcParams['image.cmap'] = 'viridis'
+    mpl.rcParams["figure.figsize"] = [20.0, 10.0]
+    mpl.rcParams["figure.dpi"] = 100
+    mpl.rcParams["savefig.dpi"] = 400
+    mpl.rcParams["image.cmap"] = "viridis"
 
 
 def mesh_plot(data):
@@ -190,18 +221,10 @@ def mesh_plot(data):
     x, y = np.meshgrid(x, y)
     # create figure with 3d subplot
     fig = plt.figure(figsize=(10, 10))
-    ax = fig.add_subplot(111, projection='3d')
+    ax = fig.add_subplot(111, projection="3d")
 
     # plot data with nice colors
-    ax.plot_surface(
-        x,
-        y,
-        data.T,
-        rstride=1,
-        cstride=1,
-        cmap=cm.jet,
-        shade=True,
-        linewidth=20)
+    ax.plot_surface(x, y, data.T, rstride=1, cstride=1, cmap=cm.jet, shade=True, linewidth=20)
 
     # c = ax.contour(x , y , tmp.T, colors='black', zorder=0)
     # # Thicken the zero contour.
@@ -211,23 +234,22 @@ def mesh_plot(data):
 
 
 def set_correct_axis_3D(ax, cutoff_freq_low, cutoff_freq_high):
-    ax.set_ylabel('Frequencies (kHz)')
+    ax.set_ylabel("Frequencies (kHz)")
     ticks, _ = plt.yticks()
-    ax.set_yticklabels(
-        [str(int(k / 1000)) for k in np.linspace(cutoff_freq_low, cutoff_freq_high, len(ticks) + 1)])
+    ax.set_yticklabels([str(int(k / 1000)) for k in np.linspace(cutoff_freq_low, cutoff_freq_high, len(ticks) + 1)])
 
-    ax.set_zlabel('SPL (au)')
-    ax.set_xlabel('Elevation')
+    ax.set_zlabel("SPL (au)")
+    ax.set_xlabel("Elevation")
     ticks, _ = plt.xticks()
     ax.set_xticklabels([str(int(k)) for k in np.linspace(-45, 90, len(ticks))])
 
 
 def set_correct_axis_2D(ax, cutoff_freq_low, cutoff_freq_high):
-    ax.set_xlabel('Frequencies (kHz)')
+    ax.set_xlabel("Frequencies (kHz)")
     ticks, _ = plt.xticks()
     ax.set_xticklabels([str(int(k / 1000)) for k in np.linspace(cutoff_freq_low, cutoff_freq_high, len(ticks) + 1)])
 
-    ax.set_ylabel('Elevation')
+    ax.set_ylabel("Elevation")
     ticks, _ = plt.yticks()
     ax.set_yticklabels([str(int(k)) for k in np.linspace(-45, 90, len(ticks))])
 
@@ -237,7 +259,7 @@ def plot_elevation_map(data, sounds, figsize=(25, 5)):
 
     for i in range(0, data.shape[0], 1):
         ax = fig.add_subplot(1, data.shape[0], 1 + i)
-        ax.set_title(sounds[i].split('/')[1].split('_')[0].split('.')[0])
+        ax.set_title(sounds[i].split("/")[1].split("_")[0].split(".")[0])
         data_revised_i = np.squeeze(data[i, :, :])
 
         c = ax.pcolormesh(data_revised_i[:, :])
@@ -247,7 +269,7 @@ def plot_elevation_map(data, sounds, figsize=(25, 5)):
 
 def set_axis(ax, n_elevations=25, label=False):
     if label:
-        ax.set_xlabel('True Elevation [deg]')
+        ax.set_xlabel("True Elevation [deg]")
     t = np.zeros(6)
 
     if n_elevations == 25:
@@ -282,6 +304,33 @@ def set_axis(ax, n_elevations=25, label=False):
         t[5] = -45 + ((n_elevations * 5.625) / 2.5) * 4
         ax.set_xticks(t[1:-1])
         ax.set_yticks(t[1:-1])
+    return ax
+
+
+def plot_localization_nice(ax, data_frame):
+    # ax.plot(x, x, "--", color="grey", alpha=0.7)
+    ax = sns.regplot(
+        x="line_number",
+        y="user_estimate",
+        data=data_frame,
+        x_estimator=np.mean,
+        x_ci="sd",
+        color="#525252",
+        line_kws={"linewidth": 3},
+        ax=ax,
+        scatter_kws={"zorder": 10},
+    )
+
+    ax.set_ylabel("Estimated Elevation [deg]")
+    ax.set_xlabel("True Elevation [deg]")
+    ax.tick_params(labelleft=True)
+    for i, I in enumerate(ax.get_lines()):
+        # get the horizontal lines for std
+        # this is a hack.
+        if i > 93 and i < len(ax.get_lines()) - 1:
+            I.set_linewidth(0.5)
+    ax.set_aspect("equal", adjustable="box")
+
     return ax
 
 

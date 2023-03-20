@@ -6,6 +6,7 @@ import pickle
 from pathlib import Path
 import numpy as np
 import click
+import pandas as pd
 
 hp_vis.set_layout(15)
 
@@ -105,6 +106,9 @@ def main(
             logger.info("Reading model data from file")
             [x_mono_motion, y_mono_motion, x_bin_motion, y_bin_motion, motion_spread] = pickle.load(f)
 
+        # remove the elevations that we can't check because of motion spread
+        elevations = elevations[motion_spread:-motion_spread]
+        print(elevations)
         # define which elevations should be used
         x_mono_motion = x_mono_motion[:, :, elevations, :]
         y_mono_motion = y_mono_motion[:, :, elevations]
@@ -118,7 +122,64 @@ def main(
         ax3 = fig.add_subplot(1, 2, 2)
 
         # plot regression line for each participant
+        dfs_mono_motion = []
+        dfs_bin_motion = []
+
         for i_par in range(x_mono_motion.shape[0]):
+
+            xs = []
+            ys = []
+            for i in range(0, x_mono_motion.shape[1]):
+                x_test = np.copy(x_mono_motion[i_par])
+                y_test = np.copy(y_mono_motion[i_par])
+
+                x_test, y_test = hp_vis.scale_v(x_test, y_test, len(elevations))
+
+                x_test = np.reshape(x_test, (x_test.shape[0] * x_test.shape[1], 2))
+                y_test = np.reshape(y_test, (y_test.shape[0] * y_test.shape[1]))
+
+                # get the data points, NOT the sound file type
+                x = x_test[x_test[:, 0] == i, 1]
+                y = y_test[x_test[:, 0] == i]
+                # print(x)
+                xs.append(x.flatten())
+                ys.append(y)
+
+            xs = np.concatenate(xs)
+            ys = np.concatenate(ys)
+            xs = xs.flatten()
+            ys = ys.flatten()
+
+            d = {"line_number": xs, "user_estimate": ys, "condition": "mono"}
+            df = pd.DataFrame(data=d)
+            dfs_mono_motion.append(df)
+
+            xs = []
+            ys = []
+            for i in range(0, x_mono_motion.shape[1]):
+                x_test = np.copy(x_bin_motion[i_par])
+                y_test = np.copy(y_bin_motion[i_par])
+
+                x_test, y_test = hp_vis.scale_v(x_test, y_test, len(elevations))
+
+                x_test = np.reshape(x_test, (x_test.shape[0] * x_test.shape[1], 2))
+                y_test = np.reshape(y_test, (y_test.shape[0] * y_test.shape[1]))
+
+                # get the data points, NOT the sound file type
+                x = x_test[x_test[:, 0] == i, 1]
+                y = y_test[x_test[:, 0] == i]
+                # print(x)
+                xs.append(x.flatten())
+                ys.append(y)
+
+            xs = np.concatenate(xs)
+            ys = np.concatenate(ys)
+            xs = xs.flatten()
+            ys = ys.flatten()
+
+            d = {"line_number": xs, "user_estimate": ys, "condition": "mono"}
+            df = pd.DataFrame(data=d)
+            dfs_bin_motion.append(df)
 
             # Monoaural Data (Ipsilateral), Mean Subtracted
             hp_vis.plot_localization_result(
@@ -188,6 +249,13 @@ def main(
             scatter_data=False,
             reg_color="black",
         )
+
+        dfs_mono_motion_all = pd.concat(dfs_mono_motion)
+        dfs_bin_motion_all = pd.concat(dfs_bin_motion)
+
+        hp_vis.plot_localization_nice(ax2, dfs_mono_motion_all)
+
+        hp_vis.plot_localization_nice(ax3, dfs_bin_motion_all)
 
         plt.tight_layout()
 

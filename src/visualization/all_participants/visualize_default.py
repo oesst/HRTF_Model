@@ -6,6 +6,7 @@ import pickle
 from pathlib import Path
 import numpy as np
 import click
+import pandas as pd
 
 hp_vis.set_layout(15)
 
@@ -114,13 +115,126 @@ def main(
 
         fig = plt.figure(figsize=(20, 5))
         # plt.suptitle('Single Participant')
-        # Monoaural Data (Ipsilateral), No Mean Subtracted
         ax1 = fig.add_subplot(1, 4, 1)
         ax2 = fig.add_subplot(1, 4, 2)
         ax3 = fig.add_subplot(1, 4, 3)
         ax4 = fig.add_subplot(1, 4, 4)
 
-        # plot regression line for each participant
+        # Quick & dirty hack....
+        dfs_mono = []
+        dfs_mono_mean = []
+        dfs_bin = []
+        dfs_bin_mean = []
+        for i_par in range(x_mono.shape[0]):
+
+            xs = []
+            ys = []
+            for i in range(0, x_mono.shape[1]):
+                x_test = np.copy(x_mono[i_par])
+                y_test = np.copy(y_mono[i_par])
+
+                x_test, y_test = hp_vis.scale_v(x_test, y_test, len(elevations))
+
+                x_test = np.reshape(x_test, (x_test.shape[0] * x_test.shape[1], 2))
+                y_test = np.reshape(y_test, (y_test.shape[0] * y_test.shape[1]))
+
+                # get the data points, NOT the sound file type
+                x = x_test[x_test[:, 0] == i, 1]
+                y = y_test[x_test[:, 0] == i]
+                # print(x)
+                xs.append(x.flatten())
+                ys.append(y)
+
+            xs = np.concatenate(xs)
+            ys = np.concatenate(ys)
+            xs = xs.flatten()
+            ys = ys.flatten()
+
+            d = {"line_number": xs, "user_estimate": ys, "condition": "mono"}
+            df = pd.DataFrame(data=d)
+            dfs_mono.append(df)
+
+            xs = []
+            ys = []
+            for i in range(0, x_mono.shape[1]):
+                x_test = np.copy(x_mono_mean[i_par])
+                y_test = np.copy(y_mono_mean[i_par])
+
+                x_test, y_test = hp_vis.scale_v(x_test, y_test, len(elevations))
+
+                x_test = np.reshape(x_test, (x_test.shape[0] * x_test.shape[1], 2))
+                y_test = np.reshape(y_test, (y_test.shape[0] * y_test.shape[1]))
+
+                # get the data points, NOT the sound file type
+                x = x_test[x_test[:, 0] == i, 1]
+                y = y_test[x_test[:, 0] == i]
+                # print(x)
+                xs.append(x.flatten())
+                ys.append(y)
+
+            xs = np.concatenate(xs)
+            ys = np.concatenate(ys)
+            xs = xs.flatten()
+            ys = ys.flatten()
+
+            d = {"line_number": xs, "user_estimate": ys, "condition": "mono"}
+            df = pd.DataFrame(data=d)
+            dfs_mono_mean.append(df)
+
+            xs = []
+            ys = []
+            for i in range(0, x_mono.shape[1]):
+                x_test = np.copy(x_bin[i_par])
+                y_test = np.copy(y_bin[i_par])
+
+                x_test, y_test = hp_vis.scale_v(x_test, y_test, len(elevations))
+
+                x_test = np.reshape(x_test, (x_test.shape[0] * x_test.shape[1], 2))
+                y_test = np.reshape(y_test, (y_test.shape[0] * y_test.shape[1]))
+
+                # get the data points, NOT the sound file type
+                x = x_test[x_test[:, 0] == i, 1]
+                y = y_test[x_test[:, 0] == i]
+                # print(x)
+                xs.append(x.flatten())
+                ys.append(y)
+
+            xs = np.concatenate(xs)
+            ys = np.concatenate(ys)
+            xs = xs.flatten()
+            ys = ys.flatten()
+
+            d = {"line_number": xs, "user_estimate": ys, "condition": "mono"}
+            df = pd.DataFrame(data=d)
+            dfs_bin.append(df)
+
+            xs = []
+            ys = []
+            for i in range(0, x_mono.shape[1]):
+                x_test = np.copy(x_bin_mean[i_par])
+                y_test = np.copy(y_bin_mean[i_par])
+
+                x_test, y_test = hp_vis.scale_v(x_test, y_test, len(elevations))
+
+                x_test = np.reshape(x_test, (x_test.shape[0] * x_test.shape[1], 2))
+                y_test = np.reshape(y_test, (y_test.shape[0] * y_test.shape[1]))
+
+                # get the data points, NOT the sound file type
+                x = x_test[x_test[:, 0] == i, 1]
+                y = y_test[x_test[:, 0] == i]
+                # print(x)
+                xs.append(x.flatten())
+                ys.append(y)
+
+            xs = np.concatenate(xs)
+            ys = np.concatenate(ys)
+            xs = xs.flatten()
+            ys = ys.flatten()
+
+            d = {"line_number": xs, "user_estimate": ys, "condition": "mono"}
+            df = pd.DataFrame(data=d)
+            dfs_bin_mean.append(df)
+
         for i_par in range(x_mono.shape[0]):
 
             hp_vis.plot_localization_result(
@@ -168,6 +282,19 @@ def main(
             ax4.set_title("Bin - Prior")
             hp_vis.set_axis(ax4, len(elevations))
             ax4.set_xlabel("True Elevation [deg]")
+
+        dfs_mono_all = pd.concat(dfs_mono)
+        dfs_mono_mean_all = pd.concat(dfs_mono_mean)
+        dfs_bin_all = pd.concat(dfs_bin)
+        dfs_bin_mean_all = pd.concat(dfs_bin_mean)
+
+        hp_vis.plot_localization_nice(ax1, dfs_mono_all)
+
+        hp_vis.plot_localization_nice(ax2, dfs_mono_mean_all)
+
+        hp_vis.plot_localization_nice(ax3, dfs_bin_all)
+
+        hp_vis.plot_localization_nice(ax4, dfs_bin_mean_all)
 
         # plot a common regression line
         x_mono_ = np.reshape(x_mono, (x_mono.shape[0] * x_mono.shape[1], x_mono.shape[2], x_mono.shape[3]))

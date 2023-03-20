@@ -183,18 +183,14 @@ def main(
                 freq_bands, par, snr, normalize, azimuth, time_window, max_freq=max_freq, diff_noise=True
             )
 
-            # Take only given elevations
+            # Use only given elevations
             psd_all_c = psd_all_c[:, elevations, :]
             psd_all_i = psd_all_i[:, elevations, :]
-
-            # filter data and integrate it
-            psd_mono, psd_mono_mean, psd_binaural, psd_binaural_mean = hp.process_inputs(
-                psd_all_i, psd_all_c, ear, normalization_type, sigma_smoothing, sigma_gauss_norm
-            )
 
             x = np.zeros((len(SOUND_FILES), len(elevations), 2))
             y = np.zeros((len(SOUND_FILES), len(elevations)))
 
+            # simulate motion
             for i in range(0 + motion_spread, len(elevations) - motion_spread):
                 if ear.find("contra") >= 0:
                     psd_motion = psd_all_c[:, i, :] / np.mean(
@@ -204,7 +200,11 @@ def main(
                     psd_motion = psd_all_i[:, i, :] / np.mean(
                         psd_all_i[:, i - motion_spread : i + motion_spread, :], axis=1
                     )
-                psd_motion = psd_motion[:, None, :]
+                # psd_motion = np.expand_dims(1 / np.max(psd_motion, axis=1), axis=1) * psd_motion
+                psd_motion = psd_motion[:, None, :]  # * 1 / -1
+                # print(psd_motion.max())
+                # print(psd_motion.min())
+
                 # localize the sounds and save the results
                 a, b = hp.localize_sound(psd_motion, learned_map)
                 a[:, :, 1] = i
@@ -216,6 +216,7 @@ def main(
             x = np.zeros((len(SOUND_FILES), len(elevations), 2))
             y = np.zeros((len(SOUND_FILES), len(elevations)))
 
+            # simulate motion
             for i in range(0 + motion_spread, len(elevations) - motion_spread):
                 psd_motion_c = psd_all_c[:, i, :] / np.mean(
                     psd_all_c[:, i - motion_spread : i + motion_spread, :], axis=1
@@ -225,8 +226,8 @@ def main(
                     psd_all_i[:, i - motion_spread : i + motion_spread, :], axis=1
                 )
 
-                psd_motion_c = np.expand_dims(1 / np.sum(psd_motion_c, axis=1), axis=1) * psd_motion_c
-                psd_motion_i = np.expand_dims(1 / np.sum(psd_motion_i, axis=1), axis=1) * psd_motion_i
+                # psd_motion_c = np.expand_dims(1 / np.sum(psd_motion_c, axis=1), axis=1) * psd_motion_c
+                # psd_motion_i = np.expand_dims(1 / np.sum(psd_motion_i, axis=1), axis=1) * psd_motion_i
 
                 if ear.find("contra") >= 0:
                     psd_motion = psd_motion_c / psd_motion_i
@@ -235,7 +236,7 @@ def main(
 
                 psd_motion = np.expand_dims(1 / np.sum(psd_motion, axis=1), axis=1) * psd_motion
 
-                psd_motion = psd_motion[:, None, :]
+                psd_motion = psd_motion[:, None, :] * 1 / -1
                 # localize the sounds and save the results
                 a, b = hp.localize_sound(psd_motion, learned_map)
                 a[:, :, 1] = i
