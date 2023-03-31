@@ -56,8 +56,6 @@ def main(
     normalize = False
     time_window = 0.1  # time window in sec
 
-    elevations = np.arange(0, elevations, 1)
-
     # make sure save type is given
     if not save_type or len(save_type) == 0:
         save_type = "svg"
@@ -126,7 +124,7 @@ def main(
                 len(participant_numbers),
                 (azimuth - 12) * 10,
                 normalize,
-                len(elevations),
+                elevations,
             ]
         )
         exp_path = ROOT / "models" / model_name
@@ -146,7 +144,7 @@ def main(
                 participant_numbers,
                 (azimuth - 12) * 10,
                 normalize,
-                len(elevations),
+                elevations,
             ]
         )
         exp_path = ROOT / "models" / model_name
@@ -155,7 +153,7 @@ def main(
     ########################################################################
     ########################################################################
 
-    fig_size = (7, 5)
+    fig_size = (14, 5)
     # fig_size = (20, 14)
 
     formatter = hp_vis.ERBFormatter(20, max_freq, unit="", places=0)
@@ -165,82 +163,85 @@ def main(
         # try to load the model files
         with open(exp_file.as_posix(), "rb") as f:
             logger.info("Reading model data from file")
-            [ipsi_maps, contra_maps] = pickle.load(f)
-
-        ipsi_maps = ipsi_maps[:, :, elevations, :]
-        contra_maps = contra_maps[:, :, elevations, :]
+            [ipsi_maps, contra_maps, ipsi_maps_no_HRTF, contra_maps_no_HRTF] = pickle.load(f)
 
         for i_par, par in enumerate(participant_numbers):
 
             for i_sound, sound in enumerate(SOUND_FILES):
                 sound = sound.name.split(".")[0]
                 # IPSI
-                fig = plt.figure(figsize=fig_size)
-                ax = fig.add_subplot(1, 1, 1)
-                ax.set_title(sound)
+                fig, axes = plt.subplots(1, 3, figsize=fig_size, squeeze=False)
+
+                plt.title(sound)
+                ax = axes[0, 0]
+                ax.set_title("Sound")
+                # ax.imshow(np.squeeze(ipsi_maps[i_par, i_sound]),interpolation = 'bilinear')
+                data = np.squeeze(ipsi_maps_no_HRTF[i_par, i_sound])
+                ax.plot(data)
+                # ax.xaxis.set_major_formatter(formatter)
+                ax.set_xlabel("Frequency [Hz]")
+                ax.set_ylabel("Energy [au]")
+                ax.set_ylim([-100, -40])
+
+                ax = axes[0, 1]
+                ax.set_title("Ipsi")
                 # ax.imshow(np.squeeze(ipsi_maps[i_par, i_sound]),interpolation = 'bilinear')
                 data = np.squeeze(ipsi_maps[i_par, i_sound])
-                # ax.pcolormesh(np.squeeze(ipsi_maps[i_par, i_sound]),shading='gouraud',linewidth=0,rasterized=True)
-                c = ax.pcolormesh(
-                    np.linspace(0, 1, data.shape[1]),
-                    np.linspace(-45, 90, data.shape[0]),
-                    data,
-                    shading="gouraud",
-                    linewidth=0,
-                    rasterized=True,
-                )
-                plt.colorbar(c)
-                ax.xaxis.set_major_formatter(formatter)
+                ax.plot(data)
+                # ax.xaxis.set_major_formatter(formatter)
                 ax.set_xlabel("Frequency [Hz]")
-                ax.set_ylabel("Elevations [deg]")
-                # ax.set_yticklabels(t[1:-1])
+                ax.set_ylabel("Energy [au]")
+                ax.set_ylim([-100, -40])
 
-                if save_figs:
-                    fig_save_path = (
-                        ROOT / "reports" / "figures" / exp_name_str / model_name / ("participant_" + str(par))
-                    )
-                    if not fig_save_path.exists():
-                        fig_save_path.mkdir(parents=True, exist_ok=True)
-                    path_final = (
-                        fig_save_path
-                        / (model_name + "_" + exp_name + "_raw_maps_ipsi_" + str(sound) + "." + save_type)
-                    ).as_posix()
-                    plt.savefig(path_final, dpi=300, transparent=True)
-                    logger.info("Writing File :" + path_final)
-                    plt.close()
-                else:
-                    plt.show()
-
-                # CONTRA
-                fig = plt.figure(figsize=fig_size)
-                ax = fig.add_subplot(1, 1, 1)
-                ax.set_title(sound)
-                # ax.pcolormesh(np.squeeze(contra_maps[i_par, i_sound]), shading='gouraud', linewidth=0, rasterized=True)
+                ax = axes[0, 2]
+                ax.set_title("Contra")
+                # ax.imshow(np.squeeze(ipsi_maps[i_par, i_sound]),interpolation = 'bilinear')
                 data = np.squeeze(contra_maps[i_par, i_sound])
-                # ax.pcolormesh(np.squeeze(ipsi_maps[i_par, i_sound]),shading='gouraud',linewidth=0,rasterized=True)
-                c = ax.pcolormesh(
-                    np.linspace(0, 1, data.shape[1]),
-                    np.linspace(-45, 90, data.shape[0]),
-                    data,
-                    shading="gouraud",
-                    linewidth=0,
-                    rasterized=True,
-                )
-                plt.colorbar(c)
-                ax.xaxis.set_major_formatter(formatter)
+                ax.plot(data)
+                # ax.xaxis.set_major_formatter(formatter)
                 ax.set_xlabel("Frequency [Hz]")
-                ax.set_ylabel("Elevations [deg]")
+                ax.set_ylabel("Energy [au]")
+                ax.set_ylim([-100, -40])
                 # ax.set_yticklabels(t[1:-1])
 
                 if save_figs:
+
+                    exp_name_str = hp.create_exp_name(
+                        [
+                            exp_name,
+                            time_window,
+                            int(snr * 100),
+                            freq_bands,
+                            max_freq,
+                            participant_numbers,
+                            (azimuth - 12) * 10,
+                            normalize,
+                        ]
+                    )
                     fig_save_path = (
-                        ROOT / "reports" / "figures" / exp_name_str / model_name / ("participant_" + str(par))
+                        ROOT
+                        / "reports"
+                        / "figures"
+                        / exp_name_str
+                        / model_name
+                        / ("participant_" + str(par))
+                        / str(sound)
                     )
                     if not fig_save_path.exists():
                         fig_save_path.mkdir(parents=True, exist_ok=True)
                     path_final = (
                         fig_save_path
-                        / (model_name + "_" + exp_name + "_raw_maps_contra_" + str(sound) + "." + save_type)
+                        / (
+                            model_name
+                            + "_"
+                            + exp_name
+                            + "_raw_maps_ipsi_"
+                            + str(sound)
+                            + "_"
+                            + str(elevations)
+                            + "."
+                            + save_type
+                        )
                     ).as_posix()
                     plt.savefig(path_final, dpi=300, transparent=True)
                     logger.info("Writing File :" + path_final)
