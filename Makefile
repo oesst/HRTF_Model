@@ -132,6 +132,13 @@ create_elevation_spectra_maps:
 		# visualization
 		$(PYTHON_INTERPRETER) src/visualization/all_elevation_spectra_maps/visualize_raw_maps.py --save_figs=$(save_figs) --save_type=$(save_type) --model_name='elevation_spectra_maps' --exp_name=$(exp_name) --azimuth=$(azimuth)  --snr=$(snr) --freq_bands=$(freq_bands) --max_freq=$(max_freq) --elevations=$(elevations) --participant_numbers=$(participant_numbers)
 
+create_single_elevation_plot:
+		test $(exp_name)
+		# create model file
+		$(PYTHON_INTERPRETER) src/models/all_elevation_spectra_maps/create_maps.py --model_name='elevation_spectra_maps' --exp_name=$(exp_name) --azimuth=$(azimuth) --snr=$(snr) --freq_bands=$(freq_bands) --max_freq=$(max_freq) --elevations=$(elevations) --participant_numbers=$(participant_numbers) $(clean)
+		# visualization
+		$(PYTHON_INTERPRETER) src/visualization/all_elevation_spectra_maps/visualize_raw_elevation.py --save_figs=$(save_figs) --save_type=$(save_type) --model_name='elevation_spectra_maps' --exp_name=$(exp_name) --azimuth=$(azimuth)  --snr=$(snr) --freq_bands=$(freq_bands) --max_freq=$(max_freq) --elevations=$(elevations) --participant_numbers=$(participant_numbers)
+
 
 map_learning:
 	test $(exp_name)
