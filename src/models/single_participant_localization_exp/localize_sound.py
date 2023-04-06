@@ -4,7 +4,7 @@ from time import monotonic_ns
 import click
 import logging
 from pathlib import Path
-from src.data import generateData
+from src.data import generateData_motion as generateData
 from src.features import helpers as hp
 from src.features import helpers_vis as hpVis
 import numpy as np
@@ -65,7 +65,7 @@ def main(
     ########################################################################
     normalize = False
     time_window = 0.1  # time window in sec
-
+    elevations = 100
     elevations = np.arange(0, elevations, 1)
     ########################################################################
     ########################################################################
@@ -141,20 +141,21 @@ def main(
         x_mono_mean = np.zeros(x_mono.shape)
         y_mono_mean = np.zeros(y_mono.shape)
 
-        motion_spread = 2
+        motion_spread = 1
         psd_motion_all_monaural = np.zeros_like(psd_binaural)
-
+        print("psd_binaural:" ,psd_binaural.shape)
         for i in range(0 + motion_spread, len(elevations) - motion_spread):
-            psd_motion = psd_all_c[:, i, :] / np.mean(psd_all_c[:, i - motion_spread : i + motion_spread, :], axis=1)
+            psd_motion = np.mean(psd_all_i[:, i - motion_spread : i + motion_spread, :], axis=1)
             psd_motion_all_monaural[:, i, :] = psd_motion
             psd_motion = psd_motion[:, None, :]
-            print("##### ", psd_motion.shape)
+            # print("##### ", psd_motion.shape)
             # localize the sounds and save the results
             a, b = hp.localize_sound(psd_motion, learned_map)
             a[:, :, 1] = i
             x_mono_mean[:, i, :], y_mono_mean[:, i] = a.squeeze(), b.squeeze()
 
             # localize the sounds and save the results
+        print(":" ,x_mono_mean.shape)
 
         x_bin = np.zeros(x_mono.shape)
         y_bin = np.zeros(y_mono.shape)
@@ -170,7 +171,7 @@ def main(
             # else:
             #     psd_motion = psd_motion_i / psd_motion_c
 
-            psd_motion = psd_binaural[:, i, :] / np.mean(
+            psd_motion = np.mean(
                 psd_binaural[:, i - motion_spread : i + motion_spread, :], axis=1
             )
 
@@ -180,12 +181,15 @@ def main(
             a, b = hp.localize_sound(psd_motion, learned_map)
             a[:, :, 1] = i
             x_bin[:, i, :], y_bin[:, i] = a.squeeze(), b.squeeze()
-
+        print(":" ,psd_motion_all_monaural.shape)
         fig, axes = plt.subplots(1, 2, squeeze=False)
         ax = axes[0, 0]
-        ax.pcolor(psd_motion_all_monaural[0, motion_spread:-motion_spread, :].squeeze())
+        c = ax.pcolor(psd_motion_all_monaural[0, motion_spread:-motion_spread, :].squeeze())
+        plt.colorbar(c,ax=ax)
         ax = axes[0, 1]
-        ax.pcolor(psd_motion_all_binaural[0, motion_spread:-motion_spread, :].squeeze())
+        # ax.pcolor(psd_motion_all_binaural[0, motion_spread:-motion_spread, :].squeeze())
+        c = ax.pcolor(learned_map)
+        plt.colorbar(c,ax=ax)
         plt.show()
 
         # localize the sounds and save the results
