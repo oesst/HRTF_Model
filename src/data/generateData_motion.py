@@ -146,7 +146,6 @@ def create_data(
             x = np.linspace(0, 1, 25 * resolution)
             hrir_r_elevs_new[:, i] = f_interp(x)
 
-        print(hrir_r_elevs_new.shape)
 
         psd_all_i = np.zeros((len(SOUND_FILES), 25 * resolution, freq_bands))
         psd_all_c = np.zeros((len(SOUND_FILES), 25 * resolution, freq_bands))
@@ -204,28 +203,26 @@ def create_data(
                 #################################################
 
             signal_ones = np.ones_like(signal)
-            # print(signal_ones.shape)
-            # print(hrir_elevs.shape)
 
-            # elev_dims = hrir_r_elevs_new.shape[0]
-            # hrtf_r = np.zeros((elev_dims, 24))
-            # hrtf_l = np.zeros((elev_dims, 24))
-            # for i in range(elev_dims):
-            #     signal_elevs = sp.filtfilt(hrir_r_elevs_new[i, :].squeeze(), 1, signal_ones)
+            elev_dims = hrir_r_elevs_new.shape[0]
+            hrtf_r = np.zeros((elev_dims, 24))
+            hrtf_l = np.zeros((elev_dims, 24))
+            for i in range(elev_dims):
+                signal_elevs = sp.filtfilt(hrir_r_elevs_new[i, :].squeeze(), 1, signal_ones)
 
-            #     y = gtgram.gtgram(signal_elevs, fs, twin, thop, freq_bands, fmin, max_freq)
-            #     y = np.mean(y, axis=1)
-            #     y = 20 * np.log10(y + np.finfo(np.float32).eps)
-            #     hrtf_r[i, :] = y.squeeze()
+                y = gtgram.gtgram(signal_elevs, fs, twin, thop, freq_bands, fmin, max_freq)
+                y = np.mean(y, axis=1)
+                y = 20 * np.log10(y + np.finfo(np.float32).eps)
+                hrtf_r[i, :] = y.squeeze()
 
-            #     signal_elevs = sp.filtfilt(hrir_l_elevs_new[i, :].squeeze(), 1, signal_ones)
+                signal_elevs = sp.filtfilt(hrir_l_elevs_new[i, :].squeeze(), 1, signal_ones)
 
-            #     y = gtgram.gtgram(signal_elevs, fs, twin, thop, freq_bands, fmin, max_freq)
-            #     y = np.mean(y, axis=1)
-            #     y = 20 * np.log10(y + np.finfo(np.float32).eps)
-            #     hrtf_l[i, :] = y.squeeze()
-            # # ax.pcolor(psd_motion_all_monaural[0, motion_spread:-motion_spread, :].squeeze())
-            # # print("hrtf:", hrtf.shape)
+                y = gtgram.gtgram(signal_elevs, fs, twin, thop, freq_bands, fmin, max_freq)
+                y = np.mean(y, axis=1)
+                y = 20 * np.log10(y + np.finfo(np.float32).eps)
+                hrtf_l[i, :] = y.squeeze()
+            # ax.pcolor(psd_motion_all_monaural[0, motion_spread:-motion_spread, :].squeeze())
+            # print("hrtf:", hrtf.shape)
 
             # fig, axes = plt.subplots(2, 3, squeeze=False)
             # ax = axes[0, 0]
@@ -240,10 +237,10 @@ def create_data(
             # signal_elevs = sp.filtfilt(hrir_elevs, 1, signal)
 
             # y = gtgram.gtgram(signal_elevs, fs, twin, thop, freq_bands, fmin, max_freq)
-            # # y = np.mean(y, axis=1)
+            # y = np.mean(y, axis=1)
             # y = 20 * np.log10(y + np.finfo(np.float32).eps)
-
-            # ax.pcolor(y.squeeze())
+            # print(y.shape)
+            # ax.pcolor(np.tile(y,(25,1)))
 
             # ax = axes[1, 0]
             # ax.set_title("Filtered Sound")
