@@ -49,13 +49,18 @@ def main(save_figs=False, save_type='svg', model_name='single_participant', exp_
     normalize = False
     time_window = 0.1  # time window in sec
 
-    elevations = np.arange(0, elevations, 1)
+    elevations = np.arange(0, 100, 1)
+
 
     ########################################################################
     ########################################################################
 
     exp_name_str = hp.create_exp_name([exp_name, normalization_type, sigma_smoothing, sigma_gauss_norm, mean_subtracted_map, time_window, int(
         snr * 100), freq_bands, max_freq, participant_number, (azimuth - 12) * 10, normalize, len(elevations), ear])
+    
+
+    elevations = np.arange(0, 25, 1)
+
 
     exp_path = ROOT / 'models' / model_name
     exp_file = exp_path / exp_name_str
