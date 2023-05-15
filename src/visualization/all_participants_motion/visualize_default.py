@@ -70,6 +70,7 @@ def main(
 
     normalize = False
     time_window = 0.1  # time window in sec
+    elevations = 100
 
     elevations = np.arange(0, elevations, 1)
 

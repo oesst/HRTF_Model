@@ -59,7 +59,7 @@ def main(save_figs=False, save_type='svg', model_name='single_participant', exp_
         snr * 100), freq_bands, max_freq, participant_number, (azimuth - 12) * 10, normalize, len(elevations), ear])
     
 
-    elevations = np.arange(0, 25, 1)
+    #elevations = np.arange(0, 25, 1)
 
 
     exp_path = ROOT / 'models' / model_name
@@ -83,41 +83,28 @@ def main(save_figs=False, save_type='svg', model_name='single_participant', exp_
         x_bin_mean = x_bin_mean[:, elevations, :]
         y_bin_mean = y_bin_mean[:, elevations]
 
-        fig = plt.figure(figsize=(20, 5))
-        # plt.suptitle('Single Participant')
+        fig = plt.figure(figsize=(10, 5))
+        # plt.suptitle("Motion (Spread : {})".format())
         # Monoaural Data (Ipsilateral), No Mean Subtracted
-        ax = fig.add_subplot(1, 4, 1)
-        hp_vis.plot_localization_result(
-            x_mono, y_mono, ax, SOUND_FILES, scale_values=True, linear_reg=True, disp_values=True)
-        ax.set_title('Monoaural')
-        hp_vis.set_axis(ax, len(elevations))
-        ax.set_ylabel('Estimated Elevation [deg]')
-        ax.set_xlabel('True Elevation [deg]')
+        ax2 = fig.add_subplot(1, 2, 1)
+        ax3 = fig.add_subplot(1, 2, 2)
+
 
         # Monoaural Data (Ipsilateral),Mean Subtracted
-        ax = fig.add_subplot(1, 4, 2)
         hp_vis.plot_localization_result(
-            x_mono_mean, y_mono_mean, ax, SOUND_FILES, scale_values=True, linear_reg=True, disp_values=True)
-        ax.set_title('Mono - Prior')
-        hp_vis.set_axis(ax, len(elevations))
-        ax.set_xlabel('True Elevation [deg]')
+            x_mono_mean, y_mono_mean, ax2, SOUND_FILES, scale_values=True, linear_reg=True, disp_values=True)
+        ax2.set_title('Mono - Prior')
+        #hp_vis.set_axis(ax, len(elevations))
+        ax2.set_xlabel('True Elevation [deg]')
 
         # Binaural Data (Ipsilateral), No Mean Subtracted
-        ax = fig.add_subplot(1, 4, 3)
         hp_vis.plot_localization_result(
-            x_bin, y_bin, ax, SOUND_FILES, scale_values=True, linear_reg=True, disp_values=True)
-        ax.set_title('Binaural')
-        hp_vis.set_axis(ax, len(elevations))
-        ax.set_xlabel('True Elevation [deg]')
+            x_bin, y_bin, ax3, SOUND_FILES, scale_values=True, linear_reg=True, disp_values=True)
+        ax3.set_title('Binaural')
+        #hp_vis.set_axis(ax, len(elevations))
+        ax3.set_xlabel('True Elevation [deg]')
 
-        # Binaural Data (Ipsilateral), Mean Subtracted
-        ax = fig.add_subplot(1, 4, 4)
-        hp_vis.plot_localization_result(
-            x_bin_mean, y_bin_mean, ax, SOUND_FILES, scale_values=True, linear_reg=True, disp_values=True)
-        ax.set_title('Bin - Prior')
-        hp_vis.set_axis(ax, len(elevations))
-        ax.set_xlabel('True Elevation [deg]')
-
+        
         plt.tight_layout()
 
         if save_figs:

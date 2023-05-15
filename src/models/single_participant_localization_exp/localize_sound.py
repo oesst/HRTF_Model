@@ -104,15 +104,15 @@ def main(
         # create Path
         exp_path.mkdir(parents=True, exist_ok=True)
         # create or read the data
-        psd_all_c, psd_all_i = generateData.create_data(
+        psd_all_c, psd_all_i = generateData_motion.create_data(
             freq_bands, participant_number, snr, normalize, azimuth, time_window, max_freq=max_freq, diff_noise=False
         )
 
         # Take only given elevations
 
-        elevations_ = np.arange(0,25)
-        psd_all_c = psd_all_c[:, elevations_, :]
-        psd_all_i = psd_all_i[:, elevations_, :]
+        #elevations_ = np.arange(0,100,4)
+        psd_all_c = psd_all_c[:, elevations, :]
+        psd_all_i = psd_all_i[:, elevations, :]
 
         # filter data and integrate it
         psd_mono, psd_mono_mean, psd_binaural, psd_binaural_mean = hp.process_inputs(
@@ -144,17 +144,20 @@ def main(
         x_mono_mean = np.zeros(x_mono.shape)
         y_mono_mean = np.zeros(y_mono.shape)
 
-        motion_spread = 5
+        motion_spread = 10
         psd_motion_all_monaural = np.zeros_like(psd_binaural)
-        print("psd_binaural:" ,psd_binaural.shape)
+        print("psd_all_c:" ,psd_all_c.shape)
         for i in range(0 + motion_spread, len(elevations) - motion_spread):
-            psd_motion =  np.mean(psd_all_c[:, i - motion_spread : i + motion_spread, :], axis=1)
+            psd_motion = psd_all_c[:, i, :] / np.mean(psd_all_c[:, i - motion_spread : i + motion_spread, :], axis=1)
+            # psd_motion =  np.mean(psd_all_c[:, i - motion_spread : i + motion_spread, :], axis=1)
+            if motion_spread == 0:
+                psd_motion =  psd_all_c[:, i , :]
+            print("psd_motion:" ,psd_motion.shape)
             psd_motion_all_monaural[:, i, :] = psd_motion
             psd_motion = psd_motion[:, None, :]
             # localize the sounds and save the results
             a, b = hp.localize_sound(psd_motion, learned_map)
             a[:, :, 1] = i
-            print("##### ", learned_map.shape)
 
             x_mono_mean[:, i, :], y_mono_mean[:, i] = a.squeeze(), b.squeeze()
 
@@ -166,34 +169,39 @@ def main(
         psd_motion_all_binaural = np.zeros_like(psd_binaural)
         for i in range(0 + motion_spread, len(elevations) - motion_spread):
 
-            # psd_motion_c = psd_all_c[:, i, :] / np.mean(psd_all_c[:, i - motion_spread : i + motion_spread, :], axis=1)
+            psd_motion_c = psd_all_c[:, i, :] / np.mean(psd_all_c[:, i - motion_spread : i + motion_spread, :], axis=1)
 
-            # psd_motion_i = psd_all_i[:, i, :] / np.mean(psd_all_i[:, i - motion_spread : i + motion_spread, :], axis=1)
+            psd_motion_i = psd_all_i[:, i, :] / np.mean(psd_all_i[:, i - motion_spread : i + motion_spread, :], axis=1)
 
-            # if ear.find("contra") >= 0:
-            #     psd_motion = psd_motion_c / psd_motion_i
-            # else:
-            #     psd_motion = psd_motion_i / psd_motion_c
+            if ear.find("contra") >= 0:
+                psd_motion = psd_motion_c / psd_motion_i
+            else:
+                psd_motion = psd_motion_i / psd_motion_c
 
-            psd_motion = np.mean(
-                psd_binaural[:, i - motion_spread : i + motion_spread, :], axis=1
-            )
-
+            # psd_motion = np.mean(
+            #     psd_binaural[:, i - motion_spread : i + motion_spread, :], axis=1
+            # )
+            if motion_spread == 0:
+                psd_motion = psd_binaural[:, i, :]
             psd_motion_all_binaural[:, i, :] = psd_motion
             psd_motion = psd_motion[:, None, :]
             # localize the sounds and save the results
             a, b = hp.localize_sound(psd_motion, learned_map)
             a[:, :, 1] = i
-            x_bin[:, i, :], y_bin[:, i] = a.squeeze(), b.squeeze()*4
+            x_bin[:, i, :], y_bin[:, i] = a.squeeze(), b.squeeze()
         print(":" ,psd_motion_all_monaural.shape)
 
         
         fig, axes = plt.subplots(1, 3, squeeze=False)
         ax = axes[0, 0]
-        c = ax.pcolor(psd_motion_all_monaural[0, motion_spread:-motion_spread, :].squeeze())
+
+        if motion_spread == 0:
+            motion_spread =1
+        sound = 1
+        c = ax.pcolor(psd_motion_all_monaural[sound, motion_spread:-motion_spread, :].squeeze())
         plt.colorbar(c,ax=ax)
         ax = axes[0, 1]
-        ax.pcolor(psd_motion_all_binaural[0, motion_spread:-motion_spread, :].squeeze())
+        ax.pcolor(psd_motion_all_binaural[sound, motion_spread:-motion_spread, :].squeeze())
         plt.colorbar(c,ax=ax)
         ax = axes[0, 2]
         c = ax.pcolor(learned_map)

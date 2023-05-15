@@ -2,7 +2,7 @@
 import logging
 import click
 from pathlib import Path
-from src.data import generateData
+from src.data import generateData_motion as generateData
 from src.features import helpers as hp
 
 # from src.visualization import helpers as hpVis
@@ -116,6 +116,7 @@ def main(
     )
     normalize = False
     time_window = 0.1  # time window in sec
+    elevations = 100
 
     elevations = np.arange(0, elevations, 1)
     ########################################################################
@@ -197,11 +198,11 @@ def main(
 
             for i in range(0 + motion_spread, len(elevations) - motion_spread):
                 if ear.find("contra") >= 0:
-                    psd_motion = psd_all_c[:, i, :] / np.mean(
+                    psd_motion = psd_all_c[:, i, :] /  np.mean(
                         psd_all_c[:, i - motion_spread : i + motion_spread, :], axis=1
                     )
                 else:
-                    psd_motion = psd_all_i[:, i, :] / np.mean(
+                    psd_motion = psd_all_i[:, i, :] /  np.mean(
                         psd_all_i[:, i - motion_spread : i + motion_spread, :], axis=1
                     )
                 psd_motion = psd_motion[:, None, :]
@@ -217,23 +218,23 @@ def main(
             y = np.zeros((len(SOUND_FILES), len(elevations)))
 
             for i in range(0 + motion_spread, len(elevations) - motion_spread):
-                psd_motion_c = psd_all_c[:, i, :] / np.mean(
+                psd_motion_c = psd_all_c[:, i, :] /  np.mean(
                     psd_all_c[:, i - motion_spread : i + motion_spread, :], axis=1
                 )
 
-                psd_motion_i = psd_all_i[:, i, :] / np.mean(
+                psd_motion_i = psd_all_i[:, i, :] /  np.mean(
                     psd_all_i[:, i - motion_spread : i + motion_spread, :], axis=1
                 )
 
-                psd_motion_c = np.expand_dims(1 / np.sum(psd_motion_c, axis=1), axis=1) * psd_motion_c
-                psd_motion_i = np.expand_dims(1 / np.sum(psd_motion_i, axis=1), axis=1) * psd_motion_i
+                # psd_motion_c = np.expand_dims(1 / np.sum(psd_motion_c, axis=1), axis=1) * psd_motion_c
+                # psd_motion_i = np.expand_dims(1 / np.sum(psd_motion_i, axis=1), axis=1) * psd_motion_i
 
                 if ear.find("contra") >= 0:
                     psd_motion = psd_motion_c / psd_motion_i
                 else:
                     psd_motion = psd_motion_i / psd_motion_c
 
-                psd_motion = np.expand_dims(1 / np.sum(psd_motion, axis=1), axis=1) * psd_motion
+                # psd_motion = np.expand_dims(1 / np.sum(psd_motion, axis=1), axis=1) * psd_motion
 
                 psd_motion = psd_motion[:, None, :]
                 # localize the sounds and save the results
