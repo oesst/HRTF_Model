@@ -11,6 +11,7 @@ import soundfile as sf
 from scipy import io
 import scipy.signal as sp
 from src.features import gtgram
+import sounddevice as sd
 
 import matplotlib.pyplot as plt
 
@@ -134,7 +135,10 @@ def create_data(
                 # filter the signal
                 signal_elevs = sp.filtfilt(hrir_elevs, 1, signal)
                 # add noise to the signal
-                signal_elevs = (1 - snr) * signal_elevs + snr * np.random.random(signal_elevs.shape[0]) * signal.max()
+
+                # this should be the correct way to add noise
+                signal_elevs = (1 - snr) * signal_elevs + signal_elevs * snr * np.random.normal(0, 1, signal_elevs.shape[0]) * signal.max()
+                # signal_elevs = (1 - snr) * signal_elevs + snr * np.random.normal(0, 1, signal_elevs.shape[0]) * signal.max()
 
                 ##### Sound Playback #####
                 # signal_play = signal_elevs * (2**15 - 1) / np.max(np.abs(signal_elevs))
