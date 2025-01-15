@@ -173,37 +173,31 @@ def main(
                 fig, axes = plt.subplots(1, 3, figsize=fig_size, squeeze=False)
 
                 plt.title(sound)
+
                 ax = axes[0, 0]
                 ax.set_title("Sound")
-                # ax.imshow(np.squeeze(ipsi_maps[i_par, i_sound]),interpolation = 'bilinear')
-                data = np.squeeze(ipsi_maps_no_HRTF[i_par, i_sound])
-                ax.plot(data)
-                # ax.xaxis.set_major_formatter(formatter)
+                g = ax.imshow(np.squeeze(ipsi_maps_no_HRTF[i_par, i_sound]), interpolation='bilinear')
+                cbar = plt.colorbar(g, ax=ax, pad=-0.0)
+                cbar.set_label('Amplitude')
                 ax.set_xlabel("Frequency [Hz]")
                 ax.set_ylabel("Energy [au]")
-                ax.set_ylim([-100, -40])
 
                 ax = axes[0, 1]
                 ax.set_title("Ipsi")
-                # ax.imshow(np.squeeze(ipsi_maps[i_par, i_sound]),interpolation = 'bilinear')
-                data = np.squeeze(ipsi_maps[i_par, i_sound])
-                ax.plot(data)
-                # ax.xaxis.set_major_formatter(formatter)
+                g = ax.imshow(np.squeeze(ipsi_maps[i_par, i_sound]), interpolation='bilinear')
+                cbar = plt.colorbar(g, ax=ax, pad=-0.0)
+                cbar.set_label('Amplitude')
                 ax.set_xlabel("Frequency [Hz]")
                 ax.set_ylabel("Energy [au]")
-                ax.set_ylim([-100, -40])
 
                 ax = axes[0, 2]
                 ax.set_title("Contra")
-                # ax.imshow(np.squeeze(ipsi_maps[i_par, i_sound]),interpolation = 'bilinear')
-                data = np.squeeze(contra_maps[i_par, i_sound])
-                ax.plot(data)
-                # ax.xaxis.set_major_formatter(formatter)
+                g = ax.imshow(np.squeeze(contra_maps[i_par, i_sound]), interpolation='bilinear')
+                cbar = plt.colorbar(g, ax=ax, pad=-0.0)
+                cbar.set_label('Amplitude')
                 ax.set_xlabel("Frequency [Hz]")
                 ax.set_ylabel("Energy [au]")
-                ax.set_ylim([-100, -40])
-                # ax.set_yticklabels(t[1:-1])
-
+                plt.tight_layout()
                 if save_figs:
 
                     exp_name_str = hp.create_exp_name(

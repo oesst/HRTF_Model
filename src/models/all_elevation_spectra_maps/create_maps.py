@@ -150,11 +150,11 @@ def main(
             [ipsi_maps, contra_maps, ipsi_maps_no_HRTF, contra_maps_no_HRTF] = pickle.load(f)
     else:
 
-        ipsi_maps = np.zeros((len(participant_numbers), len(SOUND_FILES), freq_bands))
-        contra_maps = np.zeros((len(participant_numbers), len(SOUND_FILES), freq_bands))
+        ipsi_maps = np.zeros((len(participant_numbers), len(SOUND_FILES), elevations, freq_bands))
+        contra_maps = np.zeros((len(participant_numbers), len(SOUND_FILES), elevations, freq_bands))
 
-        ipsi_maps_no_HRTF = np.zeros((len(participant_numbers), len(SOUND_FILES), freq_bands))
-        contra_maps_no_HRTF = np.zeros((len(participant_numbers), len(SOUND_FILES), freq_bands))
+        ipsi_maps_no_HRTF = np.zeros((len(participant_numbers), len(SOUND_FILES), elevations, freq_bands))
+        contra_maps_no_HRTF = np.zeros((len(participant_numbers), len(SOUND_FILES), elevations, freq_bands))
 
         for i_par, par in enumerate(participant_numbers):
 
@@ -169,17 +169,19 @@ def main(
             )
 
             # Take only given elevations
-            psd_all_c = psd_all_c[:, elevations, :]
-            psd_all_i = psd_all_i[:, elevations, :]
+            # print(psd_all_c.shape)
+            # print(elevations)
+            psd_all_c = psd_all_c[:, 0:elevations, :]
+            psd_all_i = psd_all_i[:, 0:elevations, :]
 
-            psd_all_c_no_HRTF = psd_all_c_no_HRTF[:, elevations, :]
-            psd_all_i_no_HRTF = psd_all_i_no_HRTF[:, elevations, :]
+            psd_all_c_no_HRTF = psd_all_c_no_HRTF[:, 0:elevations, :]
+            psd_all_i_no_HRTF = psd_all_i_no_HRTF[:, 0:elevations, :]
 
-            ipsi_maps[i_par, :, :] = psd_all_i
-            contra_maps[i_par, :, :] = psd_all_c
+            ipsi_maps[i_par, :, :, :] = psd_all_i
+            contra_maps[i_par, :, :, :] = psd_all_c
 
-            ipsi_maps_no_HRTF[i_par, :, :] = psd_all_i_no_HRTF
-            contra_maps_no_HRTF[i_par, :, :] = psd_all_c_no_HRTF
+            ipsi_maps_no_HRTF[i_par, :, :, :] = psd_all_i_no_HRTF
+            contra_maps_no_HRTF[i_par, :, :, :] = psd_all_c_no_HRTF
 
         # create Path
         exp_path.mkdir(parents=True, exist_ok=True)

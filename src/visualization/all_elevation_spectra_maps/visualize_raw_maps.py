@@ -165,7 +165,7 @@ def main(
         # try to load the model files
         with open(exp_file.as_posix(), "rb") as f:
             logger.info("Reading model data from file")
-            [ipsi_maps, contra_maps] = pickle.load(f)
+            [ipsi_maps, contra_maps, ipsi_maps_no_HRTF, contra_maps_no_HRTF] = pickle.load(f)
 
         ipsi_maps = ipsi_maps[:, :, elevations, :]
         contra_maps = contra_maps[:, :, elevations, :]
