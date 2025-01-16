@@ -1,7 +1,7 @@
-# -*- coding: utf-8 -*-
 import click
 import logging
 from pathlib import Path
+# -*- coding: utf-8 -*-
 
 from os import listdir
 from os.path import isfile, join
@@ -137,27 +137,34 @@ def create_data(
                 # add noise to the signal
 
                 # this should be the correct way to add noise
-                signal_elevs = (1 - snr) * signal_elevs + signal_elevs * snr * np.random.normal(0, 1, signal_elevs.shape[0]) * signal.max()
-                # signal_elevs = (1 - snr) * signal_elevs + snr * np.random.normal(0, 1, signal_elevs.shape[0]) * signal.max()
+                # signal_elevs = (1 - snr) * signal_elevs + snr * np.random.normal(0, 0.1, signal_elevs.shape[0])
 
-                ##### Sound Playback #####
+                # fig, axes = plt.subplots(3, 1)
+                # fig.suptitle(f"Participant: {participant_number} Sound: {SOUND_FILES[i].name}, Elevation: {i_elevs}")
+                # ax = axes[0]
+                # ax.plot(signal)
+
+                # ax = axes[1]
+                # ax.plot(noise)
+
+                # ax = axes[2]
+                # ax.specgram(signal_elevs, NFFT=256, Fs=44100, noverlap=128)
+
+                # ##### Sound Playback #####
                 # signal_play = signal_elevs * (2**15 - 1) / np.max(np.abs(signal_elevs))
                 # signal_play = signal_play.astype(np.int16)
-                #
+
                 # # Start playback
-                # play_obj = sa.play_buffer(signal_play, 1, 2, 44100)
-                #
-                # # Wait for playback to finish before exiting
-                # play_obj.wait_done()
+                # sd.play(signal_play, 44100)
+
+                # Wait for playback to finish before exiting
 
                 # read the hrir for a specific location
                 hrir_elevs = np.squeeze(hrir_r[azimuth, i_elevs, :])
                 # filter the signal
                 signal_elevs_c = sp.filtfilt(hrir_elevs, 1, signal)
                 # add noise to the signal
-                signal_elevs_c = (1 - snr) * signal_elevs_c + snr * np.random.random(
-                    signal_elevs_c.shape[0]
-                ) * signal.max()
+                # signal_elevs_c = (1 - snr) * signal_elevs_c + (snr * np.random.normal(0, 0.1, signal_elevs_c.shape[0]))
 
                 # Default gammatone-based spectrogram parameters
                 time_window = 0.1
@@ -172,13 +179,23 @@ def create_data(
 
                 y = np.mean(y, axis=1)
                 y = 20 * np.log10(y + np.finfo(np.float32).eps)
-                psd_all_i[i, i_elevs, :] = y
+                print(np.max(np.abs(y)))
+                # add noise here
+                std_noise = np.max(np.abs(y)) / 50
+                psd_all_i[i, i_elevs, :] = ((1 - snr) * y + snr * np.random.normal(0, std_noise, y.shape[0]))/2
                 # contralateral side
                 y = gtgram.gtgram(signal_elevs_c, fs, twin, thop, freq_bands, fmin, max_freq)
                 y = np.mean(y, axis=1)
                 y = 20 * np.log10(y + np.finfo(np.float32).eps)
-                psd_all_c[i, i_elevs, :] = y
+                psd_all_c[i, i_elevs, :] = ((1 - snr) * y + snr * np.random.normal(0, std_noise, y.shape[0]))/2
                 #################################################
+                # fig, axes = plt.subplots(2, 1)
+                # fig.suptitle(f"Participant: {participant_number} Sound: {SOUND_FILES[i].name}, Elevation: {i_elevs}")
+                # ax = axes[0]
+                # ax.plot(psd_all_i[i, i_elevs, :])
+                # ax = axes[1]
+                # ax.plot(psd_all_c[i, i_elevs, :])
+                # plt.show()
 
         np.save(path_data_r.absolute(), psd_all_c)
         np.save(path_data_l.absolute(), psd_all_i)

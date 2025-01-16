@@ -61,57 +61,7 @@ def main(
     # participant_numbers = np.array([1, 2, 3, 8, 9, 10, 11,
     #                                 12, 15, 17, 18, 19, 20, 21, 27, 28, 33, 40])
 
-    participant_numbers = np.array(
-        [
-            1,
-            2,
-            3,
-            8,
-            9,
-            10,
-            11,
-            12,
-            15,
-            17,
-            18,
-            19,
-            20,
-            21,
-            27,
-            28,
-            33,
-            40,
-            44,
-            48,
-            50,
-            51,
-            58,
-            59,
-            60,
-            61,
-            65,
-            119,
-            124,
-            126,
-            127,
-            131,
-            133,
-            134,
-            135,
-            137,
-            147,
-            148,
-            152,
-            153,
-            154,
-            155,
-            156,
-            158,
-            162,
-            163,
-            165,
-        ]
-    )
+    participant_numbers = np.array([1, 2, 3, 8, 9, 10, 11, 12, 15, 17, 18, 19, 20, 21, 27, 28, 33, 40, 44, 48, 50, 51, 58, 59, 60, 61, 65, 119, 124, 126, 127, 131, 133, 134, 135, 137, 147, 148, 152, 153, 154, 155, 156, 158, 162, 163, 165])
     normalize = False
     time_window = 0.1  # time window in sec
 
@@ -142,13 +92,13 @@ def main(
     exp_file = exp_path / exp_name_str
     # check if model results exist already and load
     if not clean and exp_path.exists() and exp_file.is_file():
+
         # try to load the model files
         with exp_file.open("rb") as f:
             logger.info("Reading model data from file")
             [x_mono, y_mono, x_mono_mean, y_mono_mean, x_bin, y_bin, x_bin_mean, y_bin_mean] = pickle.load(f)
             print(x_mono.shape)
     else:
-
         x_mono = np.zeros((len(participant_numbers), len(SOUND_FILES), len(elevations), 2))
         y_mono = np.zeros((len(participant_numbers), len(SOUND_FILES), len(elevations)))
         x_mono_mean = np.zeros((len(participant_numbers), len(SOUND_FILES), len(elevations), 2))
