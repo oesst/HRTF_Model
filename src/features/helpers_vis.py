@@ -4,7 +4,8 @@ import matplotlib.pyplot as plt
 import matplotlib as mpl
 import src.features.filters as filters
 import seaborn as sns
-
+from scipy.optimize import minimize
+from scipy.stats import skewnorm, norm
 
 # Define some colors
 C0 = [31 / 255, 119 / 255, 180 / 255]
@@ -14,6 +15,64 @@ C3 = [214 / 255, 39 / 255, 40 / 255]
 
 
 MY_COLORS = [C0, C1, C2, C3]
+
+
+class MLERegression:
+    def __init__(self, x, y):
+
+        self.x = np.squeeze(x[:, 1]).reshape(-1, 1)
+        self.y = y.reshape(-1, 1)
+
+        self.rr = 1
+
+        # MLE Fit with Skew-Normal Residuals
+        def negative_log_likelihood(params, x, y):
+            beta0, beta1, alpha, sigma = params
+            predicted = beta0 + beta1 * x
+            residuals = y - predicted
+            nll = -np.sum(skewnorm.logpdf(residuals, a=alpha, loc=0, scale=sigma))
+            return nll
+
+        def MLE_Norm(parameters, x, y):
+            const, beta, std_dev = parameters
+            pred = const + beta*x
+
+            LL = np.sum(norm.logpdf(y, pred, std_dev))
+            neg_LL = -1*LL
+            return neg_LL
+
+        initial_params = [1, 1, 1, 1]  # beta0, beta1, alpha, sigma
+        result_mle = minimize(negative_log_likelihood, initial_params, args=(self.x, self.y), method='L-BFGS-B',
+                              bounds=[(None, None), (None, None), (None, None), (1e-6, None)])
+        self.beta0_mle, self.beta1_mle, alpha_mle, sigma_mle = result_mle.x
+
+    def get_fitted_line(self):
+        return [self.x, self.beta0_mle + self.beta1_mle * self.x]
+        # return [self.x, self.lr_model.predict(self.x)]
+
+    def get_coefficients(self):
+        # gain, bias
+        return self.beta1_mle, self.beta0_mle
+
+    def get_score(self, x=0, y=0):
+        if x == 0 or y == 0:
+            return self.rr
+        else:
+            return 1
+
+    def print_coefficients(self):
+        gain = self.beta1_mle
+        bias = self.beta0_mle
+        score = self.rr
+
+        print(
+            "Gain: {0:1.2f}, Bias: {1:1.2f}, , r^2: {2:1.2f}".format(
+                gain, bias, score
+            )
+        )
+        return ("Gain: {0:1.2f},\nBias: {1:1.2f},\n" + r"$r^2$: {2:1.2f}").format(
+            gain, bias, score
+        )
 
 
 class LinearReg:
@@ -51,7 +110,6 @@ class LinearReg:
         return ("Gain: {0:1.2f},\nBias: {1:1.2f},\n" + r"$r^2$: {2:1.2f}").format(
             self.lr_model.coef_[0, 0], self.lr_model.intercept_[0], self.rr
         )
-
 
 def get_localization_coefficients_score(x_test, y_test):
     x_test = np.reshape(x_test, (x_test.shape[0] * x_test.shape[1], 2))
@@ -152,6 +210,17 @@ def plot_localization_result(
 
             # place a text box in upper left in axes coords
             ax.text(0.05, 0.95, text_str, transform=ax.transAxes, verticalalignment="top", bbox=props)
+
+        # lr_model = MLERegression(x_test, y_test)
+        # [x, y] = lr_model.get_fitted_line()
+
+        # ax.plot(x, y, color="black", linestyle="--", label="MLE")
+        # text_str = lr_model.print_coefficients()
+        #     # these are matplotlib.patch.Patch properties
+        # props = dict(boxstyle="round", facecolor="white", alpha=0.8)
+
+        # # place a text box in upper left in axes coords
+        # ax.text(0.45, 0.95, text_str, transform=ax.transAxes, verticalalignment="top", bbox=props)
 
     # ax.set_xlabel('True Elevation')
     # ax.set_ylabel('Elevation based on WN')

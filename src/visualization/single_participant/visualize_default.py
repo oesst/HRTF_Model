@@ -121,7 +121,7 @@ def main(save_figs=False, save_type='svg', model_name='single_participant', exp_
             fig_save_path = ROOT / 'reports' / 'figures' / exp_name_str / model_name
             if not fig_save_path.exists():
                 fig_save_path.mkdir(parents=True, exist_ok=True)
-            plt.savefig((fig_save_path / (model_name + '_' + exp_name + '_participant_'+ str(participant_number)+'_localization.' + save_type)).as_posix(), dpi=300)
+            plt.savefig((fig_save_path / (model_name + '_' + exp_name + '_participant_' + str(participant_number)+'_localization.' + save_type)).as_posix(), dpi=300)
 
         else:
             plt.show()

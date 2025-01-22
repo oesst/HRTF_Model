@@ -135,9 +135,10 @@ def create_data(
                 # filter the signal
                 signal_elevs = sp.filtfilt(hrir_elevs, 1, signal)
                 # add noise to the signal
+                std = np.abs(signal_elevs).max()
 
                 # this should be the correct way to add noise
-                # signal_elevs = (1 - snr) * signal_elevs + snr * np.random.normal(0, 0.1, signal_elevs.shape[0])
+                signal_elevs = (1 - snr) * signal_elevs + snr * np.random.normal(0, std, signal_elevs.shape[0])
 
                 # fig, axes = plt.subplots(3, 1)
                 # fig.suptitle(f"Participant: {participant_number} Sound: {SOUND_FILES[i].name}, Elevation: {i_elevs}")
@@ -164,7 +165,10 @@ def create_data(
                 # filter the signal
                 signal_elevs_c = sp.filtfilt(hrir_elevs, 1, signal)
                 # add noise to the signal
-                # signal_elevs_c = (1 - snr) * signal_elevs_c + (snr * np.random.normal(0, 0.1, signal_elevs_c.shape[0]))
+                std = np.abs(signal_elevs_c).max()
+                # add noise to the signal
+                std = np.abs(signal_elevs_c).max()
+                signal_elevs_c = (1 - snr) * signal_elevs_c + (snr * np.random.normal(0, std, signal_elevs_c.shape[0]))
 
                 # Default gammatone-based spectrogram parameters
                 time_window = 0.1
@@ -179,15 +183,16 @@ def create_data(
 
                 y = np.mean(y, axis=1)
                 y = 20 * np.log10(y + np.finfo(np.float32).eps)
-                print(np.max(np.abs(y)))
                 # add noise here
                 std_noise = np.max(np.abs(y)) / 50
-                psd_all_i[i, i_elevs, :] = ((1 - snr) * y + snr * np.random.normal(0, std_noise, y.shape[0]))/2
+                # psd_all_i[i, i_elevs, :] = ((1 - snr) * y + snr * np.random.normal(0, std_noise, y.shape[0]))
+                psd_all_i[i, i_elevs, :] = y
                 # contralateral side
                 y = gtgram.gtgram(signal_elevs_c, fs, twin, thop, freq_bands, fmin, max_freq)
                 y = np.mean(y, axis=1)
                 y = 20 * np.log10(y + np.finfo(np.float32).eps)
-                psd_all_c[i, i_elevs, :] = ((1 - snr) * y + snr * np.random.normal(0, std_noise, y.shape[0]))/2
+                # psd_all_c[i, i_elevs, :] = ((1 - snr) * y + snr * np.random.normal(0, std_noise, y.shape[0]))
+                psd_all_c[i, i_elevs, :] = y
                 #################################################
                 # fig, axes = plt.subplots(2, 1)
                 # fig.suptitle(f"Participant: {participant_number} Sound: {SOUND_FILES[i].name}, Elevation: {i_elevs}")
