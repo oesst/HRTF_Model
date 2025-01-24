@@ -30,35 +30,35 @@ def process_inputs(
     )
 
     # incorporate prior information by dividing it, separately for ipsi and contra lateral ear
-    psd_mono_c_mean = psd_mono_c / np.transpose(
+    psd_mono_c_mean = psd_mono_c - np.transpose(
         np.tile(np.mean(psd_mono_c, axis=1), [psd_mono_c.shape[1], 1, 1]), [1, 0, 2]
     )
 
-    psd_mono_i_mean = psd_mono_i / np.transpose(
+    psd_mono_i_mean = psd_mono_i - np.transpose(
         np.tile(np.mean(psd_mono_i, axis=1), [psd_mono_i.shape[1], 1, 1]), [1, 0, 2]
     )
 
     # create binaural signal without incorporated prior information
     if ear.find("contra") >= 0:
         psd_binaural = filter_dataset(
-            psd_mono_c / (psd_mono_i), normalization_type=normalization_type, sigma_smoothing=0, sigma_gauss_norm=0
+            psd_mono_c - (psd_mono_i), normalization_type=normalization_type, sigma_smoothing=0, sigma_gauss_norm=0
         )
     else:
         psd_binaural = filter_dataset(
-            psd_mono_i / (psd_mono_c), normalization_type=normalization_type, sigma_smoothing=0, sigma_gauss_norm=0
+            psd_mono_i - (psd_mono_c), normalization_type=normalization_type, sigma_smoothing=0, sigma_gauss_norm=0
         )
 
     # integrate the prior integrating signals and filter
     if ear.find("contra") >= 0:
         psd_binaural_mean = filter_dataset(
-            psd_mono_c_mean / (psd_mono_i_mean),
+            psd_mono_c_mean - (psd_mono_i_mean),
             normalization_type=normalization_type,
             sigma_smoothing=0,
             sigma_gauss_norm=0,
         )
     else:
         psd_binaural_mean = filter_dataset(
-            psd_mono_i_mean / (psd_mono_c_mean),
+            psd_mono_i_mean - (psd_mono_c_mean),
             normalization_type=normalization_type,
             sigma_smoothing=0,
             sigma_gauss_norm=0,
