@@ -13,7 +13,7 @@ from src.features.helpers_vis import LinearReg
 
 
 def process_inputs(
-    psd_all_i, psd_all_c, ear="ipsi", normalization_type="sum_1", sigma_smoothing=0, sigma_gauss_norm=1
+    psd_all_i, psd_all_c, ear="ipsi", normalization_type="l2", sigma_smoothing=0, sigma_gauss_norm=1
 ):
     # Normalize the data set separately
     psd_mono_c = filter_dataset(
@@ -98,7 +98,7 @@ def localize_sound(psd_all, data_to_compare, metric="correlation"):
     return x_test, y_test
 
 
-def filter_dataset(dataset, normalization_type="sum_1", sigma_smoothing=0, sigma_gauss_norm=0):
+def filter_dataset(dataset, normalization_type="l2", sigma_smoothing=0, sigma_gauss_norm=1):
     # applies filter and normalization on dataset. normalization_type can be one of the following: 'sum_1','l2','l1'
     ds = np.copy(dataset)
 
