@@ -68,7 +68,6 @@ def main(save_figs=False, save_type='svg', model_name='single_participant', exp_
                 y_bin, x_bin_mean, y_bin_mean] = pickle.load(f)
 
         # define which elevations should be used
-        print(y_mono.shape)
         x_mono = x_mono[:, elevations, :]
         y_mono = y_mono[:, elevations]
         x_mono_mean = x_mono_mean[:, elevations, :]
@@ -121,7 +120,8 @@ def main(save_figs=False, save_type='svg', model_name='single_participant', exp_
             fig_save_path = ROOT / 'reports' / 'figures' / exp_name_str / model_name
             if not fig_save_path.exists():
                 fig_save_path.mkdir(parents=True, exist_ok=True)
-            plt.savefig((fig_save_path / (model_name + '_' + exp_name + '_participant_' + str(participant_number)+'_localization.' + save_type)).as_posix(), dpi=300)
+            file_name = f"MODEL_{model_name}_{exp_name}_participant_{participant_number}_localization.{save_type}"
+            plt.savefig((fig_save_path / file_name).as_posix(), dpi=300)
 
         else:
             plt.show()

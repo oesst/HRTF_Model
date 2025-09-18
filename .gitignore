@@ -10,6 +10,8 @@ __pycache__/
 
 reports
 
+
+
 # Distribution / packaging
 .Python
 env/
@@ -83,6 +85,10 @@ target/
 # exclude data from source control by default
 /data/processed*
 /models/
+data/SO_FAR_USED
+data/OLD
+data/OLD_Noise/processed*
+*.npy
 *.svg
 *.pdf
 

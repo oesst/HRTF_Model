@@ -133,7 +133,7 @@ def main(
                 x_test = np.copy(x_mono_motion[i_par])
                 y_test = np.copy(y_mono_motion[i_par])
 
-                x_test, y_test = hp_vis.scale_v(x_test, y_test, len(elevations))
+                x_test, y_test = hp_vis.scale_v(x_test, y_test, x_test.shape[0])
 
                 x_test = np.reshape(x_test, (x_test.shape[0] * x_test.shape[1], 2))
                 y_test = np.reshape(y_test, (y_test.shape[0] * y_test.shape[1]))
@@ -150,7 +150,7 @@ def main(
             xs = xs.flatten()
             ys = ys.flatten()
 
-            d = {"line_number": xs, "user_estimate": ys, "condition": "mono"}
+            d = {"line_number": xs, "user_estimate": ys, "condition": "mono", "user_id": i_par}
             df = pd.DataFrame(data=d)
             dfs_mono_motion.append(df)
 
@@ -160,7 +160,7 @@ def main(
                 x_test = np.copy(x_bin_motion[i_par])
                 y_test = np.copy(y_bin_motion[i_par])
 
-                x_test, y_test = hp_vis.scale_v(x_test, y_test, len(elevations))
+                x_test, y_test = hp_vis.scale_v(x_test, y_test, x_test.shape[0])
 
                 x_test = np.reshape(x_test, (x_test.shape[0] * x_test.shape[1], 2))
                 y_test = np.reshape(y_test, (y_test.shape[0] * y_test.shape[1]))
@@ -177,7 +177,7 @@ def main(
             xs = xs.flatten()
             ys = ys.flatten()
 
-            d = {"line_number": xs, "user_estimate": ys, "condition": "mono"}
+            d = {"line_number": xs, "user_estimate": ys, "condition": "mono", "user_id": i_par}
             df = pd.DataFrame(data=d)
             dfs_bin_motion.append(df)
 
@@ -227,28 +227,28 @@ def main(
             y_bin_motion, (y_bin_motion.shape[0] * y_bin_motion.shape[1], y_bin_motion.shape[2])
         )
 
-        hp_vis.plot_localization_result(
-            x_mono_motion_,
-            y_mono_motion_,
-            ax2,
-            SOUND_FILES,
-            scale_values=False,
-            linear_reg=True,
-            disp_values=True,
-            scatter_data=False,
-            reg_color="black",
-        )
-        hp_vis.plot_localization_result(
-            x_bin_motion_,
-            y_bin_motion_,
-            ax3,
-            SOUND_FILES,
-            scale_values=False,
-            linear_reg=True,
-            disp_values=True,
-            scatter_data=False,
-            reg_color="black",
-        )
+        # hp_vis.plot_localization_result(
+        #     x_mono_motion_,
+        #     y_mono_motion_,
+        #     ax2,
+        #     SOUND_FILES,
+        #     scale_values=False,
+        #     linear_reg=True,
+        #     disp_values=True,
+        #     scatter_data=False,
+        #     reg_color="black",
+        # )
+        # hp_vis.plot_localization_result(
+        #     x_bin_motion_,
+        #     y_bin_motion_,
+        #     ax3,
+        #     SOUND_FILES,
+        #     scale_values=False,
+        #     linear_reg=True,
+        #     disp_values=True,
+        #     scatter_data=False,
+        #     reg_color="black",
+        # )
 
         dfs_mono_motion_all = pd.concat(dfs_mono_motion)
         dfs_bin_motion_all = pd.concat(dfs_bin_motion)

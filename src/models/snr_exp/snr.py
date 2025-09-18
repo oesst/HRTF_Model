@@ -57,10 +57,10 @@ def main(model_name='snr_experiment', exp_name='default', azimuth=12, freq_bands
 
     elevations = np.arange(0, elevations, 1)
 
-    snrs = np.arange(0.0, 1.1, 0.1)
+    snrs = np.arange(0.0, 1.05, 0.05)
 
-    #snrs = snrs[::-1]
-    #participant_numbers = participant_numbers[::-1]
+    # snrs = snrs[::-1]
+    # participant_numbers = participant_numbers[::-1]
 
     ########################################################################
     ########################################################################

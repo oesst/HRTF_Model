@@ -12,6 +12,8 @@ from scipy import io
 import scipy.signal as sp
 from src.features import gtgram
 import sounddevice as sd
+from src.features import helpers_vis as hp_vis
+
 
 import matplotlib.pyplot as plt
 
@@ -19,10 +21,11 @@ ROOT = Path(__file__).resolve().parents[2]
 # set the path to the sound files
 SOUND_FILES = ROOT / "data/raw/sound_samples/"
 # create a list of the sound files
-SOUND_FILES = list(SOUND_FILES.glob("**/*.wav"))
+SOUND_FILES = np.sort(list(SOUND_FILES.glob("**/*.wav")))
 
 # Define up to which frequency the data should be generated
 
+print(SOUND_FILES)
 
 def create_data(
     freq_bands=24,
@@ -111,6 +114,9 @@ def create_data(
         logging.info(path_data_l)
         return np.load(path_data_r), np.load(path_data_l)
     else:
+
+        # create path first
+        path_data_r.parent.mkdir(parents=True, exist_ok=True)
         logging.info("Creating data set : " + str_l)
         # read the HRIR data
         hrtf_path = (ROOT / "data/raw/hrtfs/hrir_{0:03d}.mat".format(participant_number)).resolve()
@@ -124,6 +130,10 @@ def create_data(
         # use always all elevations -> 50
         psd_all_i = np.zeros((len(SOUND_FILES), 25, freq_bands))
         psd_all_c = np.zeros((len(SOUND_FILES), 25, freq_bands))
+        signal_all = np.zeros((len(SOUND_FILES), 25, freq_bands))
+
+        formatter = hp_vis.ERBFormatter(0, 44100/2, unit='Hz', places=0)
+
         for i in range(0, psd_all_i.shape[0]):
             logging.info("Creating dataset for sound: " + SOUND_FILES[i].name)
             for i_elevs in range(psd_all_i.shape[1]):
@@ -146,7 +156,7 @@ def create_data(
                 # ax.plot(signal)
 
                 # ax = axes[1]
-                # ax.plot(noise)
+                # ax.specgram(signal, NFFT=256, Fs=44100, noverlap=128)
 
                 # ax = axes[2]
                 # ax.specgram(signal_elevs, NFFT=256, Fs=44100, noverlap=128)
@@ -177,6 +187,12 @@ def create_data(
                 fmin = 100
                 fs = 44100
 
+                y = gtgram.gtgram(signal, fs, twin, thop, freq_bands, fmin, max_freq)
+
+                y = np.mean(y, axis=1)
+                y = 20 * np.log10(y + np.finfo(np.float32).eps)
+                signal_all[i, i_elevs, :] = y
+
                 ###### Apply Gammatone Filter Bank ##############
                 # ipsi side
                 y = gtgram.gtgram(signal_elevs, fs, twin, thop, freq_bands, fmin, max_freq)
@@ -184,23 +200,51 @@ def create_data(
                 y = np.mean(y, axis=1)
                 y = 20 * np.log10(y + np.finfo(np.float32).eps)
                 # add noise here
-                std_noise = np.max(np.abs(y)) / 50
                 # psd_all_i[i, i_elevs, :] = ((1 - snr) * y + snr * np.random.normal(0, std_noise, y.shape[0]))
                 psd_all_i[i, i_elevs, :] = y
                 # contralateral side
                 y = gtgram.gtgram(signal_elevs_c, fs, twin, thop, freq_bands, fmin, max_freq)
+
+                # fig, ax = plt.subplots(1, 1)
+
+                # ax.yaxis.set_major_formatter(formatter)
+
+                # Z = np.flipud(20 * np.log10(y))
+
+                # img = ax.imshow(Z, extent=[0, len(signal)/fs, 1, 0], aspect='auto')
+                # # ax.imshow(y, aspect="auto")
+                # plt.show()
+
                 y = np.mean(y, axis=1)
                 y = 20 * np.log10(y + np.finfo(np.float32).eps)
                 # psd_all_c[i, i_elevs, :] = ((1 - snr) * y + snr * np.random.normal(0, std_noise, y.shape[0]))
                 psd_all_c[i, i_elevs, :] = y
                 #################################################
-                # fig, axes = plt.subplots(2, 1)
-                # fig.suptitle(f"Participant: {participant_number} Sound: {SOUND_FILES[i].name}, Elevation: {i_elevs}")
-                # ax = axes[0]
-                # ax.plot(psd_all_i[i, i_elevs, :])
-                # ax = axes[1]
-                # ax.plot(psd_all_c[i, i_elevs, :])
-                # plt.show()
+            fig, axes = plt.subplots(3, 1)
+            fig.suptitle(f"Participant: {participant_number} Sound: {SOUND_FILES[i].name}, Elevation: {i_elevs}")
+            ax = axes[0]
+            ax.xaxis.set_major_formatter(formatter)
+
+            ax.imshow(signal_all[i, :, :], extent=[0, 1, 0, freq_bands], aspect="auto")
+            ax.set_title("Original Sound")
+            ax.set_xlabel("Frequency Bands")
+            ax.set_ylabel("Elevation")
+            # set correct frequency bandas as xtick labels
+            print(formatter)
+
+            ax = axes[1]
+            ax.imshow(psd_all_i[i, :, :], aspect="auto")
+            ax.set_title("Left Ear")
+            ax.set_ylabel("Elevation")
+            ax.set_xlabel("Frequency Bands")
+
+            ax = axes[2]
+            ax.imshow(psd_all_c[i, :, :], aspect="auto")
+            ax.set_title("Right Ear")
+            ax.set_ylabel("Elevation")
+            ax.set_xlabel("Frequency Bands")
+
+            plt.show()
 
         np.save(path_data_r.absolute(), psd_all_c)
         np.save(path_data_l.absolute(), psd_all_i)
@@ -284,6 +328,8 @@ def main():
         ]
     )
 
+    participant_numbers = np.array([40])
+
     # define max frequency for gammatone filter bank
     max_freqs = np.array([20000])
 
@@ -296,13 +342,19 @@ def main():
 
     # walk over all parameter combinations
     for _, participant_number in enumerate(participant_numbers):
-        for _, snr in enumerate(snrs):
-            for _, freq_bands in enumerate(freq_bandss):
-                for _, azimuth in enumerate(azimuths):
-                    for _, max_freq in enumerate(max_freqs):
-                        psd_all_c, psd_all_i = create_data(
-                            freq_bands, participant_number, snr, normalize, azimuth, time_window, max_freq=max_freq
-                        )
+        psd_all_c, psd_all_i = create_data(
+            128, participant_number, 0.0, normalize, 12, time_window, max_freq=20000
+        )
+
+    # # walk over all parameter combinations
+    # for _, participant_number in enumerate(participant_numbers):
+    #     for _, snr in enumerate(snrs):
+    #         for _, freq_bands in enumerate(freq_bandss):
+    #             for _, azimuth in enumerate(azimuths):
+    #                 for _, max_freq in enumerate(max_freqs):
+    #                     psd_all_c, psd_all_i = create_data(
+    #                         freq_bands, participant_number, snr, normalize, azimuth, time_window, max_freq=max_freq
+    #                     )
 
 
 if __name__ == "__main__":

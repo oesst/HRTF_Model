@@ -56,8 +56,8 @@ def main(model_name='parameter_sweep', exp_name='default', azimuth=12, snr=0.2, 
 
     elevations = np.arange(0, elevations, 1)
 
-    sigma_smoothing_vals = np.arange(1, 3.0, 0.1)
-    sigma_gauss_norm_vals = np.arange(1, 3.0, 0.1)
+    sigma_smoothing_vals = np.arange(0, 3.0, 0.1)
+    sigma_gauss_norm_vals = np.arange(0, 3.0, 0.1)
     ########################################################################
     ########################################################################
 

@@ -22,16 +22,16 @@ SOUND_FILES = list(SOUND_FILES.glob('**/*.wav'))
 @click.option('--save_figs', type=click.BOOL, default=False, help='Save figures')
 @click.option('--save_type', default='svg', help='Define the format figures are saved.')
 @click.option('--model_name', default='hrtf_creation', help='Defines the model name.')
-@click.option('--exp_name', default='single_participant_default', help='Defines the experiment name')
+@click.option('--exp_name', default='hrtf_test', help='Defines the experiment name')
 @click.option('--azimuth', default=12, help='Azimuth for which localization is done. Default is 12')
 @click.option('--participant_number', default=9, help='CIPIC participant number. Default is 9')
-@click.option('--snr', default=0.2, help='Signal to noise ration to use. Default is 0.2')
+@click.option('--snr', default=0.0, help='Signal to noise ration to use. Default is 0.2')
 @click.option('--freq_bands', default=128, help='Amount of frequency bands to use. Default is 128')
 @click.option('--max_freq', default=20000, help='Max frequency to use. Default is 20000')
 @click.option('--elevations', default=25, help='Number of elevations to use 0-n. Default is 25 which equals 0-90 deg')
 @click.option('--mean_subtracted_map', default=True, help='Should the learned map be mean subtracted. Default is True')
 @click.option('--ear', default='contra', help='Which ear should be used, contra or ipsi. Default is contra')
-@click.option('--normalization_type', default='sum_1', help='Which normalization type should be used sum_1, l1, l2. Default is sum_1')
+@click.option('--normalization_type', default='l2', help='Which normalization type should be used sum_1, l1, l2. Default is sum_1')
 @click.option('--sigma_smoothing', default=0, help='Sigma for smoothing kernel. 0 is off. Default is 0.')
 @click.option('--sigma_gauss_norm', default=1, help='Sigma for gauss normalization. 0 is off. Default is 1.')
 def main(save_figs=False, save_type='svg', model_name='hrtf_creation', exp_name='single_participant', azimuth=12, participant_number=9, snr=0.2, freq_bands=24, max_freq=20000, elevations=25, mean_subtracted_map=True, ear='ipsi', normalization_type='sum_1', sigma_smoothing=0, sigma_gauss_norm=1):
@@ -69,17 +69,16 @@ def main(save_figs=False, save_type='svg', model_name='hrtf_creation', exp_name=
             logger.info('Reading model data from file')
             [hrtfs_i, hrtfs_c, freqs] = pickle.load(f)
 
-        fig = plt.figure(figsize=(20, 5))
+        fig = plt.figure(figsize=(20, 15))
         plt.suptitle('Participant: ' + str(participant_number))
 
         # make sure we plot the correct range of elevations
-        end_el = -45  + 5.625*(len(elevations)-1)
+        end_el = -45 + 5.625*(len(elevations)-1)
 
         # Monoaural Data (Ipsilateral), No Mean Subtracted
-        ax = fig.add_subplot(1, 2, 1)
+        ax = fig.add_subplot(2, 2, 1)
         # a = ax.pcolormesh(np.squeeze(hrtfs_i[:,:-5]))
         data = hrtfs_i[:, 5:]
-        print(data.shape)
         a = ax.pcolormesh(np.linspace(0, 1, data.shape[1]), np.linspace(-45, end_el, data.shape[0]),
                           data, shading='gouraud', linewidth=0, rasterized=True)
 
@@ -92,7 +91,7 @@ def main(save_figs=False, save_type='svg', model_name='hrtf_creation', exp_name=
         ax.set_xlabel('Frequency [Hz]')
         ax.set_ylabel('Elevations [deg]')
 
-        ax = fig.add_subplot(1, 2, 2)
+        ax = fig.add_subplot(2, 2, 2)
         data = hrtfs_c[:, 5:]
 
         a = ax.pcolormesh(np.linspace(0, 1, data.shape[1]), np.linspace(-45, end_el, data.shape[0]),
@@ -107,18 +106,51 @@ def main(save_figs=False, save_type='svg', model_name='hrtf_creation', exp_name=
         cbar.ax.get_yaxis().labelpad = 20
         cbar.set_label('Decibels [dB]', rotation=270)
 
+        separating_factor = 2.5
+
+        # Monoaural Data (Ipsilateral), No Mean Subtracted
+        ax = fig.add_subplot(2, 2, 3)
+        # a = ax.pcolormesh(np.squeeze(hrtfs_i[:,:-5]))
+        data = hrtfs_i[:, 5:]
+        # plot the data as lines instead of pixels
+        for i in range(data.shape[0]):
+            ax.plot(np.linspace(0, 1, data.shape[1]), data[i, :]+i*separating_factor, label=str(-45 + 5.625 * i) + ' deg')
+
+        # a = ax.pcolormesh(np.linspace(0, 1, data.shape[1]), np.linspace(-45, end_el, data.shape[0]),
+        #                   data, shading='gouraud', linewidth=0, rasterized=True)
+
+        ax.set_title('Ipsilateral')
+        ax.set_xlabel('Frequency [Hz]')
+        ax.set_ylabel('Elevations [deg]')
+
+        # Monoaural Data (Ipsilateral), No Mean Subtracted
+        ax = fig.add_subplot(2, 2, 4)
+        # a = ax.pcolormesh(np.squeeze(hrtfs_i[:,:-5]))
+        data = hrtfs_c[:, 5:]
+        # plot the data as lines instead of pixels
+        for i in range(data.shape[0]):
+            ax.plot(np.linspace(0, 1, data.shape[1]), data[i, :]+i*separating_factor, label=str(-45 + 5.625 * i) + ' deg')
+
+        # a = ax.pcolormesh(np.linspace(0, 1, data.shape[1]), np.linspace(-45, end_el, data.shape[0]),
+        #                   data, shading='gouraud', linewidth=0, rasterized=True)
+
+        ax.set_title('Contralateral')
+        ax.set_xlabel('Frequency [Hz]')
+        ax.set_ylabel('Elevations [deg]')
 
         if save_figs:
             exp_name_str = hp.create_exp_name([exp_name, normalization_type, sigma_smoothing, sigma_gauss_norm, mean_subtracted_map, time_window, int(
-            snr * 100), freq_bands, max_freq, (azimuth - 12) * 10, normalize, len(elevations), ear])
+                snr * 100), freq_bands, max_freq, (azimuth - 12) * 10, normalize, len(elevations), ear])
             fig_save_path = ROOT / 'reports' / 'figures' / exp_name_str / model_name
             if not fig_save_path.exists():
                 fig_save_path.mkdir(parents=True, exist_ok=True)
             logger.info('Saving figures to ' + fig_save_path.as_posix())
-            plt.savefig((fig_save_path / (model_name + '_' + exp_name + '_'+str(participant_number)+ '_raw_hrtfs.' + save_type)).as_posix(), dpi=300, transparent=True)
+            plt.tight_layout()
+            plt.savefig((fig_save_path / (model_name + '_' + exp_name + '_'+str(participant_number) + '_raw_hrtfs.' + save_type)).as_posix(), dpi=300, transparent=True)
             plt.close()
 
         else:
+            plt.tight_layout()
             plt.show()
 
     else:

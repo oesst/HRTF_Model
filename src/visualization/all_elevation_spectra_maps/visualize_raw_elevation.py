@@ -18,18 +18,18 @@ ROOT = Path(__file__).resolve().parents[3]
 
 SOUND_FILES = ROOT / "data/raw/sound_samples/"
 # create a list of the sound files
-SOUND_FILES = list(SOUND_FILES.glob("**/*.wav"))
+SOUND_FILES = np.sort(list(SOUND_FILES.glob("**/*.wav")))
 
 # Define whether figures should be saved
 @click.command()
 # @click.option('--save_figs', default=False, help='Save the figures.')
 @click.option("--save_figs", type=click.BOOL, default=False, help="Save figures")
 @click.option("--save_type", default="svg", help="Define the format figures are saved.")
-@click.option("--model_name", default="single_participant", help="Defines the model name.")
-@click.option("--exp_name", default="single_participant_default", help="Defines the experiment name")
+@click.option("--model_name", default="elevation_spectra_maps", help="Defines the model name.")
+@click.option("--exp_name", default="test", help="Defines the experiment name")
 @click.option("--azimuth", default=12, help="Azimuth for which localization is done. Default is 12")
-@click.option("--participant_numbers", help="CIPIC participant number. Default is None")
-@click.option("--snr", default=0.2, help="Signal to noise ration to use. Default is 0.2")
+@click.option("--participant_numbers", help="CIPIC participant number. Default is None", default="40")
+@click.option("--snr", default=0.0, help="Signal to noise ration to use. Default is 0.2")
 @click.option("--freq_bands", default=128, help="Amount of frequency bands to use. Default is 128")
 @click.option("--max_freq", default=20000, help="Max frequency to use. Default is 20000")
 @click.option("--elevations", default=25, help="Number of elevations to use 0-n. Default is 25 which equals 0-90 deg")
@@ -39,9 +39,9 @@ def main(
     model_name="elevation_spectra_maps",
     exp_name="unfiltered",
     azimuth=12,
-    participant_numbers=None,
-    snr=0.2,
-    freq_bands=24,
+    participant_numbers=40,
+    snr=0.0,
+    freq_bands=128,
     max_freq=20000,
     elevations=25,
     clean=False,
@@ -153,10 +153,12 @@ def main(
     ########################################################################
     ########################################################################
 
-    fig_size = (14, 5)
+    fig_size = (15, 9)
     # fig_size = (20, 14)
 
-    formatter = hp_vis.ERBFormatter(20, max_freq, unit="", places=0)
+    formatter = hp_vis.ERBFormatter(20, max_freq, unit="Hz", places=0)
+
+    separator = 4
 
     # check if model results exist already and load
     if exp_path.exists() and exp_file.is_file():
@@ -169,35 +171,97 @@ def main(
 
             for i_sound, sound in enumerate(SOUND_FILES):
                 sound = sound.name.split(".")[0]
+
+                # if not sound.find("crow") >= 0 and not sound.find("geese") >= 0:
+                #     continue
+
                 # IPSI
-                fig, axes = plt.subplots(1, 3, figsize=fig_size, squeeze=False)
+                fig, axes = plt.subplots(2, 4, figsize=(fig_size[0], fig_size[1]), squeeze=False, sharex=False, sharey=False)
 
-                plt.title(sound)
+                fig.suptitle("Participant: " + str(par) + " Sound: " + sound)
 
+                cbar_size = 1
+
+                # First row - mesh plots
                 ax = axes[0, 0]
-                ax.set_title("Sound")
-                g = ax.imshow(np.squeeze(ipsi_maps_no_HRTF[i_par, i_sound]), interpolation='bilinear')
-                cbar = plt.colorbar(g, ax=ax, pad=-0.0)
-                cbar.set_label('Amplitude')
+                ax.set_title("Sound (mesh)")
+                ax.xaxis.set_major_formatter(formatter)
+                g = ax.imshow(np.squeeze(ipsi_maps_no_HRTF[i_par, i_sound]), extent=[0, 1, 0, elevations], interpolation='bilinear', aspect='auto')
+                # cbar = plt.colorbar(g, ax=ax, pad=0.01, shrink=cbar_size)
+                # ax.set_xlabel("Frequency [Hz]")
+                ax.set_ylabel("Elevation")
+
+                # Second row - line plots
+                ax = axes[1, 0]
+                # ax.set_title("Sound (lines)")
+                ax.xaxis.set_major_formatter(formatter)
+                for i in range(ipsi_maps_no_HRTF[i_par, i_sound].shape[0]):
+                    data = ipsi_maps_no_HRTF[i_par, i_sound][i, :]
+                    ax.plot(np.linspace(0, 1, len(data)), data+i*separator, label=str(i))
                 ax.set_xlabel("Frequency [Hz]")
                 ax.set_ylabel("Energy [au]")
 
+                # First row - Ipsi mesh
                 ax = axes[0, 1]
-                ax.set_title("Ipsi")
-                g = ax.imshow(np.squeeze(ipsi_maps[i_par, i_sound]), interpolation='bilinear')
-                cbar = plt.colorbar(g, ax=ax, pad=-0.0)
-                cbar.set_label('Amplitude')
-                ax.set_xlabel("Frequency [Hz]")
-                ax.set_ylabel("Energy [au]")
+                ax.set_title("Ipsi (mesh)")
+                ax.xaxis.set_major_formatter(formatter)
+                g = ax.imshow(np.squeeze(ipsi_maps[i_par, i_sound]), extent=[0, 1, 0, elevations], interpolation='bilinear', aspect='auto')
+                # cbar = plt.colorbar(g, ax=ax, pad=0.01, shrink=cbar_size)
+                # ax.set_xlabel("Frequency [Hz]")
+                # ax.set_ylabel("Elevation")
 
-                ax = axes[0, 2]
-                ax.set_title("Contra")
-                g = ax.imshow(np.squeeze(contra_maps[i_par, i_sound]), interpolation='bilinear')
-                cbar = plt.colorbar(g, ax=ax, pad=-0.0)
-                cbar.set_label('Amplitude')
+                # Second row - Ipsi lines
+                ax = axes[1, 1]
+                # ax.set_title("Ipsi (lines)")
+                ax.xaxis.set_major_formatter(formatter)
+                for i in range(ipsi_maps[i_par, i_sound].shape[0]):
+                    data = ipsi_maps[i_par, i_sound][i, :]
+                    ax.plot(np.linspace(0, 1, len(data)), data+i*separator, label=str(i))
                 ax.set_xlabel("Frequency [Hz]")
-                ax.set_ylabel("Energy [au]")
-                plt.tight_layout()
+                # ax.set_ylabel("Energy [au]")
+
+                # First row - Contra mesh
+                ax = axes[0, 2]
+                ax.set_title("Contra (mesh)")
+                ax.xaxis.set_major_formatter(formatter)
+                g = ax.imshow(np.squeeze(contra_maps[i_par, i_sound]), extent=[0, 1, 0, elevations], interpolation='bilinear', aspect='auto')
+                # cbar = plt.colorbar(g, ax=ax, pad=0.01, shrink=cbar_size)
+                # ax.set_xlabel("Frequency [Hz]")
+                # ax.set_ylabel("Elevation")
+
+                # Second row - Contra lines
+                ax = axes[1, 2]
+                # ax.set_title("Contra (lines)")
+                ax.xaxis.set_major_formatter(formatter)
+                for i in range(contra_maps[i_par, i_sound].shape[0]):
+                    data = contra_maps[i_par, i_sound][i, :]
+                    ax.plot(np.linspace(0, 1, len(data)), data+i*separator, label=str(i))
+                ax.set_xlabel("Frequency [Hz]")
+                # ax.set_ylabel("Energy [au]")
+
+                # First row - Integrated mesh
+                ax = axes[0, 3]
+                ax.set_title("Integrated (mesh)")
+                ax.xaxis.set_major_formatter(formatter)
+                g = ax.imshow(np.squeeze(contra_maps[i_par, i_sound])/np.squeeze(ipsi_maps[i_par, i_sound]), extent=[0, 1, 0, elevations], interpolation='bilinear', aspect='auto')
+                cbar = plt.colorbar(g, ax=ax, pad=0.01, shrink=cbar_size)
+                cbar.set_label('Energy [au]')
+                # ax.set_xlabel("Frequency [Hz]")
+                # ax.set_ylabel("Elevation")
+
+                # Second row - Integrated lines
+                ax = axes[1, 3]
+                # ax.set_title("Integrated (lines)")
+                ax.xaxis.set_major_formatter(formatter)
+                for i in range(contra_maps[i_par, i_sound].shape[0]):
+                    data = (contra_maps[i_par, i_sound][i, :]/ipsi_maps[i_par, i_sound][i, :])
+                    ax.plot(np.linspace(0, 1, len(data)), data+i*separator*0.01, label=str(i))
+
+                ax.set_xlabel("Frequency [Hz]")
+                # ax.set_ylabel("Energy [au]")
+
+                # plt.tight_layout()
+
                 if save_figs:
 
                     exp_name_str = hp.create_exp_name(
@@ -219,16 +283,14 @@ def main(
                         / exp_name_str
                         / model_name
                         / ("participant_" + str(par))
-                        / str(sound)
                     )
+
                     if not fig_save_path.exists():
                         fig_save_path.mkdir(parents=True, exist_ok=True)
                     path_final = (
                         fig_save_path
                         / (
-                            model_name
-                            + "_"
-                            + exp_name
+                            exp_name
                             + "_raw_maps_ipsi_"
                             + str(sound)
                             + "_"
@@ -238,6 +300,7 @@ def main(
                         )
                     ).as_posix()
                     plt.savefig(path_final, dpi=300, transparent=True)
+
                     logger.info("Writing File :" + path_final)
                     plt.close()
                 else:

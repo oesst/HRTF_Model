@@ -103,6 +103,9 @@ def main(
             logger.info("Reading model data from file")
             [x_mono, y_mono, x_mono_mean, y_mono_mean, x_bin, y_bin, x_bin_mean, y_bin_mean] = pickle.load(f)
 
+        # This is a hack to get the same elevations as in the other experiments
+        elevations = np.arange(0, 19, 1)
+
         # define which elevations should be used
         x_mono = x_mono[:, :, elevations, :]
         y_mono = y_mono[:, :, elevations]
@@ -113,12 +116,22 @@ def main(
         x_bin_mean = x_bin_mean[:, :, elevations, :]
         y_bin_mean = y_bin_mean[:, :, elevations]
 
-        fig = plt.figure(figsize=(20, 5))
+        fig = plt.figure(figsize=(15, 15))
         # plt.suptitle('Single Participant')
-        ax1 = fig.add_subplot(1, 4, 1)
-        ax2 = fig.add_subplot(1, 4, 2)
-        ax3 = fig.add_subplot(1, 4, 3)
-        ax4 = fig.add_subplot(1, 4, 4)
+        ax1 = fig.add_subplot(2, 2, 1)
+        ax2 = fig.add_subplot(2, 2, 3)
+        ax3 = fig.add_subplot(2, 2, 2)
+        ax4 = fig.add_subplot(2, 2, 4)
+
+        # # # remove some sounds that are not used
+        # x_mono = x_mono[:, :5, :, :]
+        # y_mono = y_mono[:, :5, :]
+        # x_mono_mean = x_mono_mean[:, :5, :, :]
+        # y_mono_mean = y_mono_mean[:, :5:, :]
+        # x_bin = x_bin[:, :5, :, :]
+        # y_bin = y_bin[:, :5:, :]
+        # x_bin_mean = x_bin_mean[:, :5, :, :]
+        # y_bin_mean = y_bin_mean[:, :5, :]
 
         # Quick & dirty hack....
         dfs_mono = []
@@ -133,7 +146,7 @@ def main(
                 x_test = np.copy(x_mono[i_par])
                 y_test = np.copy(y_mono[i_par])
 
-                x_test, y_test = hp_vis.scale_v(x_test, y_test, len(elevations))
+                x_test, y_test = hp_vis.scale_v(x_test, y_test, x_test.shape[0])
 
                 x_test = np.reshape(x_test, (x_test.shape[0] * x_test.shape[1], 2))
                 y_test = np.reshape(y_test, (y_test.shape[0] * y_test.shape[1]))
@@ -141,7 +154,6 @@ def main(
                 # get the data points, NOT the sound file type
                 x = x_test[x_test[:, 0] == i, 1]
                 y = y_test[x_test[:, 0] == i]
-                # print(x)
                 xs.append(x.flatten())
                 ys.append(y)
 
@@ -150,7 +162,7 @@ def main(
             xs = xs.flatten()
             ys = ys.flatten()
 
-            d = {"line_number": xs, "user_estimate": ys, "condition": "mono"}
+            d = {"line_number": xs, "user_estimate": ys, "condition": "mono", "user_id": i_par}
             df = pd.DataFrame(data=d)
             dfs_mono.append(df)
 
@@ -160,7 +172,7 @@ def main(
                 x_test = np.copy(x_mono_mean[i_par])
                 y_test = np.copy(y_mono_mean[i_par])
 
-                x_test, y_test = hp_vis.scale_v(x_test, y_test, len(elevations))
+                x_test, y_test = hp_vis.scale_v(x_test, y_test, x_test.shape[0])
 
                 x_test = np.reshape(x_test, (x_test.shape[0] * x_test.shape[1], 2))
                 y_test = np.reshape(y_test, (y_test.shape[0] * y_test.shape[1]))
@@ -177,7 +189,7 @@ def main(
             xs = xs.flatten()
             ys = ys.flatten()
 
-            d = {"line_number": xs, "user_estimate": ys, "condition": "mono"}
+            d = {"line_number": xs, "user_estimate": ys, "condition": "mono", "user_id": i_par}
             df = pd.DataFrame(data=d)
             dfs_mono_mean.append(df)
 
@@ -187,7 +199,7 @@ def main(
                 x_test = np.copy(x_bin[i_par])
                 y_test = np.copy(y_bin[i_par])
 
-                x_test, y_test = hp_vis.scale_v(x_test, y_test, len(elevations))
+                x_test, y_test = hp_vis.scale_v(x_test, y_test, x_test.shape[0])
 
                 x_test = np.reshape(x_test, (x_test.shape[0] * x_test.shape[1], 2))
                 y_test = np.reshape(y_test, (y_test.shape[0] * y_test.shape[1]))
@@ -204,7 +216,7 @@ def main(
             xs = xs.flatten()
             ys = ys.flatten()
 
-            d = {"line_number": xs, "user_estimate": ys, "condition": "mono"}
+            d = {"line_number": xs, "user_estimate": ys, "condition": "mono", "user_id": i_par}
             df = pd.DataFrame(data=d)
             dfs_bin.append(df)
 
@@ -214,7 +226,7 @@ def main(
                 x_test = np.copy(x_bin_mean[i_par])
                 y_test = np.copy(y_bin_mean[i_par])
 
-                x_test, y_test = hp_vis.scale_v(x_test, y_test, len(elevations))
+                x_test, y_test = hp_vis.scale_v(x_test, y_test, x_test.shape[0])
 
                 x_test = np.reshape(x_test, (x_test.shape[0] * x_test.shape[1], 2))
                 y_test = np.reshape(y_test, (y_test.shape[0] * y_test.shape[1]))
@@ -231,54 +243,92 @@ def main(
             xs = xs.flatten()
             ys = ys.flatten()
 
-            d = {"line_number": xs, "user_estimate": ys, "condition": "mono"}
+            d = {"line_number": xs, "user_estimate": ys, "condition": "mono", "user_id": i_par}
             df = pd.DataFrame(data=d)
             dfs_bin_mean.append(df)
 
+        lr_results_mono = []
+        lr_results_mono_mean = []
+        lr_results_bin = []
+        lr_results_bin_mean = []
         for i_par in range(x_mono.shape[0]):
 
-            hp_vis.plot_localization_result(
-                x_mono[i_par], y_mono[i_par], ax1, SOUND_FILES, scale_values=True, linear_reg=True, scatter_data=False
-            )
+            # do a linear regression for each participant
+            x_test = np.copy(x_mono[i_par])
+            y_test = np.copy(y_mono[i_par])
+            x_test = np.reshape(x_test, (x_test.shape[0] * x_test.shape[1], 2))
+            y_test = np.reshape(y_test, (y_test.shape[0] * y_test.shape[1]))
+            lr_model = hp_vis.LinearReg(x_test, y_test)
+            [g, b] = lr_model.get_coefficients()
+            s = lr_model.get_score()
+            lr_results_mono.append([g, b, s, y_test.shape[0]])
+            # hp_vis.plot_localization_result(
+            #     x_mono[i_par], y_mono[i_par], ax1, SOUND_FILES, scale_values=True, linear_reg=True, scatter_data=False
+            # )
             ax1.set_title("Monoaural")
             hp_vis.set_axis(ax1, len(elevations))
             ax1.set_ylabel("Estimated Elevation [deg]")
             ax1.set_xlabel("True Elevation [deg]")
 
             # Monoaural Data (Ipsilateral), Mean Subtracted
-            hp_vis.plot_localization_result(
-                x_mono_mean[i_par],
-                y_mono_mean[i_par],
-                ax2,
-                SOUND_FILES,
-                scale_values=True,
-                linear_reg=True,
-                scatter_data=False,
-            )
+            # hp_vis.plot_localization_result(
+            #     x_mono_mean[i_par],
+            #     y_mono_mean[i_par],
+            #     ax2,
+            #     SOUND_FILES,
+            #     scale_values=True,
+            #     linear_reg=True,
+            #     scatter_data=False,
+            # )
+
+            x_test = np.copy(x_mono_mean[i_par])
+            y_test = np.copy(y_mono_mean[i_par])
+            x_test = np.reshape(x_test, (x_test.shape[0] * x_test.shape[1], 2))
+            y_test = np.reshape(y_test, (y_test.shape[0] * y_test.shape[1]))
+            lr_model = hp_vis.LinearReg(x_test, y_test)
+            [g, b] = lr_model.get_coefficients()
+            s = lr_model.get_score()
+            lr_results_mono_mean.append([g, b, s, y_test.shape[0]])
             ax2.set_title("Mono - Prior")
             hp_vis.set_axis(ax2, len(elevations))
             ax2.set_xlabel("True Elevation [deg]")
 
             # Binaural Data (Ipsilateral), No Mean Subtracted
 
-            hp_vis.plot_localization_result(
-                x_bin[i_par], y_bin[i_par], ax3, SOUND_FILES, scale_values=True, linear_reg=True, scatter_data=False
-            )
+            # hp_vis.plot_localization_result(
+            #     x_bin[i_par], y_bin[i_par], ax3, SOUND_FILES, scale_values=True, linear_reg=True, scatter_data=False, disp_values=False
+            # )
+            x_test = np.copy(x_bin[i_par])
+            y_test = np.copy(y_bin[i_par])
+            x_test = np.reshape(x_test, (x_test.shape[0] * x_test.shape[1], 2))
+            y_test = np.reshape(y_test, (y_test.shape[0] * y_test.shape[1]))
+            lr_model = hp_vis.LinearReg(x_test, y_test)
+            [g, b] = lr_model.get_coefficients()
+            s = lr_model.get_score()
+            lr_results_bin.append([g, b, s, y_test.shape[0]])
             ax3.set_title("Binaural")
             hp_vis.set_axis(ax3, len(elevations))
             ax3.set_xlabel("True Elevation [deg]")
 
             # Binaural Data (Ipsilateral), Mean Subtracted
 
-            hp_vis.plot_localization_result(
-                x_bin_mean[i_par],
-                y_bin_mean[i_par],
-                ax4,
-                SOUND_FILES,
-                scale_values=True,
-                linear_reg=True,
-                scatter_data=False,
-            )
+            # hp_vis.plot_localization_result(
+            #     x_bin_mean[i_par],
+            #     y_bin_mean[i_par],
+            #     ax4,
+            #     SOUND_FILES,
+            #     scale_values=True,
+            #     linear_reg=True,
+            #     scatter_data=False,
+            # )
+            x_test = np.copy(x_bin_mean[i_par])
+            y_test = np.copy(y_bin_mean[i_par])
+            x_test = np.reshape(x_test, (x_test.shape[0] * x_test.shape[1], 2))
+            y_test = np.reshape(y_test, (y_test.shape[0] * y_test.shape[1]))
+            lr_model = hp_vis.LinearReg(x_test, y_test)
+            [g, b] = lr_model.get_coefficients()
+            s = lr_model.get_score()
+            lr_results_bin_mean.append([g, b, s, y_test.shape[0]])
             ax4.set_title("Bin - Prior")
             hp_vis.set_axis(ax4, len(elevations))
             ax4.set_xlabel("True Elevation [deg]")
@@ -288,75 +338,119 @@ def main(
         dfs_bin_all = pd.concat(dfs_bin)
         dfs_bin_mean_all = pd.concat(dfs_bin_mean)
 
-        hp_vis.plot_localization_nice(ax1, dfs_mono_all)
+        # hp_vis.plot_localization_nice(ax1, dfs_mono_all)
+        # hp_vis.plot_localization_nice(ax2, dfs_mono_mean_all)
+        # hp_vis.plot_localization_nice(ax3, dfs_bin_all)
+        # hp_vis.plot_localization_nice(ax4, dfs_bin_mean_all)
 
-        hp_vis.plot_localization_nice(ax2, dfs_mono_mean_all)
+        lr_results_mono = np.array(lr_results_mono)
+        lr_results_mono_mean = np.array(lr_results_mono_mean)
+        lr_results_bin = np.array(lr_results_bin)
+        lr_results_bin_mean = np.array(lr_results_bin_mean)
 
-        hp_vis.plot_localization_nice(ax3, dfs_bin_all)
+        hp_vis.plot_linear_mixed_model(dfs_mono_all, ax1, color="C0")
+        hp_vis.make_side_plot(fig, ax1, dfs_mono_all, lr_results_mono, lmm_results=None)
+        hp_vis.plot_linear_mixed_model(dfs_mono_mean_all, ax2, color="C0")
+        hp_vis.make_side_plot(fig, ax2, dfs_mono_mean_all, lr_results_mono, lmm_results=None)
+        hp_vis.plot_linear_mixed_model(dfs_bin_all, ax3, color="C0")
+        hp_vis.make_side_plot(fig, ax3, dfs_bin_all, lr_results_bin, lmm_results=None)
+        hp_vis.plot_linear_mixed_model(dfs_bin_mean_all, ax4, color="C0")
+        hp_vis.make_side_plot(fig, ax4, dfs_bin_mean_all, lr_results_bin_mean, lmm_results=None)
 
-        hp_vis.plot_localization_nice(ax4, dfs_bin_mean_all)
+        # save data, just for now
+        if not (ROOT / "reports" / "data" / exp_name_str / model_name).exists():
+            (ROOT / "reports" / "data" / exp_name_str / model_name).mkdir(parents=True, exist_ok=True)
+        np.savez_compressed(
+            (ROOT / "reports" / "data" / exp_name_str / model_name / (exp_name + "_localization.npz")).as_posix(),
+            lr_results_mono=lr_results_mono,
+            lr_results_mono_mean=lr_results_mono_mean,
+            lr_results_bin=lr_results_bin,
+            lr_results_bin_mean=lr_results_bin_mean,
+        )
+
+        # save the data frames
+        dfs_mono_all.to_csv(
+            (ROOT / "reports" / "data" / exp_name_str / model_name / (exp_name + "_mono.csv")).as_posix(),
+            index=False,
+        )
+        dfs_mono_mean_all.to_csv(
+            (ROOT / "reports" / "data" / exp_name_str / model_name / (exp_name + "_mono_mean.csv")).as_posix(),
+            index=False,
+        )
+        dfs_bin_all.to_csv(
+            (ROOT / "reports" / "data" / exp_name_str / model_name / (exp_name + "_bin.csv")).as_posix(),
+            index=False,
+        )
+        dfs_bin_mean_all.to_csv(
+            (ROOT / "reports" / "data" / exp_name_str / model_name / (exp_name + "_bin_mean.csv")).as_posix(),
+            index=False,
+        )
 
         # plot a common regression line
-        x_mono_ = np.reshape(x_mono, (x_mono.shape[0] * x_mono.shape[1], x_mono.shape[2], x_mono.shape[3]))
-        y_mono_ = np.reshape(y_mono, (y_mono.shape[0] * y_mono.shape[1], y_mono.shape[2]))
+        # x_mono_ = np.reshape(x_mono, (x_mono.shape[0] * x_mono.shape[1], x_mono.shape[2], x_mono.shape[3]))
+        # y_mono_ = np.reshape(y_mono, (y_mono.shape[0] * y_mono.shape[1], y_mono.shape[2]))
 
-        x_mono_mean_ = np.reshape(
-            x_mono_mean, (x_mono_mean.shape[0] * x_mono_mean.shape[1], x_mono_mean.shape[2], x_mono_mean.shape[3])
-        )
-        y_mono_mean_ = np.reshape(y_mono_mean, (y_mono_mean.shape[0] * y_mono_mean.shape[1], y_mono_mean.shape[2]))
+        # x_mono_mean_ = np.reshape(
+        #     x_mono_mean, (x_mono_mean.shape[0] * x_mono_mean.shape[1], x_mono_mean.shape[2], x_mono_mean.shape[3])
+        # )
+        # y_mono_mean_ = np.reshape(y_mono_mean, (y_mono_mean.shape[0] * y_mono_mean.shape[1], y_mono_mean.shape[2]))
 
-        x_bin_ = np.reshape(x_bin, (x_bin.shape[0] * x_bin.shape[1], x_bin.shape[2], x_bin.shape[3]))
-        y_bin_ = np.reshape(y_bin, (y_bin.shape[0] * y_bin.shape[1], y_bin.shape[2]))
+        # x_bin_ = np.reshape(x_bin, (x_bin.shape[0] * x_bin.shape[1], x_bin.shape[2], x_bin.shape[3]))
+        # y_bin_ = np.reshape(y_bin, (y_bin.shape[0] * y_bin.shape[1], y_bin.shape[2]))
 
-        x_bin_mean_ = np.reshape(
-            x_bin_mean, (x_bin_mean.shape[0] * x_bin_mean.shape[1], x_bin_mean.shape[2], x_bin_mean.shape[3])
-        )
-        y_bin_mean_ = np.reshape(y_bin_mean, (y_bin_mean.shape[0] * y_bin_mean.shape[1], y_bin_mean.shape[2]))
+        # x_bin_mean_ = np.reshape(
+        #     x_bin_mean, (x_bin_mean.shape[0] * x_bin_mean.shape[1], x_bin_mean.shape[2], x_bin_mean.shape[3])
+        # )
+        # y_bin_mean_ = np.reshape(y_bin_mean, (y_bin_mean.shape[0] * y_bin_mean.shape[1], y_bin_mean.shape[2]))
 
-        hp_vis.plot_localization_result(
-            x_mono_,
-            y_mono_,
-            ax1,
-            SOUND_FILES,
-            scale_values=False,
-            linear_reg=True,
-            disp_values=True,
-            scatter_data=False,
-            reg_color="black",
-        )
-        hp_vis.plot_localization_result(
-            x_mono_mean_,
-            y_mono_mean_,
-            ax2,
-            SOUND_FILES,
-            scale_values=False,
-            linear_reg=True,
-            disp_values=True,
-            scatter_data=False,
-            reg_color="black",
-        )
-        hp_vis.plot_localization_result(
-            x_bin_,
-            y_bin_,
-            ax3,
-            SOUND_FILES,
-            scale_values=False,
-            linear_reg=True,
-            disp_values=True,
-            scatter_data=False,
-            reg_color="black",
-        )
-        hp_vis.plot_localization_result(
-            x_bin_mean_,
-            y_bin_mean_,
-            ax4,
-            SOUND_FILES,
-            scale_values=False,
-            linear_reg=True,
-            disp_values=True,
-            scatter_data=False,
-            reg_color="black",
-        )
+        # hp_vis.plot_localization_result(
+        #     x_mono_,
+        #     y_mono_,
+        #     ax1,
+        #     SOUND_FILES,
+        #     scale_values=False,
+        #     linear_reg=True,
+        #     disp_values=False,
+        #     scatter_data=False,
+        #     reg_color="black",
+        # )
+        # hp_vis.plot_localization_result(
+        #     x_mono_mean_,
+        #     y_mono_mean_,
+        #     ax2,
+        #     SOUND_FILES,
+        #     scale_values=False,
+        #     linear_reg=True,
+        #     disp_values=False,
+        #     scatter_data=False,
+        #     reg_color="black",
+        # )
+        # hp_vis.plot_localization_result(
+        #     x_bin_,
+        #     y_bin_,
+        #     ax3,
+        #     SOUND_FILES,
+        #     scale_values=False,
+        #     linear_reg=True,
+        #     disp_values=False,
+        #     scatter_data=False,
+        #     reg_color="black",
+        # )
+        # hp_vis.plot_localization_result(
+        #     x_bin_mean_,
+        #     y_bin_mean_,
+        #     ax4,
+        #     SOUND_FILES,
+        #     scale_values=False,
+        #     linear_reg=True,
+        #     disp_values=False,
+        #     scatter_data=False,
+        #     reg_color="black",
+        # )
+
+        ax3.set_ylabel("")
+        ax3.set_xlabel("")
+        ax4.set_ylabel("")
 
         plt.tight_layout()
 

@@ -8,6 +8,7 @@ from src.features import helpers as hp
 # from src.visualization import helpers as hpVis
 import numpy as np
 import pickle
+from scipy.ndimage import gaussian_filter1d
 
 ROOT = Path(__file__).resolve().parents[3]
 
@@ -47,9 +48,9 @@ def main(
     ear="ipsi",
     normalization_type="sum_1",
     sigma_smoothing=0,
-    sigma_gauss_norm=1,
+    sigma_gauss_norm=0,
     clean=False,
-    motion_spread=1,
+    motion_spread=0,
 ):
     """This script takes the filtered data and tries to localize sounds with a learned map
     for all participants.
@@ -187,19 +188,22 @@ def main(
             psd_all_c = psd_all_c[:, elevations, :]
             psd_all_i = psd_all_i[:, elevations, :]
 
+            # filter data and integrate it
+            # psd_mono, psd_mono_mean, psd_binaural, psd_binaural_mean = hp.process_inputs(
+            #     psd_all_i, psd_all_c, ear, normalization_type, sigma_smoothing, sigma_gauss_norm
+            # )
+
             x = np.zeros((len(SOUND_FILES), len(elevations), 2))
             y = np.zeros((len(SOUND_FILES), len(elevations)))
 
             # simulate motion
             for i in range(0 + motion_spread, len(elevations) - motion_spread):
+
                 if ear.find("contra") >= 0:
-                    psd_motion = psd_all_c[:, i, :] / np.mean(
-                        psd_all_c[:, i - motion_spread : i + motion_spread, :], axis=1
-                    )
+                    psd_mono = psd_all_c
                 else:
-                    psd_motion = psd_all_i[:, i, :] / np.mean(
-                        psd_all_i[:, i - motion_spread : i + motion_spread, :], axis=1
-                    )
+                    psd_mono = psd_all_i
+                psd_motion = psd_mono[:, i, :] / gaussian_filter1d(np.mean(psd_mono[:, i - motion_spread: i + motion_spread, :], axis=1), sigma=1, mode="nearest", axis=1)
                 # psd_motion = np.expand_dims(1 / np.max(psd_motion, axis=1), axis=1) * psd_motion
                 psd_motion = psd_motion[:, None, :]  # * 1 / -1
                 # print(psd_motion.max())
@@ -218,25 +222,24 @@ def main(
 
             # simulate motion
             for i in range(0 + motion_spread, len(elevations) - motion_spread):
-                psd_motion_c = psd_all_c[:, i, :] / np.mean(
-                    psd_all_c[:, i - motion_spread : i + motion_spread, :], axis=1
-                )
 
-                psd_motion_i = psd_all_i[:, i, :] / np.mean(
-                    psd_all_i[:, i - motion_spread : i + motion_spread, :], axis=1
-                )
-
-                # psd_motion_c = np.expand_dims(1 / np.sum(psd_motion_c, axis=1), axis=1) * psd_motion_c
-                # psd_motion_i = np.expand_dims(1 / np.sum(psd_motion_i, axis=1), axis=1) * psd_motion_i
+                psd_motion_c = psd_all_c[:, i, :] / gaussian_filter1d(np.mean(psd_all_c[:, i - motion_spread: i + motion_spread, :], axis=1), sigma=1, mode="nearest", axis=1)
+                psd_motion_i = psd_all_i[:, i, :] / gaussian_filter1d(np.mean(psd_all_i[:, i - motion_spread: i + motion_spread, :], axis=1), sigma=1, mode="nearest", axis=1)
 
                 if ear.find("contra") >= 0:
                     psd_motion = psd_motion_c / psd_motion_i
                 else:
                     psd_motion = psd_motion_i / psd_motion_c
 
-                psd_motion = np.expand_dims(1 / np.sum(psd_motion, axis=1), axis=1) * psd_motion
+                # now divide the data by a gaussian convolved version of it (filter it)
+                # psd_motion = psd_motion / ((psd_motion, sigma=sigma_gauss_norm, mode="nearest", axis=1))
 
-                psd_motion = psd_motion[:, None, :] * 1 / -1
+                # psd_motion = np.expand_dims(1 / np.sum(psd_motion, axis=1), axis=1) * psd_motion
+                # psd_motion_i = np.expand_dims(1 / np.sum(psd_motion_i, axis=1), axis=1) * psd_motion_i
+
+                # psd_motion = np.expand_dims(1 / np.sum(psd_motion, axis=1), axis=1) * psd_motion
+
+                psd_motion = psd_motion[:, None, :]
                 # localize the sounds and save the results
                 a, b = hp.localize_sound(psd_motion, learned_map)
                 a[:, :, 1] = i

@@ -114,6 +114,11 @@ def main(
                 freq_bands, par, snr, normalize, azimuth, time_window, max_freq=max_freq, diff_noise=False
             )
 
+            # print type and shape of psd_all_c
+            logger.info(type(psd_all_c))
+            #
+            # print(psd_all_c)
+
             # Take only given elevations
             psd_all_c = psd_all_c[:, elevations, :]
             psd_all_i = psd_all_i[:, elevations, :]
@@ -133,10 +138,6 @@ def main(
             psd_all_c, psd_all_i = generateData.create_data(
                 freq_bands, par, snr, normalize, azimuth, time_window, max_freq=max_freq, diff_noise=True
             )
-
-            # Take only given elevations
-            psd_all_c = psd_all_c[:, elevations, :]
-            psd_all_i = psd_all_i[:, elevations, :]
 
             # filter data and integrate it
             psd_mono, psd_mono_mean, psd_binaural, psd_binaural_mean = hp.process_inputs(
